@@ -210,21 +210,111 @@
 
     // --- TELAS / VIEWS ---
 
-    const AuthScreen = ({ mode, onLogin, onRegister }) => {
-      const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [error, setError] = useState('');
-      const handleSubmit = (e) => { e.preventDefault(); setError(''); if (mode === 'register') { if (pin.length < 4) return setError('Mínimo 4 dígitos'); if (pin !== confirmPin) return setError('PINs não conferem'); if (!name) return setError('Digite seu nome'); onRegister(name, pin); } else { onLogin(pin); } };
+const AuthScreen = ({ mode, onLogin, onRegister }) => {
+      const [localMode, setLocalMode] = useState(mode); // login, register, recover
+      const [name, setName] = useState(''); 
+      const [pin, setPin] = useState(''); 
+      const [confirmPin, setConfirmPin] = useState('');
+      
+      // Novos estados para segurança
+      const [question, setQuestion] = useState('Qual o nome do seu primeiro animal de estimação?');
+      const [answer, setAnswer] = useState('');
+      const [error, setError] = useState('');
+      const [successMsg, setSuccessMsg] = useState('');
+
+      const handleSubmit = async (e) => { 
+          e.preventDefault(); 
+          setError(''); 
+          setSuccessMsg('');
+
+          if (localMode === 'register') { 
+              if (pin.length < 4) return setError('PIN deve ter 4+ dígitos'); 
+              if (pin !== confirmPin) return setError('PINs não conferem'); 
+              if (!name || !answer) return setError('Preencha todos os campos'); 
+              onRegister(name, pin, question, answer); 
+          } 
+          else if (localMode === 'login') { 
+              onLogin(pin); 
+          }
+          else if (localMode === 'recover') {
+              if (!name || !answer || !pin) return setError('Preencha todos os campos');
+              try {
+                  const res = await fetch('/api/auth/reset', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ name, answer, newPin: pin })
+                  });
+                  const data = await res.json();
+                  if (data.success) {
+                      setSuccessMsg('PIN alterado com sucesso! Faça login.');
+                      setTimeout(() => setLocalMode('login'), 2000);
+                  } else {
+                      setError(data.error || 'Erro ao resetar.');
+                  }
+              } catch (err) { setError('Erro de conexão.'); }
+          }
+      };
+
       return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
           <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in">
-            <div className="text-center mb-8 flex flex-col items-center"><div className="mb-4 scale-125"><CustomLogo /></div><h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1><p className="text-slate-400 font-medium">O cofre do seu futuro</p></div>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {mode === 'register' && <div><label className={theme.label}>Seu Nome</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Seu nome" autoFocus /></div>}
-              <div><label className={theme.label}>Código de Acesso</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
-              {mode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
+            <div className="text-center mb-6 flex flex-col items-center"><div className="mb-4 scale-125"><CustomLogo /></div><h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1><p className="text-slate-400 font-medium">O cofre do seu futuro</p></div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              
+              {/* CAMPOS DE REGISTRO OU RECUPERAÇÃO */}
+              {(localMode === 'register' || localMode === 'recover') && (
+                  <div><label className={theme.label}>Seu Nome (Identificação)</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>
+              )}
+
+              {/* PERGUNTA DE SEGURANÇA (REGISTRO) */}
+              {localMode === 'register' && (
+                  <div>
+                      <label className={theme.label}>Pergunta Secreta</label>
+                      <select value={question} onChange={e => setQuestion(e.target.value)} className={theme.input}>
+                          <option>Qual o nome do seu primeiro animal de estimação?</option>
+                          <option>Qual a cidade onde você nasceu?</option>
+                          <option>Qual o nome da sua mãe?</option>
+                          <option>Qual sua comida favorita?</option>
+                      </select>
+                  </div>
+              )}
+
+              {/* RESPOSTA (REGISTRO E RECUPERAÇÃO) */}
+              {(localMode === 'register' || localMode === 'recover') && (
+                  <div><label className={theme.label}>{localMode === 'register' ? 'Sua Resposta' : `Responda: ${question}`}</label><input type="text" value={answer} onChange={e => setAnswer(e.target.value)} className={theme.input} placeholder="Resposta secreta" /></div>
+              )}
+
+              {/* PIN (TODOS OS MODOS) */}
+              <div><label className={theme.label}>{localMode === 'recover' ? 'Novo PIN' : 'Código de Acesso'}</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
+              
+              {/* CONFIRMAR PIN (REGISTRO) */}
+              {localMode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
+              
               {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-2xl border border-rose-500/20 font-medium">{error}</div>}
-              <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Acessar' : 'Iniciar Jornada'}</button>
+              {successMsg && <div className="text-emerald-400 text-sm text-center bg-emerald-500/10 p-3 rounded-2xl border border-emerald-500/20 font-medium">{successMsg}</div>}
+              
+              <button type="submit" className={theme.btnPrimary}>
+                  {localMode === 'login' && 'Acessar'}
+                  {localMode === 'register' && 'Criar Conta'}
+                  {localMode === 'recover' && 'Redefinir PIN'}
+              </button>
             </form>
+
+            {/* BOTÕES DE TROCA DE MODO */}
+            <div className="mt-6 flex justify-center gap-4 text-sm font-medium">
+                {localMode === 'login' && (
+                    <>
+                        <button onClick={() => setLocalMode('recover')} className="text-slate-400 hover:text-white transition-colors">Esqueci meu PIN</button>
+                        <span className="text-slate-600">|</span>
+                        <button onClick={() => setLocalMode('register')} className="text-violet-400 hover:text-violet-300 transition-colors">Criar conta</button>
+                    </>
+                )}
+                {(localMode === 'register' || localMode === 'recover') && (
+                    <button onClick={() => setLocalMode('login')} className="text-slate-400 hover:text-white transition-colors">Voltar para Login</button>
+                )}
+            </div>
           </div>
         </div>
       );
@@ -541,21 +631,23 @@
         }
       }, []);
 
-      const handleRegister = async (name, pin) => { 
+   const handleRegister = async (name, pin, question, answer) => { // <--- Recebe question e answer
           try {
-             const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, pin}) });
+             // Envia tudo para o backend
+             const r = await fetch('/api/auth/register', { 
+                 method: 'POST', 
+                 headers: {'Content-Type': 'application/json'}, 
+                 body: JSON.stringify({name, pin, question, answer}) 
+             });
              const d = await r.json();
-             if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); addToast(`Bem-vindo, ${name}!`); }
+             if(d.success) { 
+                 localStorage.setItem('prospera_user', JSON.stringify(d.user)); 
+                 setUser(d.user); 
+                 setAuthMode('app'); 
+                 fetchAllData(); 
+                 addToast(`Bem-vindo, ${name}!`); 
+             }
           } catch(e) { addToast("Erro ao registrar", "error"); }
-      };
-      
-      const handleLogin = async (pin) => { 
-          try {
-             const r = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({pin}) });
-             const d = await r.json();
-             if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); }
-             else { addToast("PIN Incorreto", "error"); }
-          } catch(e) { addToast("Erro de conexão", "error"); }
       };
 
       // --- CRUD HANDLERS ---
@@ -669,3 +761,4 @@
   </script>
 </body>
 </html>
+
