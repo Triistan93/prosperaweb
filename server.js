@@ -13,22 +13,20 @@ const pool = new Pool({
     `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
 });
 
-// --- CRIAÇÃO AUTOMÁTICA DAS TABELAS ---
+// --- INICIALIZAÇÃO SEGURA (NÃO APAGA DADOS) ---
 const initDB = async () => {
   try {
-// 1. Tabela de Usuários (Simples)
+    // 1. Tabela de Usuários
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         pin VARCHAR(50) NOT NULL,
+        security_question VARCHAR(255),
+        security_answer VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    
-    // --- ADICIONE ESTA LINHA ABAIXO ---
-    // Garante que a coluna PIN exista mesmo se a tabela for antiga
-    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin VARCHAR(50);`);
 
     // 2. Tabela de Transações
     await pool.query(`
@@ -47,7 +45,7 @@ const initDB = async () => {
       );
     `);
 
-    // 3. Tabela de Metas (Goals)
+    // 3. Metas (Goals)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS goals (
         id SERIAL PRIMARY KEY,
@@ -59,7 +57,7 @@ const initDB = async () => {
       );
     `);
 
-    // 4. Tabela de Cartões (Cards)
+    // 4. Cartões (Cards)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS cards (
         id SERIAL PRIMARY KEY,
@@ -72,7 +70,7 @@ const initDB = async () => {
       );
     `);
 
-    // 5. Tabela de Investimentos
+    // 5. Investimentos
     await pool.query(`
       CREATE TABLE IF NOT EXISTS investments (
         id SERIAL PRIMARY KEY,
@@ -84,7 +82,7 @@ const initDB = async () => {
       );
     `);
 
-    // 6. Tabela de Orçamentos (Budgets)
+    // 6. Orçamentos (Budgets)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS budgets (
         id SERIAL PRIMARY KEY,
@@ -94,7 +92,7 @@ const initDB = async () => {
       );
     `);
     
-    console.log("Banco de dados e tabelas inicializados com sucesso!");
+    console.log("Banco de dados conectado e tabelas verificadas.");
   } catch (err) {
     console.error("Erro ao inicializar tabelas:", err);
   }
@@ -112,21 +110,10 @@ app.use(express.static(path.join(__dirname, '/')));
 //               ROTAS DA API
 // ==========================================
 
-// --- USUÁRIOS (AUTH COM RECUPERAÇÃO) ---
-
-// 1. Registro (Agora salva pergunta e resposta)
+// --- USUÁRIOS ---
 app.post('/api/auth/register', async (req, res) => {
   const { name, pin, question, answer } = req.body;
   try {
-    const check = await pool.query('SELECT * FROM users LIMIT 1');
-    if (check.rows.length > 0) {
-        // Atualiza usuário existente com dados de segurança
-        await pool.query(
-            'UPDATE users SET name=$1, pin=$2, security_question=$3, security_answer=$4 WHERE id=$5', 
-            [name, pin, question, answer, check.rows[0].id]
-        );
-        return res.json({ success: true, user: { name, pin } });
-    }
     const result = await pool.query(
         'INSERT INTO users (name, pin, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING *', 
         [name, pin, question, answer]
@@ -135,7 +122,6 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no registro' }); }
 });
 
-// 2. Login (Igual ao anterior)
 app.post('/api/auth/login', async (req, res) => {
   const { pin } = req.body;
   try {
@@ -148,26 +134,21 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no login' }); }
 });
 
-// 3. Recuperação de Senha (NOVA ROTA)
 app.post('/api/auth/reset', async (req, res) => {
   const { name, answer, newPin } = req.body;
   try {
-    // Busca usuário pelo nome e verifica a resposta (Case insensitive para a resposta ficar mais fácil)
     const result = await pool.query(
         'SELECT * FROM users WHERE name = $1 AND LOWER(security_answer) = LOWER($2)', 
         [name, answer]
     );
-
     if (result.rows.length > 0) {
-      // Se acertou, atualiza o PIN
       await pool.query('UPDATE users SET pin = $1 WHERE id = $2', [newPin, result.rows[0].id]);
       res.json({ success: true });
     } else {
-      res.status(401).json({ error: 'Nome ou resposta de segurança incorretos.' });
+      res.status(401).json({ error: 'Dados incorretos.' });
     }
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao resetar senha' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao resetar' }); }
 });
-
 
 // --- TRANSAÇÕES ---
 app.get('/api/transactions', async (req, res) => {
@@ -208,17 +189,12 @@ app.delete('/api/transactions/:id', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar' }); }
 });
 
-
 // --- METAS (GOALS) ---
 app.get('/api/goals', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM goals ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id,
-      name: r.name,
-      target: parseFloat(r.target),
-      current: parseFloat(r.current_amount),
-      color: r.color
+      id: r.id, name: r.name, target: parseFloat(r.target), current: parseFloat(r.current_amount), color: r.color
     }));
     res.json(formatted);
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar metas' }); }
@@ -252,18 +228,12 @@ app.delete('/api/goals/:id', async (req, res) => {
   catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar' }); }
 });
 
-
 // --- CARTÕES (CARDS) ---
 app.get('/api/cards', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM cards ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id,
-      name: r.name,
-      limit: parseFloat(r.limit_amount),
-      used: parseFloat(r.used_amount),
-      dueDay: r.due_day,
-      color: r.color
+      id: r.id, name: r.name, limit: parseFloat(r.limit_amount), used: parseFloat(r.used_amount), dueDay: r.due_day, color: r.color
     }));
     res.json(formatted);
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar cartões' }); }
@@ -297,17 +267,12 @@ app.delete('/api/cards/:id', async (req, res) => {
   catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar cartão' }); }
 });
 
-
 // --- INVESTIMENTOS ---
 app.get('/api/investments', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM investments ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id,
-      name: r.name,
-      type: r.type,
-      value: parseFloat(r.value_amount),
-      returnRate: r.return_rate
+      id: r.id, name: r.name, type: r.type, value: parseFloat(r.value_amount), returnRate: r.return_rate
     }));
     res.json(formatted);
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar investimentos' }); }
@@ -341,15 +306,12 @@ app.delete('/api/investments/:id', async (req, res) => {
   catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar investimento' }); }
 });
 
-
 // --- ORÇAMENTOS (BUDGETS) ---
 app.get('/api/budgets', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM budgets ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id, // O front pode usar isso ou a categoria como chave
-      category: r.category,
-      limit: parseFloat(r.limit_amount)
+      id: r.id, category: r.category, limit: parseFloat(r.limit_amount)
     }));
     res.json(formatted);
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar orçamentos' }); }
@@ -358,7 +320,6 @@ app.get('/api/budgets', async (req, res) => {
 app.post('/api/budgets', async (req, res) => {
   const { category, limit } = req.body;
   try {
-    // Upsert simples: se já existe a categoria, atualiza
     const check = await pool.query('SELECT id FROM budgets WHERE category = $1', [category]);
     if (check.rows.length > 0) {
        await pool.query('UPDATE budgets SET limit_amount = $1 WHERE category = $2', [limit, category]);
@@ -374,7 +335,6 @@ app.post('/api/budgets', async (req, res) => {
 });
 
 app.put('/api/budgets/:category', async (req, res) => {
-  // Nota: o front manda a categoria, que é única
   const { limit } = req.body;
   const { category } = req.params;
   try {
@@ -388,13 +348,12 @@ app.delete('/api/budgets/:category', async (req, res) => {
   catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar orçamento' }); }
 });
 
-
 // --- ROTA FINAL (SPA) ---
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// O '0.0.0.0' é essencial para o Docker/Easypanel enxergar o site
+// Inicia o servidor (0.0.0.0 para Docker)
 app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
