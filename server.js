@@ -16,7 +16,7 @@ const pool = new Pool({
 // --- CRIAÇÃO AUTOMÁTICA DAS TABELAS ---
 const initDB = async () => {
   try {
-    // 1. Tabela de Usuários (Simples)
+// 1. Tabela de Usuários (Simples)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -25,6 +25,10 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    
+    // --- ADICIONE ESTA LINHA ABAIXO ---
+    // Garante que a coluna PIN exista mesmo se a tabela for antiga
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin VARCHAR(50);`);
 
     // 2. Tabela de Transações
     await pool.query(`
