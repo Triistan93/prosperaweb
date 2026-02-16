@@ -626,8 +626,8 @@ const AuthScreen = ({ mode, onLogin, onRegister }) => {
             setUser(JSON.parse(savedUser)); 
             setAuthMode('app'); 
             fetchAllData(); 
-        } else { 
-            setAuthMode('register'); 
+   } else { 
+            setAuthMode('login'); // <--- Mude para 'login'
         }
       }, []);
 
@@ -761,4 +761,5 @@ const AuthScreen = ({ mode, onLogin, onRegister }) => {
   </script>
 </body>
 </html>
+
 
