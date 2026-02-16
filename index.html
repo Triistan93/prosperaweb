@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark"> <head>
+<html lang="pt-BR">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Prospera - Gestão Inteligente</title>
@@ -11,54 +12,86 @@
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { sans: ['Outfit', 'sans-serif'], body: ['Inter', 'sans-serif'] },
-          colors: { background: '#09090b', surface: '#18181b', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4', gold: '#fbbf24' },
-          animation: { 'fade-in': 'fadeIn 0.4s ease-out', 'slide-up': 'slideUp 0.5s ease-out', 'pulse-slow': 'pulse 4s infinite' },
-          keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } } },
-          screens: { 'xs': '375px' }
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            background: '#09090b',
+            surface: '#18181b',
+            primary: '#8b5cf6',
+            secondary: '#ec4899',
+            accent: '#06b6d4',
+            gold: '#fbbf24',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            'slide-in-right': 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shimmer': 'shimmer 2s infinite',
+            'spin-slow': 'spin 3s linear infinite',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+            slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+            shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
+          },
+          screens: {
+            'xs': '375px',
+          }
         }
       }
     }
   </script>
+  
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <script type="importmap">
-    { 
-      "imports": { 
-        "react": "https://esm.sh/react@18.2.0", 
-        "react-dom": "https://esm.sh/react-dom@18.2.0", 
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client", 
-        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom", 
-        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom" 
-      } 
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom": "https://esm.sh/react-dom@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom",
+        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom"
+      }
     }
   </script>
+
   <style>
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #09090b; color: #fff; }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-    
-    /* Efeito de Vidro Profundo (Dark Glass) */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
     .glass {
-      background: rgba(24, 24, 27, 0.6); /* #18181b com opacidade */
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
-    
-    .bg-gradient-animate { 
-        background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%), 
-                    radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%); 
+    .bg-gradient-animate {
+      background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%),
+                  radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%);
     }
-    
-    select { color-scheme: dark; } 
+    select { color-scheme: dark; }
     option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
-    .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); }
-    .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .dark option { background-color: #18181b !important; color: #ffffff !important; }
+    ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    .pt-safe { padding-top: env(safe-area-inset-top); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-[#09090b] text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
+<body class="bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
   <div id="root"></div>
 
   <script type="text/babel" data-type="module">
@@ -67,23 +100,57 @@
     import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line } from 'recharts';
     import { Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save, Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock } from 'lucide-react';
 
-    // CONSTANTES
-    const CATEGORIES = { expense: { 'Moradia': [], 'Alimentação': [], 'Transporte': [], 'Lazer': [], 'Pessoal': [], 'Serviços': [], 'Outros': [] }, income: { 'Salário': [], 'Extra': [] } };
-    const CATEGORY_COLORS = { 'Moradia': '#8b5cf6', 'Alimentação': '#f59e0b', 'Transporte': '#ef4444', 'Lazer': '#06b6d4', 'Pessoal': '#ec4899', 'Serviços': '#6366f1', 'Outros': '#64748b', 'Salário': '#10b981', 'Extra': '#3b82f6' };
-    const PAYMENT_METHODS = [ { id: 'pix', label: 'Pix' }, { id: 'money', label: 'Dinheiro' }, { id: 'debit', label: 'Débito' }, { id: 'credit_card', label: 'Cartão de Crédito' } ];
-    const formatCurrency = (val, hid) => hid ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
-    const formatDate = (s) => { if (!s) return ''; const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
+    // --- DADOS E CONSTANTES ---
+    const getToday = () => new Date();
+    
+    // As constantes de Categoria e Cores permanecem iguais para o visual
+    const CATEGORIES = {
+      expense: {
+        'Moradia': ['Aluguel', 'Condomínio', 'Energia', 'Água', 'Internet', 'Gás', 'Manutenção'],
+        'Alimentação': ['Supermercado', 'Restaurante', 'Delivery', 'Lanches'],
+        'Transporte': ['Combustível', 'Uber', 'Ônibus', 'IPVA'],
+        'Lazer': ['Viagens', 'Cinema', 'Streaming', 'Jogos', 'Assinaturas'],
+        'Pessoal': ['Roupas', 'Estética', 'Academia', 'Farmácia'],
+        'Serviços': ['Seguros', 'Bancos', 'Contador'],
+        'Outros': ['Presentes', 'Imprevistos']
+      },
+      income: {
+        'Salário': ['Mensal', 'Adiantamento', '13º', 'Férias', 'Bônus'],
+        'Extra': ['Freelance', 'Vendas', 'Investimentos'],
+      }
+    };
 
-    // TEMA VISUAL (Forçando Dark Mode Styles)
+    const CATEGORY_COLORS = {
+      'Moradia': '#8b5cf6', 'Alimentação': '#f59e0b', 'Transporte': '#ef4444',
+      'Lazer': '#06b6d4', 'Pessoal': '#ec4899', 'Serviços': '#6366f1',
+      'Outros': '#64748b', 'Salário': '#10b981', 'Extra': '#3b82f6',
+    };
+
+    const PAYMENT_METHODS = [
+      { id: 'pix', label: 'Pix' },
+      { id: 'money', label: 'Dinheiro' },
+      { id: 'debit', label: 'Débito' },
+      { id: 'credit_card', label: 'Cartão de Crédito' },
+    ];
+
+    // --- HELPERS ---
+    const formatCurrency = (value, isHidden) => isHidden ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    };
+
+    // --- DESIGN SYSTEM (Mantido Igual) ---
     const theme = {
-      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 relative overflow-hidden group bg-[#18181b]/60 border border-white/5 text-white",
-      input: "w-full rounded-xl border-0 bg-[#18181b] border border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-500 font-medium text-sm md:text-base shadow-sm",
-      label: "mb-1.5 md:mb-2 block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1",
-      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide w-full cursor-pointer touch-manipulation",
+      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 transition-all hover:border-white/20 dark:hover:border-white/10 relative overflow-hidden group",
+      input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base shadow-sm",
+      label: "mb-1.5 md:mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1",
+      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide w-full cursor-pointer touch-manipulation",
       btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 md:py-3.5 md:px-6 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] text-xs md:text-sm tracking-wide cursor-pointer touch-manipulation",
     };
 
-    // COMPONENTS UI
+    // --- COMPONENTES UI (Mantidos Iguais) ---
     const Modal = ({ isOpen, onClose, title, children }) => {
       useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
       if (!isOpen) return null;
@@ -117,308 +184,479 @@
       const handlePrev = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
       const handleNext = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
       return (
-        <div className="flex items-center gap-1 md:gap-2 bg-[#18181b] p-1 rounded-xl border border-white/5">
-          <button onClick={handlePrev} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"><ChevronLeft size={18}/></button>
-          <span className="text-xs md:text-sm font-bold text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
-          <button onClick={handleNext} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"><ChevronRight size={18}/></button>
+        <div className="flex items-center gap-1 md:gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5">
+          <button onClick={handlePrev} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronLeft size={18}/></button>
+          <span className="text-xs md:text-sm font-bold text-slate-800 dark:text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
+          <button onClick={handleNext} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronRight size={18}/></button>
         </div>
       );
     };
 
-    // --- AUTH SCREEN ---
+    // --- AUTH SCREEN (Conectada ao Banco) ---
     const AuthScreen = ({ mode, onLogin, onRegister }) => {
-        const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [keepLogged, setKeepLogged] = useState(false); const [error, setError] = useState('');
-        const handleSubmit = (e) => { e.preventDefault(); setError(''); if(mode==='register') { if(pin.length<4) return setError('Mínimo 4 dígitos'); if(pin!==confirmPin) return setError('PINs não conferem'); if(!name) return setError('Nome obrigatório'); onRegister(name, pin, setError); } else { onLogin(pin, keepLogged, setError); } };
-        return (
-            <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-                <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in flex flex-col items-center">
-                    <div className="mb-4 scale-125"><CustomLogo /></div>
-                    <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1>
-                    <p className="text-slate-400 font-medium mb-8">O cofre do seu futuro</p>
-                    <form onSubmit={handleSubmit} className="w-full space-y-4">
-                        {mode === 'register' && (<div><label className={theme.label}>Seu Nome</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>)}
-                        <div><label className={theme.label}>Código de Acesso</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
-                        {mode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
-                        {mode === 'login' && (<div className="flex items-center gap-2 justify-center py-2"><input type="checkbox" id="keep" checked={keepLogged} onChange={e=>setKeepLogged(e.target.checked)} className="w-4 h-4 accent-violet-600 rounded cursor-pointer" /><label htmlFor="keep" className="text-sm text-slate-400 cursor-pointer">Manter conectado</label></div>)}
-                        {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-2xl border border-rose-500/20 font-medium">{error}</div>}
-                        <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Acessar' : 'Criar Conta'}</button>
-                    </form>
-                    <div className="mt-6 flex justify-center gap-4 text-sm font-medium">
-                        {mode === 'login' ? <button onClick={() => window.location.hash = 'register'} className="text-violet-400 hover:text-violet-300 font-bold">Criar uma conta</button> : <button onClick={() => window.location.hash = ''} className="text-slate-400 hover:text-white">Voltar para Login</button>}
-                    </div>
-                </div>
-            </div>
-        );
+      const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [error, setError] = useState('');
+      
+      const handleSubmit = (e) => { 
+          e.preventDefault(); setError(''); 
+          if (mode === 'register') { 
+              if (pin.length < 4) return setError('Mínimo 4 dígitos'); 
+              if (pin !== confirmPin) return setError('PINs não conferem'); 
+              if (!name) return setError('Digite seu nome'); 
+              onRegister(name, pin, setError); 
+          } else { 
+              onLogin(pin, setError); 
+          } 
+      };
+      
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+          <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in">
+            <div className="text-center mb-8 flex flex-col items-center"><div className="mb-4 scale-125"><CustomLogo /></div><h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1><p className="text-slate-400 font-medium">O cofre do seu futuro</p></div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {mode === 'register' && <div><label className={theme.label}>Seu Nome</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Seu nome" autoFocus /></div>}
+              <div><label className={theme.label}>Código de Acesso</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
+              {mode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
+              {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-2xl border border-rose-500/20 font-medium">{error}</div>}
+              <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Acessar' : 'Iniciar Jornada'}</button>
+            </form>
+          </div>
+        </div>
+      );
     };
 
-    const SettingsModal = ({ isOpen, onClose, onLogout }) => (<Modal isOpen={isOpen} onClose={onClose} title="Segurança"><div className="space-y-6"><div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados na Nuvem</h4><p className="text-slate-400 text-sm mb-4">Seus dados estão salvos no banco de dados.</p></div><div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div></div></Modal>);
-    
-    // SAFE MAP
-    const DayDetailsModal = ({ isOpen, onClose, date, transactions=[], onDelete, onAdd, onEdit }) => { 
-        if (!isOpen) return null; 
-        const safeTrans = Array.isArray(transactions) ? transactions : [];
-        const inc = safeTrans.filter(t=>t.type==='income').reduce((a,c)=>a+Number(c.amount),0); 
-        const exp = safeTrans.filter(t=>t.type==='expense').reduce((a,c)=>a+Number(c.amount),0); 
-        return (<Modal isOpen={isOpen} onClose={onClose} title={`Dia ${formatDate(date)}`}><div className="space-y-6"><div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-emerald-400">ENTRADAS</span><p className="text-lg font-bold text-white">{formatCurrency(inc)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-rose-400">SAÍDAS</span><p className="text-lg font-bold text-white">{formatCurrency(exp)}</p></div></div><div><h4 className="text-slate-400 text-sm font-bold mb-3 uppercase">Transações</h4><div className="space-y-3">{safeTrans.map(t=>(<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount)}</span><button onClick={()=>{onClose();onEdit(t)}} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}</div></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div></Modal>); 
+    const SettingsModal = ({ isOpen, onClose, onLogout }) => {
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Segurança e Dados">
+          <div className="space-y-6">
+            <div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados na Nuvem</h4><p className="text-slate-400 text-sm mb-4 leading-relaxed">Seus dados estão seguros no banco de dados.</p></div>
+            <div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div>
+          </div>
+        </Modal>
+      );
+    };
+
+    const DayDetailsModal = ({ isOpen, onClose, date, transactions, onDelete, onAdd, onEdit }) => {
+      if (!isOpen) return null;
+      // Garante que é array
+      const safeTrans = Array.isArray(transactions) ? transactions : [];
+      const dayIncome = safeTrans.filter(t => t.type === 'income').reduce((a,c) => a+Number(c.amount), 0);
+      const dayExpense = safeTrans.filter(t => t.type === 'expense').reduce((a,c) => a+Number(c.amount), 0);
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title={`Resumo do dia ${formatDate(date)}`}>
+          <div className="space-y-6">
+            <div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 text-center"><span className="text-xs font-bold text-emerald-400 uppercase">Entradas</span><p className="text-lg font-bold text-white">{formatCurrency(dayIncome, false)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20 text-center"><span className="text-xs font-bold text-rose-400 uppercase">Saídas</span><p className="text-lg font-bold text-white">{formatCurrency(dayExpense, false)}</p></div></div>
+            <div>
+              <h4 className="text-slate-400 text-sm font-bold mb-3 uppercase tracking-wider">Transações</h4>
+              <div className="space-y-3">{safeTrans.map(t => (<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category} {t.subcategory && `• ${t.subcategory}`}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount, false)}</span><button onClick={() => { onClose(); onEdit(t); }} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}{safeTrans.length === 0 && <p className="text-center text-slate-500 text-sm">Sem movimentos neste dia.</p>}</div>
+            </div>
+            <button onClick={onAdd} className={theme.btnAccent}><Plus size={18} /> Adicionar Nova Transação</button>
+          </div>
+        </Modal>
+      );
     };
 
     // --- VIEWS ---
     const Overview = ({ transactions = [], goals, privacyMode, toggleModal, setPrefilledDate, user }) => {
       const [currentDate, setCurrentDate] = useState(new Date());
       const safeTrans = Array.isArray(transactions) ? transactions : [];
-      const filtered = useMemo(() => safeTrans.filter(t => { const d = new Date(t.date); const adj = new Date(d.getTime() + d.getTimezoneOffset()*60000); return adj.getMonth()===currentDate.getMonth() && adj.getFullYear()===currentDate.getFullYear(); }), [safeTrans, currentDate]);
-      const prevBal = useMemo(() => { const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); start.setHours(0,0,0,0); return safeTrans.filter(t => { const d = new Date(t.date); const adj = new Date(d.getTime() + d.getTimezoneOffset()*60000); return adj < start; }).reduce((acc, t) => acc + (t.type==='income'?Number(t.amount):-Number(t.amount)), 0); }, [safeTrans, currentDate]);
-      const inc = filtered.filter(t=>t.type==='income').reduce((a,t)=>a+Number(t.amount),0);
-      const exp = filtered.filter(t=>t.type==='expense').reduce((a,t)=>a+Number(t.amount),0);
-      const balance = inc - exp;
-      const total = prevBal + balance;
-      const areaData = useMemo(() => { const days = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0).getDate(); return Array.from({length:days},(_,i)=>{ const d=i+1; const dateStr=`${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const dt=filtered.filter(t=>t.date===dateStr); return { name:String(d), Entradas:dt.filter(t=>t.type==='income').reduce((a,c)=>a+Number(c.amount),0), Saídas:dt.filter(t=>t.type==='expense').reduce((a,c)=>a+Number(c.amount),0) }; }); }, [filtered, currentDate]);
-      const catData = useMemo(() => { const m={}; filtered.filter(t=>t.type==='expense').forEach(t=>{m[t.category]=(m[t.category]||0)+Number(t.amount)}); return Object.entries(m).map(([name,value])=>({name,value})).sort((a,b)=>b.value-a.value).slice(0,5); }, [filtered]);
+
+      const filteredTransactions = useMemo(() => {
+        return safeTrans.filter(t => {
+          const tDate = new Date(t.date);
+          const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
+          return adjustedDate.getMonth() === currentDate.getMonth() && 
+                 adjustedDate.getFullYear() === currentDate.getFullYear();
+        });
+      }, [safeTrans, currentDate]);
+
+      const previousBalance = useMemo(() => {
+        const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        startOfCurrentMonth.setHours(0,0,0,0);
+        return safeTrans.filter(t => {
+            const tDate = new Date(t.date);
+            const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
+            return adjustedDate < startOfCurrentMonth;
+        }).reduce((acc, t) => acc + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
+      }, [safeTrans, currentDate]);
+
+      const income = filteredTransactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0);
+      const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0);
+      const currentMonthResult = income - expense;
+      const totalAccumulatedBalance = previousBalance + currentMonthResult;
+      const currentMonthName = currentDate.toLocaleDateString('pt-BR', { month: 'long' });
+
+      const areaData = useMemo(() => {
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+        return Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const dayTrans = filteredTransactions.filter(t => t.date === dateStr);
+          return {
+            name: String(day),
+            Entradas: dayTrans.filter(t => t.type === 'income').reduce((a, c) => a + Number(c.amount), 0),
+            Saídas: dayTrans.filter(t => t.type === 'expense').reduce((a, c) => a + Number(c.amount), 0),
+          };
+        });
+      }, [filteredTransactions, currentDate]);
+
+      const categoryData = useMemo(() => {
+        const catMap = {};
+        filteredTransactions.filter(t => t.type === 'expense').forEach(t => {
+           catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount);
+        });
+        return Object.entries(catMap)
+           .map(([name, value]) => ({ name, value }))
+           .sort((a,b) => b.value - a.value)
+           .slice(0, 5);
+      }, [filteredTransactions]);
 
       return (
         <div className="space-y-6 md:space-y-8 animate-slide-up">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"><div className="flex justify-between items-center w-full md:w-auto"><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            <Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible flex flex-col justify-between"><div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div><div className="relative z-10 flex flex-col h-full justify-between"><div className="flex justify-between items-start mb-2"><p className="text-violet-200 font-medium text-sm md:text-base">Saldo Acumulado</p><span className="bg-white/20 text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-md">Atualizado</span></div><h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight mb-6 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(total, privacyMode)}</h2><div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-3"><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium">Saldo Anterior</span><span className={`font-bold ${privacyMode ? 'blur-sm' : ''} ${prevBal < 0 ? 'text-rose-300' : 'text-white'}`}>{formatCurrency(prevBal, privacyMode)}</span></div><div className="h-px bg-white/10 w-full"></div><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium capitalize">Resultado {currentDate.toLocaleDateString('pt-BR',{month:'long'})}</span><span className={`font-bold ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${privacyMode ? 'blur-sm' : ''}`}>{balance > 0 ? '+' : ''}{formatCurrency(balance, privacyMode)}</span></div></div></div></Card>
-            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Entradas</p></div><div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400"><ArrowUpRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(inc, privacyMode)}</h2></Card>
-            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Saídas</p></div><div className="p-2 bg-rose-500/10 rounded-xl text-rose-400"><ArrowDownRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(exp, privacyMode)}</h2></Card>
+            <Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible flex flex-col justify-between"><div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div><div className="relative z-10 flex flex-col h-full justify-between"><div className="flex justify-between items-start mb-2"><p className="text-violet-200 font-medium text-sm md:text-base">Saldo Acumulado</p><span className="bg-white/20 text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-md">Atualizado</span></div><h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight mb-6 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(totalAccumulatedBalance, privacyMode)}</h2><div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-3"><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium">Saldo Anterior</span><span className={`font-bold ${privacyMode ? 'blur-sm' : ''} ${previousBalance < 0 ? 'text-rose-300' : 'text-white'}`}>{formatCurrency(previousBalance, privacyMode)}</span></div><div className="h-px bg-white/10 w-full"></div><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium capitalize">Resultado {currentMonthName}</span><span className={`font-bold ${currentMonthResult >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${privacyMode ? 'blur-sm' : ''}`}>{currentMonthResult > 0 ? '+' : ''}{formatCurrency(currentMonthResult, privacyMode)}</span></div></div></div></Card>
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Entradas</p></div><div className="p-2 bg-emerald-100 dark:bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400"><ArrowUpRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(income, privacyMode)}</h2></Card>
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Saídas</p></div><div className="p-2 bg-rose-100 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400"><ArrowDownRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(expense, privacyMode)}</h2></Card>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            <Card className="lg:col-span-2 min-h-[350px] md:min-h-[400px]"><div className="flex justify-between items-center mb-6 md:mb-8"><h3 className="text-lg md:text-xl font-bold text-white">Fluxo Diário</h3><div className="flex gap-4"><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500"></span>Entradas</span><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-rose-500"></span>Saídas</span></div></div><div className={`h-[250px] md:h-[300px] w-full ${privacyMode ? 'opacity-20 blur-sm' : ''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="cInc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="cExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} interval={2} /><YAxis hide /><RechartsTooltip cursor={{stroke: '#ffffff10', strokeWidth: 1}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} itemStyle={{color: '#fff'}} /><Area type="monotone" dataKey="Entradas" stroke="#10B981" fillOpacity={1} fill="url(#cInc)" strokeWidth={3} /><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fillOpacity={1} fill="url(#cExp)" strokeWidth={3} /></AreaChart></ResponsiveContainer></div></Card>
-            <Card className="min-h-[350px] md:min-h-[400px] flex flex-col"><h3 className="text-lg md:text-xl font-bold text-white mb-6">Top Despesas</h3><div className="flex-1 relative flex items-center justify-center">{categoryData.length > 0 ? (<div className="w-full h-full flex flex-col items-center justify-center"><div className="w-full h-40 md:h-48 relative"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{categoryData.map((entry, index) => (<Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || '#94a3b8'} />))}</Pie><RechartsTooltip formatter={(value) => formatCurrency(value, false)} itemStyle={{color: '#fff'}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} /></PieChart></ResponsiveContainer></div><div className="w-full mt-4 space-y-2 px-2 overflow-y-auto max-h-40 custom-scrollbar">{categoryData.map((entry, index) => (<div key={index} className="flex items-center justify-between text-sm"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[entry.name] || '#94a3b8' }}></div><span className="text-slate-300">{entry.name}</span></div><span className="font-bold text-white">{formatCurrency(entry.value, false)}</span></div>))}</div></div>) : (<div className="absolute inset-0 flex items-center justify-center text-slate-500 text-sm">Sem despesas no período</div>)}</div></Card>
+            <Card className="lg:col-span-2 min-h-[350px] md:min-h-[400px]"><div className="flex justify-between items-center mb-6 md:mb-8"><h3 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Fluxo Diário</h3><div className="flex gap-4"><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500"></span>Entradas</span><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-rose-500"></span>Saídas</span></div></div><div className={`h-[250px] md:h-[300px] w-full ${privacyMode ? 'opacity-20 blur-sm' : ''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} interval={2} /><YAxis hide /><RechartsTooltip cursor={{stroke: '#ffffff10', strokeWidth: 1}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} itemStyle={{color: '#fff'}} /><Area type="monotone" dataKey="Entradas" stroke="#10B981" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={3} /><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={3} /></AreaChart></ResponsiveContainer></div></Card>
+            <Card className="min-h-[350px] md:min-h-[400px] flex flex-col"><h3 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white mb-6">Top Despesas</h3><div className="flex-1 relative flex items-center justify-center">{categoryData.length > 0 ? (<div className="w-full h-full flex flex-col items-center justify-center"><div className="w-full h-40 md:h-48 relative"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{categoryData.map((entry, index) => (<Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || '#94a3b8'} />))}</Pie><RechartsTooltip formatter={(value) => formatCurrency(value, false)} itemStyle={{color: '#fff'}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} /></PieChart></ResponsiveContainer></div><div className="w-full mt-4 space-y-2 px-2 overflow-y-auto max-h-40 custom-scrollbar">{categoryData.map((entry, index) => (<div key={index} className="flex items-center justify-between text-sm"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[entry.name] || '#94a3b8' }}></div><span className="text-slate-500 dark:text-slate-300">{entry.name}</span></div><span className="font-bold text-slate-800 dark:text-white">{formatCurrency(entry.value, false)}</span></div>))}</div></div>) : (<div className="absolute inset-0 flex items-center justify-center text-slate-500 text-sm">Sem despesas no período</div>)}</div></Card>
           </div>
         </div>
       );
     };
 
-    const TransactionsView = ({ transactions=[], onDelete, onEdit }) => {
-        const [filter, setFilter] = useState('');
-        const safe = Array.isArray(transactions) ? transactions : [];
-        const filtered = safe.filter(t=>t.description.toLowerCase().includes(filter.toLowerCase()));
-        return (
-            <div className="space-y-6 animate-fade-in">
-                <div className="flex justify-between gap-4"><div className="relative flex-1"><Search size={18} className="absolute left-4 top-3.5 text-slate-400"/><input type="text" placeholder="Buscar..." value={filter} onChange={e=>setFilter(e.target.value)} className={`${theme.input} !pl-12`}/></div></div>
-                <Card className="!p-0 overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left text-sm text-slate-400"><thead className="bg-white/5 text-xs uppercase text-slate-300"><tr><th className="p-4">Descrição</th><th className="p-4">Categoria</th><th className="p-4 text-right">Valor</th><th className="p-4 text-center">Data</th><th className="p-4 text-center">Ação</th></tr></thead><tbody className="divide-y divide-white/5">{filtered.map(t=>(<tr key={t.id} className="hover:bg-white/5"><td className="p-4 font-medium text-white">{t.description}{t.isRecurring&&<span className="text-[10px] text-violet-500 ml-2">Recurring</span>}</td><td className="p-4"><span className="px-2 py-1 rounded text-xs bg-white/10 text-white">{t.category}</span></td><td className={`p-4 text-right font-bold ${t.type==='income'?'text-emerald-400':'text-rose-400'}`}>{t.type==='income'?'+':'-'} {formatCurrency(t.amount)}</td><td className="p-4 text-center">{formatDate(t.date)}</td><td className="p-4 text-center flex justify-center gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></td></tr>))}</tbody></table></div></Card>
-            </div>
-        );
+    const TransactionsView = ({ transactions = [], onDelete, onEdit }) => {
+      const [filterDesc, setFilterDesc] = useState('');
+      const [filterCategory, setFilterCategory] = useState('');
+      const [filterDate, setFilterDate] = useState('');
+      const [filterType, setFilterType] = useState('all');
+      const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+      const safeTrans = Array.isArray(transactions) ? transactions : [];
+      const allCategories = Array.from(new Set(safeTrans.map(t => t.category))).sort();
+
+      const handleSort = (key) => {
+        let direction = 'desc';
+        if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
+        setSortConfig({ key, direction });
+      };
+
+      const filteredTransactions = useMemo(() => {
+        let items = safeTrans.filter(t => {
+           const matchDesc = t.description.toLowerCase().includes(filterDesc.toLowerCase());
+           const matchCat = filterCategory ? t.category === filterCategory : true;
+           const matchDate = filterDate ? t.date === filterDate : true;
+           const matchType = filterType !== 'all' ? t.type === filterType : true;
+           return matchDesc && matchCat && matchDate && matchType;
+        });
+        if (sortConfig.key) {
+           items.sort((a, b) => {
+              if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+              if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
+              return 0;
+           });
+        }
+        return items;
+      }, [safeTrans, filterDesc, filterCategory, filterDate, filterType, sortConfig]);
+
+      const exportCSV = () => { 
+        const headers = "Descrição;Categoria;Valor;Data;Tipo;Recorrente\n"; 
+        const csvContent = filteredTransactions.map(t => {
+            const dateFormatted = formatDate(t.date);
+            const amountFormatted = Number(t.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const typeFormatted = t.type === 'income' ? 'Entrada' : 'Saída';
+            const recurringFormatted = t.isRecurring ? 'Sim' : 'Não';
+            const desc = `"${t.description.replace(/"/g, '""')}"`;
+            return `${desc};${t.category};"${amountFormatted}";${dateFormatted};${typeFormatted};${recurringFormatted}`;
+        }).join("\n");
+        const blob = new Blob(["\uFEFF" + headers + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `extrato_prospera_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      return ( <div className="space-y-6 animate-fade-in pb-20 md:pb-0"> <div className="flex flex-col md:flex-row justify-between items-center gap-4"> <div className="flex items-center gap-2"> <h2 className="text-xl font-bold text-slate-800 dark:text-white">Extrato</h2> <span className="text-xs bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-400">{filteredTransactions.length} itens</span> </div> <button onClick={exportCSV} className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-colors text-sm font-medium border border-white/5"> <Download size={16}/> Exportar CSV </button> </div> <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-100 dark:bg-[#18181b] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-inner"> <div className="relative group"> <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors pointer-events-none"/> <input type="text" placeholder="Buscar..." value={filterDesc} onChange={e => setFilterDesc(e.target.value)} className={`${theme.input} !pl-12`} /> </div> <select value={filterType} onChange={e => setFilterType(e.target.value)} className={theme.input}> <option value="all">Todos</option> <option value="income">Receitas</option> <option value="expense">Despesas</option> </select> <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className={theme.input}> <option value="">Categorias (Todas)</option> {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)} </select> <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} className={theme.input}/> </div> <Card className="animate-fade-in !p-0 overflow-hidden"> <div className="overflow-x-auto"> <table className="w-full text-left text-slate-600 dark:text-slate-400 min-w-[700px]"> <thead className="bg-slate-50 dark:bg-white/5 text-xs uppercase font-bold text-slate-500 border-b border-slate-200 dark:border-white/5"> <tr> <th className="px-6 py-5 w-[30%]">Descrição</th> <th className="px-6 py-5 w-[20%]">Categoria</th> <th className="px-6 py-5 text-right cursor-pointer w-[20%] hover:text-violet-500 transition-colors" onClick={() => handleSort('amount')}> <div className="flex items-center justify-end gap-1">Valor <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center cursor-pointer w-[15%] hover:text-violet-500 transition-colors" onClick={() => handleSort('date')}> <div className="flex items-center justify-center gap-1">Data <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center w-[15%]">Ações</th> </tr> </thead> <tbody className="divide-y divide-slate-200 dark:divide-white/5"> {filteredTransactions.map(t => ( <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"> <td className="px-6 py-4 font-medium text-slate-900 dark:text-white"> <div className="flex flex-col"> <span>{t.description}</span> {t.isRecurring && <span className="text-[10px] text-violet-500 flex items-center gap-1 mt-0.5"><Repeat size={10}/> Mensal</span>} </div> </td> <td className="px-6 py-4"> <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/10 shadow-sm" style={{ backgroundColor: CATEGORY_COLORS[t.category] || '#64748b' }}> {t.category} </span> </td> <td className={`px-6 py-4 text-right font-bold text-base ${t.type==='income'?'text-emerald-500 dark:text-emerald-400':'text-rose-500 dark:text-rose-400'} `}> {t.type==='income'?'+':'-'} {formatCurrency(t.amount, false)} </td> <td className="px-6 py-4 text-center text-slate-500 text-sm font-medium bg-slate-50/50 dark:bg-white/5 rounded-lg mx-2 my-2"> {formatDate(t.date)} </td> <td className="px-6 py-4 text-center"> <div className="flex justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"> <button onClick={() => onEdit(t)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all" title="Editar"><Edit2 size={16}/></button> <button onClick={() => onDelete(t.id)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all" title="Excluir"><Trash2 size={16}/></button> </div> </td> </tr> ))} </tbody> </table> </div> {filteredTransactions.length === 0 && ( <div className="p-16 text-center text-slate-500 flex flex-col items-center"> <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4"> <Search size={24} className="opacity-50"/> </div> <p className="font-medium">Nenhuma transação encontrada.</p> <p className="text-sm opacity-60 mt-1">Tente ajustar os filtros.</p> </div> )} </Card> </div> );
     };
 
     const RecurringView = ({ transactions=[], cards=[], onEdit, onDelete, onAdd, privacyMode }) => {
-        const safeTrans = Array.isArray(transactions) ? transactions : [];
-        const list = useMemo(()=> { const m=new Map(); safeTrans.filter(t=>t.isRecurring).forEach(t=>{const ex=m.get(t.description); if(!ex||new Date(t.date)>new Date(ex.date)) m.set(t.description,t)}); return Array.from(m.values()); }, [safeTrans]);
-        const total = list.reduce((a,c)=>a+Number(c.amount),0);
-        return (<div className="space-y-8 animate-fade-in"><div className="flex justify-between items-end"><div><h2 className="text-xl font-bold text-white flex gap-2"><Repeat className="text-violet-500"/> Recorrências</h2></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div><div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(total, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{list.length} assinaturas ativas</p></div></div></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{list.length>0?list.map(t=>(<div key={t.id} className="bg-[#18181b] border border-white/5 rounded-[24px] p-5 flex flex-col justify-between h-full"><div className="flex justify-between mb-4"><div><h4 className="font-bold text-white">{t.description}</h4><p className="text-slate-500 text-xs">{t.category}</p></div><h3 className="text-xl font-bold text-white">{formatCurrency(t.amount)}</h3></div><div className="flex justify-between pt-4 border-t border-white/5"><span className="text-xs bg-white/5 px-2 py-1 rounded text-slate-400">Dia {new Date(t.date).getDate()}</span><div className="flex gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></div></div></div>)):<div className="col-span-full text-center py-10 text-slate-500">Nenhuma recorrência.</div>}</div></div>);
+       const recurringMap = new Map();
+       const safeTrans = Array.isArray(transactions) ? transactions : [];
+       safeTrans.filter(t => t.isRecurring).forEach(t => { const existing = recurringMap.get(t.description); if (!existing || new Date(t.date) > new Date(existing.date)) { recurringMap.set(t.description, t); } });
+       const recurringTrans = Array.from(recurringMap.values());
+       const totalRecurring = recurringTrans.reduce((acc, t) => acc + (t.type === 'expense' ? Number(t.amount) : 0), 0);
+       const getPaymentIcon = (t) => { if (t.paymentMethod === 'credit_card') return <CreditCard size={16} className="text-violet-400"/>; if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; return <DollarSign size={16} className="text-slate-400"/>; };
+       const getStatus = (dateStr) => { const today = new Date(); const dueDay = new Date(dateStr).getDate(); if (today.getDate() > dueDay) return { label: 'Pago', color: 'text-emerald-500 bg-emerald-500/10' }; if (today.getDate() === dueDay) return { label: 'Hoje', color: 'text-amber-500 bg-amber-500/10' }; return { label: 'Em breve', color: 'text-blue-500 bg-blue-500/10' }; };
+
+       return (
+         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6"><div><h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Repeat className="text-violet-500"/> Cobranças Recorrentes</h2><p className="text-slate-500 text-sm mt-1">Gerencie suas assinaturas e custos fixos mensais</p></div><button onClick={onAdd} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}><Plus size={18} className="mr-2"/> Nova Recorrência</button></div>
+            <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(totalRecurring, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{recurringTrans.length} assinaturas ativas</p></div></div></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{recurringTrans.length > 0 ? recurringTrans.map(t => { const status = getStatus(t.date); return (<div key={t.id} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"><div className="absolute top-0 left-0 bottom-0 w-1.5" style={{backgroundColor: CATEGORY_COLORS[t.category] || '#64748b'}}></div><div className="pl-3 flex flex-col justify-between h-full"><div><div className="flex justify-between items-start mb-3"><div><h4 className="font-bold text-slate-800 dark:text-white text-lg line-clamp-1">{t.description}</h4><p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">{t.category}</p></div><span className={`text-[10px] font-bold px-2 py-1 rounded-full ${status.color}`}>{status.label}</span></div><h3 className={`text-2xl font-extrabold text-slate-800 dark:text-white mb-4 ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(t.amount, privacyMode)}</h3></div><div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5"><div className="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg">{getPaymentIcon(t)}<span>Dia {new Date(t.date).getDate()}</span></div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => onEdit(t)} className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-500 rounded-lg transition-colors"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="p-2 hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-lg transition-colors"><Trash2 size={16}/></button></div></div></div></div>); }) : (<div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700/50 rounded-[32px] bg-slate-800/20"><RefreshCw size={48} className="mb-4 opacity-30"/><p className="text-lg font-medium">Nenhuma assinatura cadastrada.</p><button onClick={onAdd} className="text-violet-400 font-bold text-sm mt-2 hover:underline">Adicionar Recorrência</button></div>)}</div>
+         </div>
+       );
     };
 
-    const BudgetView = ({ transactions=[], budgets=[], onRefresh, privacyMode, user }) => {
-        const [editing, setEditing] = useState(null); const [isAdding, setIsAdding] = useState(false);
-        const currentMonth = new Date();
-        const safeTrans = Array.isArray(transactions) ? transactions : [];
-        const safeBuds = Array.isArray(budgets) ? budgets : [];
-        const expenses = useMemo(()=>safeTrans.filter(t=>{const d=new Date(t.date); const adj=new Date(d.getTime()+d.getTimezoneOffset()*60000); return t.type==='expense'&&adj.getMonth()===currentMonth.getMonth()}).reduce((a,c)=>{a[c.category]=(a[c.category]||0)+Number(c.amount);return a},{}),[safeTrans]);
-        const handleSave = async (e) => { e.preventDefault(); const fd=new FormData(e.target); const body={category:fd.get('category')||editing.category, limit:Number(fd.get('limit'))}; const url = editing ? `/api/budgets/${editing.category}` : '/api/budgets'; await fetch(url,{method:editing?'PUT':'POST',headers:{'Content-Type':'application/json', 'user-id': user.id},body:JSON.stringify(body)}); onRefresh(); setIsAdding(false); setEditing(null); };
-        return (<div className="space-y-8 animate-fade-in"><div className="flex justify-between items-end"><div><h2 className="text-xl font-bold text-white flex gap-2"><PiggyBank className="text-violet-500"/> Orçamentos</h2></div><button onClick={()=>setIsAdding(true)} className={theme.btnAccent}><Plus size={18}/> Novo</button></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{safeBuds.map(b=>{const sp=expenses[b.category]||0; const limit=Number(b.limit)||1; const pct=(sp/limit)*100; return (<div key={b.id||b.category} className="group relative bg-[#18181b] border border-white/5 rounded-[24px] p-5"><div className="flex justify-between mb-4"><div><h3 className="font-bold text-white">{b.category}</h3><p className="text-xs text-slate-500">Limite: {formatCurrency(b.limit)}</p></div><button onClick={()=>setEditing(b)} className="text-slate-400 hover:text-white"><Edit2 size={16}/></button></div><div className="space-y-1"><p className="text-2xl font-bold text-white">{formatCurrency(sp)}</p><div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden"><div className="absolute top-0 left-0 h-full rounded-full transition-all" style={{width:`${Math.min(pct,100)}%`, backgroundColor:pct>100?'#ef4444':'#8b5cf6'}}></div></div></div></div>)})}</div>{(isAdding||editing)&&<Modal isOpen={true} onClose={()=>{setIsAdding(false);setEditing(null)}} title="Orçamento"><form onSubmit={handleSave} className="space-y-4"><div><label className={theme.label}>Categoria</label><input name="category" defaultValue={editing?.category} className={theme.input} disabled={!!editing} required/></div><div><label className={theme.label}>Limite</label><input name="limit" type="number" defaultValue={editing?.limit} className={theme.input} required/></div><button className={theme.btnPrimary}>Salvar</button></form></Modal>}</div>);
+    const BudgetView = ({ transactions=[], budgets=[], setBudgets, onRefresh, privacyMode }) => {
+      const [editingBudget, setEditingBudget] = useState(null); const [isAdding, setIsAdding] = useState(false); const [deletingBudget, setDeletingBudget] = useState(null); const currentMonth = new Date();
+      const currentMonthExpenses = useMemo(() => {
+        return transactions.filter(t => { const d = new Date(t.date); const adjusted = new Date(d.getTime() + d.getTimezoneOffset() * 60000); return t.type === 'expense' && adjusted.getMonth() === currentMonth.getMonth() && adjusted.getFullYear() === currentMonth.getFullYear(); }).reduce((acc, curr) => { acc[curr.category] = (acc[curr.category] || 0) + Number(curr.amount); return acc; }, {});
+      }, [transactions]);
+      const totalBudget = budgets.reduce((acc, b) => acc + Number(b.limit), 0); const totalSpent = budgets.reduce((acc, b) => acc + (currentMonthExpenses[b.category] || 0), 0); const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+      const handleUpdate = async (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('limit')); try { await fetch(`/api/budgets/${editingBudget.category}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({limit: val}) }); onRefresh(); setEditingBudget(null); } catch(err) { console.error(err); } };
+      const handleAdd = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const cat = fd.get('category'); const lim = parseFloat(fd.get('limit')); try { await fetch('/api/budgets', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({category: cat, limit: lim}) }); onRefresh(); setIsAdding(false); } catch(err) { console.error(err); } };
+      const confirmDelete = async () => { if (deletingBudget) { try { await fetch(`/api/budgets/${deletingBudget.category}`, { method: 'DELETE' }); onRefresh(); setDeletingBudget(null); } catch(err) { console.error(err); } } };
+
+      return (
+        <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6"><div><h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><PiggyBank className="text-violet-500"/> Planejamento Mensal</h2><p className="text-slate-500 text-sm mt-1">Gerencie seus limites de gastos por categoria</p></div><button onClick={() => setIsAdding(true)} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}><Plus size={18} className="mr-2"/> Novo Orçamento</button></div>
+          <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-2xl"><div className="absolute top-0 right-0 p-4 opacity-10"><PiggyBank size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center"><div className="flex-1 w-full"><p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Total Previsto</p><h3 className={`text-3xl font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(totalBudget, privacyMode)}</h3></div><div className="flex-1 w-full"><div className="flex justify-between text-sm mb-2"><span className="text-slate-300">Total Gasto</span><span className="font-bold">{Math.round(totalProgress)}%</span></div><div className="w-full bg-slate-700 rounded-full h-4 overflow-hidden"><div className={`h-full rounded-full transition-all duration-1000 ${totalProgress > 100 ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{width: `${Math.min(totalProgress, 100)}%`}}></div></div><p className={`text-right text-xs text-slate-400 mt-2 ${privacyMode ? 'blur-sm' : ''}`}>Restante: {formatCurrency(totalBudget - totalSpent, privacyMode)}</p></div></div></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">{budgets.map(b => { const spent = currentMonthExpenses[b.category] || 0; const percentage = (spent / b.limit) * 100; const remaining = b.limit - spent; const isOver = spent > b.limit; const catColor = CATEGORY_COLORS[b.category] || '#64748b'; return (<div key={b.category} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"><div className="absolute top-0 left-0 right-0 h-1" style={{background: isOver ? '#ef4444' : catColor}}></div><div className="flex justify-between items-start mb-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: catColor}}><span className="font-bold text-lg">{b.category[0]}</span></div><div><h3 className="font-bold text-slate-800 dark:text-white">{b.category}</h3><p className={`text-xs text-slate-500 ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(b.limit, privacyMode)} limite</p></div></div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => setEditingBudget(b)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"><Edit2 size={16}/></button><button onClick={() => setDeletingBudget(b)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button></div></div><div className="space-y-1 mb-4"><p className="text-sm text-slate-500 dark:text-slate-400">Gasto Atual</p><p className={`text-2xl font-extrabold ${isOver ? 'text-rose-500' : 'text-slate-800 dark:text-white'} ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(spent, privacyMode)}</p></div><div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden"><div className={`absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-rose-500' : ''}`} style={{width: `${Math.min(percentage, 100)}%`, background: isOver ? undefined : catColor}}></div></div><div className="flex justify-between items-center mt-3 text-xs font-bold"><span className={`${isOver ? 'text-rose-500' : 'text-slate-400'}`}>{percentage.toFixed(0)}% usado</span><span className={`${remaining < 0 ? 'text-rose-500' : 'text-emerald-500'} ${privacyMode ? 'blur-sm' : ''}`}>{remaining < 0 ? 'Excedido' : 'Disponível'}: {formatCurrency(Math.abs(remaining), privacyMode)}</span></div></div>); })}</div>
+          {editingBudget && <Modal isOpen={!!editingBudget} onClose={() => setEditingBudget(null)} title={`Ajustar: ${editingBudget.category}`}><form onSubmit={handleUpdate} className="space-y-6"><div><label className={theme.label}>Novo Limite (R$)</label><input autoFocus name="limit" type="number" min="0" defaultValue={editingBudget.limit} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+          {isAdding && <Modal isOpen={isAdding} onClose={() => setIsAdding(false)} title="Novo Orçamento"><form onSubmit={handleAdd} className="space-y-6"><div><label className={theme.label}>Categoria</label><input required name="category" className={theme.input} /></div><div><label className={theme.label}>Limite (R$)</label><input required name="limit" type="number" min="0" className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Criar</button></form></Modal>}
+          {deletingBudget && <Modal isOpen={!!deletingBudget} onClose={() => setDeletingBudget(null)} title="Excluir"><div className="space-y-6"><p className="text-slate-300">Excluir orçamento de <strong className="text-white">{deletingBudget.category}</strong>?</p><div className="flex gap-4"><button onClick={() => setDeletingBudget(null)} className="w-full py-3 bg-white/5 text-white rounded-xl">Cancelar</button><button onClick={confirmDelete} className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold">Excluir</button></div></div></Modal>}
+        </div>
+      );
     };
 
-    const GoalsView = ({ goals=[], onRefresh, onDelete, privacyMode, user }) => {
-        const [isAdding, setIsAdding] = useState(false); const [editing, setEditing] = useState(null); const [depositing, setDepositing] = useState(null);
-        const handleSave = async (e) => { e.preventDefault(); const fd=new FormData(e.target); const body={name:fd.get('name'), target:Number(fd.get('target')), current:Number(fd.get('current')), color:fd.get('color')}; try { await fetch(editing?`/api/goals/${editing.id}`:'/api/goals', {method:editing?'PUT':'POST', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(body)}); onRefresh(); setIsAdding(false); setEditing(null); } catch(e){} };
-        const handleDeposit = async (e) => { e.preventDefault(); const val=Number(new FormData(e.target).get('amount')); if(val>0){ await fetch(`/api/goals/${depositing.id}`, {method:'PUT', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify({...depositing, current:depositing.current+val})}); onRefresh(); setDepositing(null); } };
-        return (
-            <div className="space-y-8 animate-fade-in"><div className="flex justify-between items-end"><div><h2 className="text-xl font-bold text-white flex gap-2"><Target className="text-violet-500"/> Objetivos</h2></div><button onClick={()=>setIsAdding(true)} className={theme.btnAccent}><Plus size={18}/> Nova Meta</button></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{goals.map(g=>{ const pct=Math.min((g.current/g.target)*100,100); return (<div key={g.id} className="group relative bg-[#18181b] border border-white/5 rounded-[24px] p-5 hover:border-violet-500/30 transition-all"><div className="flex justify-between mb-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor:g.color}}><Target size={20}/></div><div><h3 className="font-bold text-white">{g.name}</h3><p className={`text-xs text-slate-500 ${privacyMode?'blur-sm':''}`}>Meta: {formatCurrency(g.target)}</p></div></div><div className="flex gap-2"><button onClick={()=>setEditing(g)} className="p-1.5 text-slate-400 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(g.id)} className="p-1.5 text-slate-400 hover:text-rose-400"><Trash2 size={16}/></button></div></div><div className="space-y-1 mb-4"><div className="flex justify-between items-end"><p className="text-sm text-slate-400">Progresso</p><span className="text-xs font-bold text-white">{pct.toFixed(0)}%</span></div><div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden"><div className="absolute top-0 left-0 h-full rounded-full transition-all" style={{width:`${pct}%`, backgroundColor:g.color}}></div></div></div><button onClick={()=>setDepositing(g)} className="w-full py-2 bg-white/5 rounded-xl text-white hover:bg-white/10 text-sm font-bold flex items-center justify-center gap-2"><Plus size={14}/> Depositar</button></div>)})}</div>
-            {(isAdding||editing)&&<Modal isOpen={true} onClose={()=>{setIsAdding(false);setEditing(null)}} title={editing?"Editar":"Nova Meta"}><form onSubmit={handleSave} className="space-y-4"><div><label className={theme.label}>Nome</label><input name="name" defaultValue={editing?.name} className={theme.input} required/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta</label><input name="target" type="number" defaultValue={editing?.target} className={theme.input} required/></div><div><label className={theme.label}>Atual</label><input name="current" type="number" defaultValue={editing?.current||0} className={theme.input} required/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-2"><input type="radio" name="color" value="#8b5cf6" defaultChecked/><input type="radio" name="color" value="#ec4899"/><input type="radio" name="color" value="#10b981"/></div></div><button className={theme.btnPrimary}>Salvar</button></form></Modal>}
-            {depositing&&<Modal isOpen={true} onClose={()=>setDepositing(null)} title="Depositar"><form onSubmit={handleDeposit} className="space-y-4"><div><label className={theme.label}>Valor</label><input name="amount" type="number" className={theme.input} autoFocus/></div><button className={theme.btnPrimary}>Confirmar</button></form></Modal>}
-            </div>
-        );
+    const GoalsView = ({ goals=[], onRefresh, onDelete, privacyMode }) => {
+      const [editingGoal, setEditingGoal] = useState(null); const [depositGoal, setDepositGoal] = useState(null); const [isAdding, setIsAdding] = useState(false); const [deletingGoal, setDeletingGoal] = useState(null);
+      const totalTarget = goals.reduce((acc, g) => acc + Number(g.target), 0); const totalCurrent = goals.reduce((acc, g) => acc + Number(g.current), 0); const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0; const totalRemaining = Math.max(0, totalTarget - totalCurrent);
+
+      const handleEditSave = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const updated = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }; try { await fetch(`/api/goals/${editingGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(updated) }); onRefresh(); setEditingGoal(null); } catch(e) { console.error(e); } };
+      const handleDepositSave = async (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('amount')); if (val > 0) { try { await fetch(`/api/goals/${depositGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({...depositGoal, current: depositGoal.current + val}) }); onRefresh(); setDepositGoal(null); } catch(e) { console.error(e); } } };
+      const handleAdd = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const newGoal = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }; try { await fetch('/api/goals', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newGoal) }); onRefresh(); setIsAdding(false); } catch(e) { console.error(e); } };
+      const confirmDelete = () => { if (deletingGoal) { onDelete(deletingGoal.id); setDeletingGoal(null); } };
+
+      return (
+        <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6"><div><h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Target className="text-violet-500"/> Meus Objetivos</h2><p className="text-slate-500 text-sm mt-1">Acompanhe a evolução dos seus sonhos</p></div><button onClick={() => setIsAdding(true)} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}><Plus size={18} className="mr-2"/> Nova Meta</button></div>
+          <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-emerald-900 to-slate-900 p-6 text-white shadow-2xl border border-emerald-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><Trophy size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center"><div className="flex-1 w-full"><p className="text-emerald-400 text-sm font-bold uppercase tracking-wider mb-1">Total Guardado</p><h3 className={`text-3xl font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(totalCurrent, privacyMode)}</h3><p className="text-slate-400 text-xs mt-1">de <span className={privacyMode ? 'blur-sm' : ''}>{formatCurrency(totalTarget, privacyMode)}</span> previstos</p></div><div className="flex-1 w-full"><div className="flex justify-between text-sm mb-2"><span className="text-slate-300">Progresso Global</span><span className="font-bold text-emerald-400">{Math.round(totalProgress)}%</span></div><div className="w-full bg-black/40 rounded-full h-4 overflow-hidden border border-white/5"><div className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-emerald-500 to-teal-400" style={{width: `${Math.min(totalProgress, 100)}%`}}></div></div><p className={`text-right text-xs text-emerald-200/70 mt-2 font-medium ${privacyMode ? 'blur-sm' : ''}`}>Faltam: {formatCurrency(totalRemaining, privacyMode)}</p></div></div></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{goals.map(g => { const progress = Math.min((g.current / g.target) * 100, 100); const isCompleted = progress >= 100; return (<div key={g.id} className={`group relative bg-white dark:bg-[#18181b] border ${isCompleted ? 'border-yellow-500/50 shadow-yellow-500/10' : 'border-slate-200 dark:border-white/5'} rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden`}><div className="flex justify-between items-start mb-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: g.color || '#8b5cf6'}}><Target size={20}/></div><div><h3 className="font-bold text-slate-800 dark:text-white line-clamp-1">{g.name}</h3>{isCompleted ? (<span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-1"><Trophy size={10}/> Concluído</span>) : (<p className={`text-xs text-slate-500 ${privacyMode ? 'blur-sm' : ''}`}>Meta: {formatCurrency(g.target, privacyMode)}</p>)}</div></div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => setEditingGoal(g)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"><Edit2 size={16}/></button><button onClick={() => setDeletingGoal(g)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button></div></div><div className="space-y-1 mb-4"><div className="flex justify-between items-end"><p className="text-sm text-slate-500 dark:text-slate-400">Acumulado</p><span className="text-xs font-bold text-slate-400">{progress.toFixed(0)}%</span></div><p className={`text-2xl font-extrabold text-slate-800 dark:text-white ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(g.current, privacyMode)}</p></div><div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-6"><div className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000" style={{width: `${progress}%`, background: isCompleted ? 'linear-gradient(90deg, #EAB308 0%, #FACC15 100%)' : `linear-gradient(90deg, ${g.color || '#8b5cf6'} 0%, ${g.color ? g.color + '80' : '#a78bfa'} 100%)`}}><div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div></div></div><button onClick={() => setDepositGoal(g)} className="w-full py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-700 dark:text-white font-medium transition-all flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 group-hover:shadow-lg"><Plus size={16} className={`transition-transform group-hover:rotate-90 ${isCompleted ? 'text-yellow-500' : 'text-slate-400'}`}/> {isCompleted ? 'Adicionar Bônus' : 'Depositar'}</button></div>); })}</div>
+          {editingGoal && <Modal isOpen={!!editingGoal} onClose={() => setEditingGoal(null)} title="Editar Meta"><form onSubmit={handleEditSave} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" defaultValue={editingGoal.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" defaultValue={editingGoal.target} className={theme.input} /></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue={editingGoal.current} className={theme.input} /></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked={editingGoal.color === '#8b5cf6'} className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" defaultChecked={editingGoal.color === '#ec4899'} className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" defaultChecked={editingGoal.color === '#06b6d4'} className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" defaultChecked={editingGoal.color === '#10b981'} className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+          {isAdding && <Modal isOpen={isAdding} onClose={() => setIsAdding(false)} title="Novo Objetivo"><form onSubmit={handleAdd} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" className={theme.input} placeholder="Ex: Viagem, Carro Novo..."/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" className={theme.input}/></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue="0" className={theme.input}/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Criar Meta</button></form></Modal>}
+          {depositGoal && <Modal isOpen={!!depositGoal} onClose={() => setDepositGoal(null)} title={`Depositar em: ${depositGoal.name}`}><form onSubmit={handleDepositSave} className="space-y-6"><div><label className={theme.label}>Valor do Aporte</label><input required name="amount" type="number" step="0.01" min="0" autoFocus className={`${theme.input} text-3xl font-bold text-emerald-500 text-center py-6`} placeholder="R$ 0,00" /></div><div className="flex justify-between text-xs text-slate-500 px-2"><span>Atual: {formatCurrency(depositGoal.current, false)}</span><span>Meta: {formatCurrency(depositGoal.target, false)}</span></div><button type="submit" className={theme.btnAccent}>Confirmar Depósito</button></form></Modal>}
+          {deletingGoal && <Modal isOpen={!!deletingGoal} onClose={() => setDeletingGoal(null)} title="Excluir Meta"><div className="space-y-6"><p className="text-slate-300">Tem certeza que deseja excluir a meta <strong className="text-white">{deletingGoal.name}</strong>? Todo o histórico de progresso será perdido.</p><div className="flex gap-4"><button onClick={() => setDeletingGoal(null)} className="w-full py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors">Cancelar</button><button onClick={confirmDelete} className="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-600/20 transition-all">Excluir Definitivamente</button></div></div></Modal>}
+        </div>
+      );
     };
 
-    const InvestmentsView = ({ investments, cards, onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode, user }) => {
-        const [edCard, setEdCard] = useState(null); const [addCard, setAddCard] = useState(false);
-        const [edInv, setEdInv] = useState(null); const [addInv, setAddInv] = useState(false);
-        const safeInv = Array.isArray(investments) ? investments : [];
-        const safeCards = Array.isArray(cards) ? cards : [];
-        const total = safeInv.reduce((a,c)=>a+Number(c.value),0);
-        const distributionData = useMemo(() => { const counts = {}; safeInv.forEach(i => counts[i.type] = (counts[i.type] || 0) + Number(i.value)); return Object.entries(counts).map(([name, value]) => ({ name, value })); }, [safeInv]);
-        
+    const InvestmentsView = ({ investments=[], cards=[], onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode }) => {
+        const [editingCard, setEditingCard] = useState(null); const [editingInvest, setEditingInvest] = useState(null); const [isAddingCard, setIsAddingCard] = useState(false); const [isAddingInvest, setIsAddingInvest] = useState(false);
+        const totalInvested = investments.reduce((a,c) => a + Number(c.value), 0);
+        const distributionData = useMemo(() => { const counts = {}; investments.forEach(i => counts[i.type] = (counts[i.type] || 0) + Number(i.value)); return Object.entries(counts).map(([name, value]) => ({ name, value })); }, [investments]);
         const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'];
         const getBgColorForType = (type) => { switch(type) { case 'Renda Fixa': return 'bg-emerald-500/10 border-emerald-500/20'; case 'Ações': return 'bg-blue-500/10 border-blue-500/20'; case 'Cripto': return 'bg-amber-500/10 border-amber-500/20'; case 'FIIs': return 'bg-violet-500/10 border-violet-500/20'; default: return 'bg-slate-500/10 border-slate-500/20'; } };
         const getIconForType = (type) => { switch(type) { case 'Renda Fixa': return <Building2 size={20} className="text-emerald-400"/>; case 'Ações': return <TrendingUp size={20} className="text-blue-400"/>; case 'Cripto': return <Coins size={20} className="text-amber-400"/>; case 'FIIs': return <Briefcase size={20} className="text-violet-400"/>; default: return <Target size={20} className="text-slate-400"/>; } };
-        const handleCardSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const d={name:fd.get('name'),limit:Number(fd.get('limit')),used:0,dueDay:Number(fd.get('dueDay')),color:fd.get('color')}; if(edCard) onUpdateCard({...edCard,...d}); else onAddCard(d); setEdCard(null); setAddCard(false); };
-        const handleInvestSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const d={name:fd.get('name'),type:fd.get('type'),value:Number(fd.get('value')),returnRate:fd.get('returnRate')}; if(edInv) onUpdateInvest({...edInv,...d}); else onAddInvest(d); setEdInv(null); setAddInv(false); };
+        const handleCardSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const cardData = { name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; if(editingCard) { onUpdateCard({...editingCard, ...cardData}); setEditingCard(null); } else { onAddCard(cardData); setIsAddingCard(false); } };
+        const handleInvestSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const invData = { name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }; if(editingInvest) { onUpdateInvest({...editingInvest, ...invData}); setEditingInvest(null); } else { onAddInvest(invData); setIsAddingInvest(false); } };
 
-        return (<div className="space-y-8 animate-fade-in"><div className="grid grid-cols-1 md:grid-cols-3 gap-6"><Card className="md:col-span-2 !bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-900"><h2 className="text-slate-400 font-medium mb-1">Patrimônio Total</h2><h3 className={`text-4xl font-extrabold text-white mb-4 ${privacyMode?'blur-md':''}`}>{formatCurrency(total, privacyMode)}</h3><div className="flex gap-3"><button onClick={()=>setAddInv(true)} className="px-5 py-2.5 bg-emerald-500 rounded-xl font-bold text-slate-900 text-sm flex gap-2"><Plus size={18}/> Ativo</button><button onClick={()=>setAddCard(true)} className="px-5 py-2.5 bg-white/10 rounded-xl font-bold text-white text-sm border border-white/10 flex gap-2"><CreditCard size={18}/> Cartão</button></div></Card></div>
-        <div><h3 className="text-xl font-bold text-white mb-4">Cartões</h3><div className="grid grid-cols-1 md:grid-cols-3 gap-4">{safeCards.map(c=>(<div key={c.id} className={`p-6 rounded-[24px] text-white relative overflow-hidden ${c.color||'bg-slate-800'}`}><div className="flex justify-between items-start mb-4"><div><p className="font-bold text-lg">{c.name}</p><p className="text-xs opacity-70">Crédito</p></div><CreditCard/></div><p className="text-xs opacity-60">Fatura</p><p className="text-2xl font-bold">{formatCurrency(c.used)}</p><div className="absolute top-4 right-4 flex gap-2"><button onClick={()=>setEdCard(c)}><Edit2 size={14}/></button><button onClick={()=>onDeleteCard(c.id)}><Trash2 size={14}/></button></div></div>))}</div></div>
-        <div><h3 className="text-xl font-bold text-white mb-4">Ativos</h3><div className="grid grid-cols-1 md:grid-cols-4 gap-4">{safeInv.map(i=>(<div key={i.id} className="bg-[#18181b] border border-white/5 rounded-[24px] p-5"><div className="flex justify-between mb-4"><div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center"><TrendingUp size={20} className="text-emerald-400"/></div><div className="flex gap-2"><button onClick={()=>setEdInv(i)} className="text-slate-400 hover:text-blue-400"><Edit2 size={14}/></button><button onClick={()=>onDeleteInvest(i.id)} className="text-slate-400 hover:text-rose-400"><Trash2 size={14}/></button></div></div><p className="text-xs font-bold uppercase text-slate-500">{i.type}</p><h4 className="font-bold text-white truncate">{i.name}</h4><p className="text-2xl font-bold text-white">{formatCurrency(i.value)}</p></div>))}</div></div>
-        {(edCard||addCard)&&<Modal isOpen={true} onClose={()=>{setEdCard(null);setAddCard(false)}} title="Cartão"><form onSubmit={handleCardSubmit} className="space-y-4"><div><label className={theme.label}>Nome</label><input name="name" defaultValue={edCard?.name} className={theme.input} required/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input name="limit" type="number" defaultValue={edCard?.limit} className={theme.input} required/></div><div><label className={theme.label}>Dia Venc.</label><input name="dueDay" type="number" defaultValue={edCard?.dueDay} className={theme.input} required/></div></div><div><label className={theme.label}>Cor</label><select name="color" defaultValue={edCard?.color} className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Preto</option><option value="bg-blue-600">Azul</option></select></div><button className={theme.btnPrimary}>Salvar</button></form></Modal>}
-        {(edInv||addInv)&&<Modal isOpen={true} onClose={()=>{setEdInv(null);setAddInv(false)}} title="Investimento"><form onSubmit={handleInvestSubmit} className="space-y-4"><div><label className={theme.label}>Nome</label><input name="name" defaultValue={edInv?.name} className={theme.input} required/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" defaultValue={edInv?.type} className={theme.input}><option>Renda Fixa</option><option>Ações</option><option>Cripto</option></select></div><div><label className={theme.label}>Valor</label><input name="value" type="number" defaultValue={edInv?.value} className={theme.input} required/></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" defaultValue={edInv?.returnRate} className={theme.input}/></div><button className={theme.btnPrimary}>Salvar</button></form></Modal>}
-        </div>);
+        return (
+            <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2 relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-900 border border-white/5 p-6 flex flex-col md:flex-row items-center justify-between shadow-2xl">
+                        <div className="z-10"><h2 className="text-slate-400 font-medium mb-1">Patrimônio Total</h2><h3 className={`text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(totalInvested, privacyMode)}</h3><div className="flex gap-3"><button onClick={() => setIsAddingInvest(true)} className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all flex items-center gap-2 text-sm"><Plus size={18}/> Novo Ativo</button><button onClick={() => setIsAddingCard(true)} className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all flex items-center gap-2 text-sm border border-white/10"><CreditCard size={18}/> Novo Cartão</button></div></div>
+                        <div className="w-32 h-32 md:w-40 md:h-40 relative mt-6 md:mt-0 opacity-80"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={distributionData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value" stroke="none">{distributionData.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}</Pie></PieChart></ResponsiveContainer></div>
+                    </div>
+                    <div className="hidden md:flex flex-col justify-center bg-slate-100 dark:bg-white/5 rounded-[32px] p-6 border border-slate-200 dark:border-white/5"><h4 className="text-slate-500 font-bold uppercase text-xs mb-4">Diversificação</h4><div className="space-y-3">{distributionData.map((d, i) => (<div key={d.name} className="flex justify-between items-center text-sm"><div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}}></div><span className="text-slate-700 dark:text-slate-300">{d.name}</span></div><span className={`font-bold text-slate-900 dark:text-white ${privacyMode ? 'blur-sm' : ''}`}>{Math.round((d.value / totalInvested) * 100) || 0}%</span></div>))}</div></div>
+                </div>
+                <div><h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Cartões</h3><div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x no-scrollbar">{cards.map(c => (<div key={c.id} className={`snap-center shrink-0 w-[85vw] md:w-auto h-52 rounded-[28px] p-6 text-white relative overflow-hidden shadow-xl transition-transform hover:-translate-y-1 ${c.color} bg-gradient-to-br from-white/10 to-black/30 backdrop-blur-xl border border-white/10 group`}><div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div><div className="relative z-10 flex flex-col justify-between h-full"><div className="flex justify-between items-start"><div><p className="font-bold text-lg tracking-wide">{c.name}</p><p className="text-[10px] opacity-70 uppercase tracking-widest mt-0.5">Crédito</p></div><CreditCard size={28} className="opacity-80"/></div><div className="space-y-3"><div className="flex justify-between items-end"><div><p className="text-xs font-medium opacity-60 mb-1">Fatura Atual</p><p className={`text-2xl font-bold tracking-tight ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(c.used, privacyMode)}</p></div><div className="text-right"><p className="text-xs font-medium opacity-60 mb-1">Limite</p><p className={`text-sm font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(c.limit, privacyMode)}</p></div></div><div className="w-full bg-black/30 rounded-full h-1.5 overflow-hidden"><div className={`h-full rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] ${c.used/c.limit > 0.9 ? 'bg-rose-400' : 'bg-white'}`} style={{ width: `${Math.min((c.used/c.limit)*100, 100)}%` }}></div></div></div></div><div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20"><button onClick={() => setEditingCard(c)} className="p-2 bg-black/20 hover:bg-black/40 rounded-full text-white backdrop-blur-md"><Edit2 size={14}/></button><button onClick={() => onDeleteCard(c.id)} className="p-2 bg-black/20 hover:bg-rose-500/80 rounded-full text-white backdrop-blur-md"><Trash2 size={14}/></button></div></div>))}
+                        <button onClick={() => setIsAddingCard(true)} className="snap-center shrink-0 w-[85vw] md:w-auto h-52 rounded-[28px] border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-violet-500 hover:border-violet-500/50 hover:bg-violet-500/5 transition-all gap-3 group"><div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-white/5 group-hover:bg-violet-500/20 flex items-center justify-center transition-colors"><Plus size={24}/></div><span className="font-medium">Adicionar Cartão</span></button>
+                </div></div>
+                <div><h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Ativos</h3><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">{investments.map(i => (<div key={i.id} className={`group bg-white dark:bg-[#18181b] border rounded-[24px] p-5 hover:shadow-lg transition-all relative overflow-hidden ${getBgColorForType(i.type)}`}><div className="flex justify-between items-start mb-4"><div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-white dark:bg-white/5 shadow-sm`}>{getIconForType(i.type)}</div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => setEditingInvest(i)} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500"><Edit2 size={14}/></button><button onClick={() => onDeleteInvest(i.id)} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500"><Trash2 size={14}/></button></div></div><div><p className="text-xs font-bold uppercase tracking-wider opacity-50 mb-1">{i.type}</p><h4 className="font-bold text-slate-800 dark:text-white text-lg truncate mb-1">{i.name}</h4><h3 className={`text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(i.value, privacyMode)}</h3></div>{i.returnRate && (<div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center gap-2"><div className={`text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-500`}>{i.returnRate.includes('+') ? '' : '+'}{i.returnRate}</div><span className="text-[10px] text-slate-400 uppercase font-bold">Rentabilidade</span></div>)}</div>))}</div></div>
+                {(editingCard || isAddingCard) && <Modal isOpen={true} onClose={() => {setEditingCard(null); setIsAddingCard(false)}} title={editingCard ? "Editar Cartão" : "Novo Cartão"}><form onSubmit={handleCardSubmit} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" defaultValue={editingCard?.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" defaultValue={editingCard?.limit} className={theme.input} /></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" defaultValue={editingCard?.dueDay} className={theme.input} /></div></div><div><label className={theme.label}>Estilo</label><select name="color" defaultValue={editingCard?.color} className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option><option value="bg-rose-600">Rose</option></select></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+                {(editingInvest || isAddingInvest) && <Modal isOpen={true} onClose={() => {setEditingInvest(null); setIsAddingInvest(false)}} title={editingInvest ? "Editar Ativo" : "Novo Ativo"}><form onSubmit={handleInvestSubmit} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" defaultValue={editingInvest?.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" defaultValue={editingInvest?.type} className={theme.input}><option value="Renda Fixa">Renda Fixa</option><option value="Ações">Ações</option><option value="Cripto">Cripto</option><option value="FIIs">FIIs</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" defaultValue={editingInvest?.value} className={theme.input} /></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" defaultValue={editingInvest?.returnRate} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+            </div>
+        );
     };
 
     const CalculatorView = () => {
-       const [v, setV] = useState({ i:1000, m:500, r:10, y:10 }); const [d, setD] = useState([]);
-       useEffect(() => { const arr=[]; let c=Number(v.i); const rate=v.r/100/12; for(let i=0;i<=v.y*12;i++){ if(i%12===0) arr.push({year:`Ano ${i/12}`, Total:Math.round(c)}); c=c*(1+rate)+Number(v.m); } setD(arr); }, [v]);
-       const handleChange = (e) => setV({...v, [e.target.name]: e.target.value});
-       return (<div className="space-y-6 animate-fade-in"><h2 className="text-xl font-bold text-white flex gap-2"><Calculator className="text-violet-400"/> Juros Compostos</h2><div className="grid grid-cols-1 lg:grid-cols-3 gap-6"><Card><div className="space-y-4"><div><label className={theme.label}>Inicial</label><input name="i" type="number" value={v.i} onChange={handleChange} className={theme.input}/></div><div><label className={theme.label}>Mensal</label><input name="m" type="number" value={v.m} onChange={handleChange} className={theme.input}/></div><div><label className={theme.label}>Juros Anual %</label><input name="r" type="number" value={v.r} onChange={handleChange} className={theme.input}/></div><div><label className={theme.label}>Anos</label><input name="y" type="number" value={v.y} onChange={handleChange} className={theme.input}/></div></div></Card><Card className="lg:col-span-2 min-h-[300px]"><h3 className="text-emerald-400 text-sm font-bold uppercase mb-2">Resultado</h3><p className="text-4xl font-extrabold text-white mb-6">{formatCurrency(d[d.length-1]?.Total||0)}</p><div className="h-[200px] w-full"><ResponsiveContainer><AreaChart data={d}><defs><linearGradient id="cT" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333"/><XAxis dataKey="year" stroke="#666"/><RechartsTooltip contentStyle={{background:'#18181b',border:'none',color:'#fff'}}/><Area type="monotone" dataKey="Total" stroke="#10B981" fill="url(#cT)" strokeWidth={3}/></AreaChart></ResponsiveContainer></div></Card></div></div>);
+       const [values, setValues] = useState({ initial: 1000, monthly: 500, rate: 10, years: 10 });
+       const [data, setData] = useState([]);
+       useEffect(() => { const newData = []; let current = Number(values.initial), invested = Number(values.initial); const rate = values.rate / 100 / 12, months = values.years * 12; for (let i = 0; i <= months; i++) { if (i % 12 === 0) newData.push({ year: `Ano ${i/12}`, Total: Math.round(current), Investido: Math.round(invested) }); current = current * (1 + rate) + Number(values.monthly); invested += Number(values.monthly); } setData(newData); }, [values]);
+       const handleChange = (e) => setValues({ ...values, [e.target.name]: e.target.value });
+       return (
+         <div className="space-y-6 animate-fade-in pb-20 md:pb-0"><h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Calculator className="text-violet-400"/> Juros Compostos</h2><div className="grid grid-cols-1 lg:grid-cols-3 gap-6"><Card><form className="space-y-5"><div><label className={theme.label}>Inicial (R$)</label><input name="initial" type="number" value={values.initial} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Mensal (R$)</label><input name="monthly" type="number" value={values.monthly} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Juros Anual (%)</label><input name="rate" type="number" value={values.rate} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Anos</label><input name="years" type="number" value={values.years} onChange={handleChange} className={theme.input} /></div></form></Card><Card className="lg:col-span-2 flex flex-col min-h-[400px]"><div className="mb-8 text-center bg-emerald-100 dark:bg-emerald-500/10 p-6 rounded-2xl border border-emerald-200 dark:border-emerald-500/20"><span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Patrimônio Projetado</span><h3 className="text-3xl md:text-5xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{formatCurrency(data[data.length-1]?.Total || 0, false)}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Total investido: {formatCurrency(data[data.length-1]?.Investido || 0, false)}</p></div><div className="flex-1 w-full h-full min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data}><defs><linearGradient id="cT" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill:'#666', fontSize:12}} /><YAxis axisLine={false} tickLine={false} tick={{fill:'#666', fontSize:12}} /><RechartsTooltip contentStyle={{borderRadius:'12px', border:'none', backgroundColor:'#0f172a', color:'#fff'}} /><Area type="monotone" dataKey="Total" stroke="#10B981" fillOpacity={1} fill="url(#cT)" strokeWidth={3} /><Legend /></AreaChart></ResponsiveContainer></div></Card></div></div>
+       );
     };
 
-    // --- APP ---
+    // --- MAIN APP ---
     function App() {
-        const [authMode, setAuthMode] = useState('loading');
-        const [user, setUser] = useState(null);
-        const [activeTab, setActiveTab] = useState('overview');
-        const [toasts, setToasts] = useState([]);
-        const [modals, setModals] = useState({});
-        
-        const [transactions, setTransactions] = useState([]);
-        const [goals, setGoals] = useState([]);
-        const [cards, setCards] = useState([]);
-        const [investments, setInvestments] = useState([]);
-        const [budgets, setBudgets] = useState([]);
-        const [privacyMode, setPrivacyMode] = useState(false);
-        const [isDarkMode, setIsDarkMode] = useState(true);
+      const [toasts, setToasts] = useState([]);
+      const [authMode, setAuthMode] = useState('loading');
+      const [user, setUser] = useState(null);
+      const [privacyMode, setPrivacyMode] = useState(false);
+      const [activeTab, setActiveTab] = useState('overview');
+      const [isDarkMode, setIsDarkMode] = useState(true);
+      const [modals, setModals] = useState({ transaction: false, subscription: false, settings: false, dayDetails: false });
+      
+      const [transactions, setTransactions] = useState([]);
+      const [goals, setGoals] = useState([]);
+      const [investments, setInvestments] = useState([]);
+      const [cards, setCards] = useState([]);
+      const [budgets, setBudgets] = useState([]);
 
-        const [transType, setTransType] = useState('expense');
-        const [transCat, setTransCat] = useState('Moradia');
-        const [editingTransaction, setEditingTransaction] = useState(null);
-        const [prefilledDate, setPrefilledDate] = useState(new Date().toISOString().split('T')[0]);
-        const [selectedDateDetails, setSelectedDateDetails] = useState(null);
+      const [transType, setTransType] = useState('expense');
+      const [transCat, setTransCat] = useState(Object.keys(CATEGORIES.expense)[0]);
+      const [selectedDateDetails, setSelectedDateDetails] = useState(null);
+      const [prefilledDate, setPrefilledDate] = useState(new Date().toISOString().split('T')[0]);
+      const [editingTransaction, setEditingTransaction] = useState(null);
 
-        const addToast = (msg, type='success') => { const id=Date.now(); setToasts(p=>[...p,{id,msg,type}]); setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),3000); };
-        const toggleModal = (k,v) => setModals(p=>({...p,[k]:v}));
+      // Toast Helper
+      const addToast = (msg, type = 'success') => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, msg, type }]);
+        setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+      };
 
-        const fetchAll = async (currentUser) => {
-            if (!currentUser || !currentUser.id) return;
-            const headers = { 'user-id': currentUser.id };
-            try {
-                const [t,g,c,i,b] = await Promise.all([
-                    fetch('/api/transactions', {headers}).then(r=>r.ok?r.json():[]),
-                    fetch('/api/goals', {headers}).then(r=>r.ok?r.json():[]),
-                    fetch('/api/cards', {headers}).then(r=>r.ok?r.json():[]),
-                    fetch('/api/investments', {headers}).then(r=>r.ok?r.json():[]),
-                    fetch('/api/budgets', {headers}).then(r=>r.ok?r.json():[])
-                ]);
-                setTransactions(Array.isArray(t)?t:[]); setGoals(Array.isArray(g)?g:[]); setCards(Array.isArray(c)?c:[]); setInvestments(Array.isArray(i)?i:[]); setBudgets(Array.isArray(b)?b:[]);
-            } catch(e) { console.error(e); }
+      // --- API FETCHERS ---
+      const fetchTransactions = async () => { try { const r = await fetch('/api/transactions'); const d = await r.json(); setTransactions(d || []); } catch (e) { console.error(e); } };
+      const fetchGoals = async () => { try { const r = await fetch('/api/goals'); const d = await r.json(); setGoals(d || []); } catch (e) { console.error(e); } };
+      const fetchCards = async () => { try { const r = await fetch('/api/cards'); const d = await r.json(); setCards(d || []); } catch (e) { console.error(e); } };
+      const fetchInvestments = async () => { try { const r = await fetch('/api/investments'); const d = await r.json(); setInvestments(d || []); } catch (e) { console.error(e); } };
+      const fetchBudgets = async () => { try { const r = await fetch('/api/budgets'); const d = await r.json(); setBudgets(d || []); } catch (e) { console.error(e); } };
+
+      const fetchAllData = () => {
+          fetchTransactions(); fetchGoals(); fetchCards(); fetchInvestments(); fetchBudgets();
+      };
+
+      // --- AUTH & INIT ---
+      useEffect(() => {
+        document.documentElement.classList.add('dark');
+        const savedUser = localStorage.getItem('prospera_user');
+        if (savedUser) { 
+            setUser(JSON.parse(savedUser)); 
+            setAuthMode('app'); 
+            fetchAllData(); 
+        } else { 
+            setAuthMode('register'); 
+        }
+      }, []);
+
+      const handleRegister = async (name, pin, setError) => { 
+          try {
+             const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, pin}) });
+             const d = await r.json();
+             if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); addToast(`Bem-vindo, ${name}!`); }
+             else { setError(d.error); }
+          } catch(e) { setError("Erro ao registrar"); }
+      };
+      
+      const handleLogin = async (pin, setError) => { 
+          try {
+             const r = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({pin}) });
+             const d = await r.json();
+             if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); }
+             else { setError("PIN Incorreto"); }
+          } catch(e) { setError("Erro de conexão"); }
+      };
+
+      // --- CRUD HANDLERS ---
+      
+      const handleAddTrans = async (e) => {
+        e.preventDefault(); const fd = new FormData(e.target);
+        const newTrans = { 
+          description: fd.get('description'), amount: parseFloat(fd.get('amount')), type: fd.get('type'), 
+          category: transCat, subcategory: fd.get('subcategory'), date: fd.get('date'), 
+          paymentMethod: fd.get('paymentMethod'), isRecurring: fd.get('isRecurring') === 'on', cardId: fd.get('cardId')
         };
+        try {
+          const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newTrans) });
+          if (res.ok) { addToast("Transação salva! 🏦"); fetchTransactions(); toggleModal('transaction', false); setEditingTransaction(null); setModals(p => ({...p, dayDetails: false})); }
+        } catch (error) { addToast("Erro ao salvar", "error"); }
+      };
 
-        useEffect(() => {
-            document.documentElement.classList.add('dark'); // FORCE DARK MODE IN APP
-            const saved = localStorage.getItem('prospera_keep_login');
-            if (saved) { 
-                const u = JSON.parse(saved);
-                setUser(u); 
-                setAuthMode('app'); 
-                fetchAll(u); 
-            } else { setAuthMode('login'); }
-        }, []);
+      const handleAddSubscription = async (e) => {
+         e.preventDefault(); const fd = new FormData(e.target);
+         const newSub = { description: fd.get('description'), amount: parseFloat(fd.get('amount')), type: 'expense', category: transCat, subcategory: 'Assinatura', date: fd.get('date'), isRecurring: true, paymentMethod: fd.get('paymentMethod'), cardId: fd.get('cardId') };
+         try { const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSub) }); if (res.ok) { addToast("Assinatura criada! 🔄"); fetchTransactions(); toggleModal('subscription', false); } } catch (e) { addToast("Erro", "error"); }
+      };
 
-        const handleLogin = async (pin, keep, setError) => { 
-             try { 
-                 const res = await fetch('/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pin})}); 
-                 const d = await res.json(); 
-                 if(d.success) { 
-                     if(keep) localStorage.setItem('prospera_keep_login', JSON.stringify(d.user)); 
-                     setUser(d.user); 
-                     setAuthMode('app'); 
-                     fetchAll(d.user); 
-                 } else setError(d.error); 
-             } catch { setError("Erro"); }
-        };
-        const handleRegister = async (name, pin, setError) => { 
-             try { 
-                 const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, pin})}); 
-                 const d=await res.json(); 
-                 if(d.success) { 
-                     localStorage.setItem('prospera_keep_login', JSON.stringify(d.user)); 
-                     setUser(d.user); 
-                     setAuthMode('app'); 
-                     fetchAll(d.user); 
-                     addToast(`Bem-vindo, ${name}!`); 
-                 } else setError(d.error); 
-             } catch { setError("Erro"); }
-        };
-        const handleLogout = () => { localStorage.removeItem('prospera_keep_login'); setUser(null); setAuthMode('login'); setModals({ ...modals, settings: false }); };
+      const deleteItem = async (setList, id) => {
+         let url = '';
+         if (setList === setTransactions) url = `/api/transactions/${id}`;
+         else if (setList === setGoals) url = `/api/goals/${id}`;
+         else if (setList === setCards) url = `/api/cards/${id}`;
+         else if (setList === setInvestments) url = `/api/investments/${id}`;
+         
+         if(url) {
+             try { await fetch(url, { method: 'DELETE' }); addToast("Item excluído 🗑️"); fetchAllData(); setModals(p => ({...p, dayDetails: false})); }
+             catch(e) { addToast("Erro ao excluir", "error"); }
+         }
+      };
 
-        const handleAddTrans = async (e) => {
-            e.preventDefault(); const fd=new FormData(e.target);
-            const body = { description:fd.get('description'), amount:Number(fd.get('amount')), type:fd.get('type'), category:transCat, subcategory:fd.get('subcategory'), date:fd.get('date'), paymentMethod:fd.get('paymentMethod'), isRecurring:fd.get('isRecurring')==='on', cardId:fd.get('cardId') };
-            await fetch('/api/transactions', {method:'POST', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(body)});
-            addToast("Salvo!"); fetchAll(user); toggleModal('transaction', false); setEditingTransaction(null);
-        };
-        const deleteItem = async (type, id) => { 
-            await fetch(`/api/${type}/${id}`, {method:'DELETE', headers: {'user-id': user.id}}); 
-            addToast("Excluído"); fetchAll(user); if(type==='transactions') setModals(p=>({...p,dayDetails:false})); 
-        };
-        const handleCardActions = {
-            add: async (d) => { await fetch('/api/cards', {method:'POST', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(d)}); fetchAll(user); },
-            update: async (d) => { await fetch(`/api/cards/${d.id}`, {method:'PUT', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(d)}); fetchAll(user); },
-            delete: (id) => deleteItem('cards', id)
-        };
-        const handleInvestActions = {
-            add: async (d) => { await fetch('/api/investments', {method:'POST', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(d)}); fetchAll(user); },
-            update: async (d) => { await fetch(`/api/investments/${d.id}`, {method:'PUT', headers:{'Content-Type':'application/json', 'user-id': user.id}, body:JSON.stringify(d)}); fetchAll(user); },
-            delete: (id) => deleteItem('investments', id)
-        };
+      // Wrappers
+      const handleCardActions = {
+          add: async (data) => { await fetch('/api/cards', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchCards(); addToast("Cartão criado"); },
+          update: async (data) => { await fetch(`/api/cards/${data.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchCards(); addToast("Cartão atualizado"); },
+          delete: async (id) => deleteItem(setCards, id)
+      };
+      const handleInvestActions = {
+          add: async (data) => { await fetch('/api/investments', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchInvestments(); addToast("Ativo criado"); },
+          update: async (data) => { await fetch(`/api/investments/${data.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchInvestments(); addToast("Ativo atualizado"); },
+          delete: async (id) => deleteItem(setInvestments, id)
+      };
 
-        if (authMode === 'loading') return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div></div>;
-        if (authMode !== 'app') return <AuthScreen mode={authMode} onLogin={handleLogin} onRegister={handleRegister} />;
+      const toggleModal = (key, val) => setModals(prev => ({ ...prev, [key]: val }));
+      const handleLogout = () => { localStorage.removeItem('prospera_user'); setUser(null); setAuthMode('login'); setModals({ ...modals, settings: false }); };
+      const handleTypeChange = (e) => { const type = e.target.value; setTransType(type); setTransCat(Object.keys(CATEGORIES[type])[0]); };
 
-        const navItems = [ { id: 'overview', label: 'Dashboard', icon: LayoutDashboard }, { id: 'transactions', label: 'Extrato', icon: ListFilter }, { id: 'goals', label: 'Objetivos', icon: Target }, { id: 'budgets', label: 'Orçamentos', icon: PiggyBank }, { id: 'investments', label: 'Carteira', icon: TrendingUp }, { id: 'recurring', label: 'Recorrência', icon: Repeat }, { id: 'calculator', label: 'Calculadora', icon: Calculator } ];
+      // --- RENDER ---
+      if (authMode === 'login') return <AuthScreen mode="login" onLogin={handleLogin} onRegister={handleRegister} />;
+      if (authMode === 'register') return <AuthScreen mode="register" onLogin={handleLogin} onRegister={handleRegister} />;
+      if (authMode === 'loading') return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div></div>;
 
-        return (
-            <div className="flex flex-col md:flex-row h-screen bg-[#09090b] text-slate-100 overflow-hidden font-body">
-                <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-white/5 bg-[#09090b]/50 backdrop-blur-sm">
-                    <div className="mb-8 scale-75"><CustomLogo /></div>
-                    <div className="flex-1 flex flex-col gap-4 w-full px-4">{navItems.map(i => (<button key={i.id} onClick={() => setActiveTab(i.id)} className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab===i.id?'bg-white/10 text-white':'text-slate-400 hover:bg-white/5 hover:text-slate-300'}`}><i.icon size={22}/><span className="text-[9px] font-medium">{i.label}</span></button>))}</div>
-                    <div className="flex flex-col gap-4 px-4 pb-4"><button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">{privacyMode?<EyeOff/>:<Eye/>}</button><button onClick={handleLogout} className="w-full aspect-square rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center"><LogOut/></button></div>
-                </aside>
-                <main className="flex-1 overflow-y-auto relative z-20 pb-24 md:pb-0 pt-safe">
-                    <div className="max-w-7xl mx-auto p-6 md:p-10">
-                        <header className="flex justify-between items-center mb-10"><div><h1 className="text-3xl font-extrabold mb-1 text-white">Olá, {user?.name}</h1><p className="text-slate-400 font-medium">Bem-vindo de volta.</p></div><div className="flex gap-3">{activeTab==='overview'&&<button onClick={()=>{setEditingTransaction(null);toggleModal('transaction',true)}} className={theme.btnAccent}><Plus size={18}/> Transação</button>}</div></header>
-                        
-                        {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
-                        {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem('transactions', id)} onEdit={(t)=>{setEditingTransaction(t);toggleModal('transaction',true)}} />}
-                        {activeTab === 'goals' && <GoalsView goals={goals} onRefresh={()=>fetchAll(user)} onDelete={(id) => deleteItem('goals', id)} privacyMode={privacyMode} user={user} />}
-                        {activeTab === 'budgets' && <BudgetView transactions={transactions} budgets={budgets} setBudgets={setBudgets} onRefresh={()=>fetchAll(user)} privacyMode={privacyMode} user={user} />}
-                        {activeTab === 'investments' && <InvestmentsView investments={investments} cards={cards} onAddCard={handleCardActions.add} onUpdateCard={handleCardActions.update} onDeleteCard={handleCardActions.delete} onAddInvest={handleInvestActions.add} onUpdateInvest={handleInvestActions.update} onDeleteInvest={handleInvestActions.delete} privacyMode={privacyMode} user={user} />}
-                        {activeTab === 'recurring' && <RecurringView transactions={transactions} cards={cards} onDelete={(id) => deleteItem('transactions', id)} onEdit={(t)=>{setEditingTransaction(t);toggleModal('transaction',true)}} onAdd={()=>{toggleModal('subscription',true)}} privacyMode={privacyMode} />}
-                        {activeTab === 'calculator' && <CalculatorView />}
-                        {activeTab === 'calendar' && <CalendarView transactions={transactions} onDayClick={(date, ts) => { setSelectedDateDetails({date, transactions:ts}); toggleModal('dayDetails', true); }} />}
-                    </div>
-                </main>
-                <div className="md:hidden fixed bottom-0 w-full bg-[#09090b]/90 backdrop-blur-xl border-t border-white/5 flex justify-between px-6 py-4 z-50">{navItems.slice(0,4).map(i=><button key={i.id} onClick={()=>setActiveTab(i.id)} className={`${activeTab===i.id?'text-violet-500':'text-slate-500'}`}><i.icon/></button>)}</div>
-                <ToastContainer toasts={toasts} />
+      const navItems = [ { id: 'overview', label: 'Dashboard', icon: LayoutDashboard }, { id: 'transactions', label: 'Extrato', icon: ListFilter }, { id: 'calendar', label: 'Agenda', icon: CalendarIcon }, { id: 'budgets', label: 'Orçamentos', icon: PiggyBank }, { id: 'goals', label: 'Objetivos', icon: Target }, { id: 'investments', label: 'Carteira', icon: TrendingUp }, { id: 'recurring', label: 'Recorrência', icon: Repeat }, { id: 'calculator', label: 'Calculadora', icon: Calculator } ];
+
+      return (
+        <div className="flex flex-col md:flex-row h-screen bg-slate-50 dark:bg-[#050505] overflow-hidden bg-gradient-animate relative transition-colors duration-500">
+           {/* Sidebar */}
+           <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm">
+             <div className="mb-8 scale-75"><CustomLogo /></div>
+             <div className="flex-1 flex flex-col gap-4 w-full px-4 overflow-y-auto no-scrollbar">
+               {navItems.map(item => (<button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${activeTab === item.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-inner ring-1 ring-slate-200 dark:ring-white/10' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-300'}`} title={item.label}><item.icon size={22} className={activeTab === item.id ? 'scale-110' : 'group-hover:scale-110'} /><span className="text-[9px] font-medium">{item.label}</span></button>))}
+             </div>
+             <div className="flex flex-col gap-4 px-4 mt-4 mb-4">
+                 <button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">{privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}</button>
+                 <button onClick={() => toggleModal('settings', true)} className="w-full aspect-square rounded-2xl bg-white/5 text-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center"><ShieldCheck size={20}/></button>
+                 <button className="w-full aspect-square rounded-2xl bg-white/5 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center" onClick={handleLogout}><LogOut size={20}/></button>
+             </div>
+           </aside>
+
+           {/* Main Content */}
+           <main className="flex-1 overflow-y-auto relative z-20 pb-24 md:pb-0 pt-safe">
+             <div className="max-w-7xl mx-auto p-4 md:p-10">
+                <header className="hidden md:flex justify-between items-center mb-10"><div><h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-1">{navItems.find(i=>i.id===activeTab)?.label}</h1><p className="text-slate-500 dark:text-slate-400 font-medium">Bem-vindo, <span className="text-violet-500">{user?.name}</span></p></div><div className="flex gap-4">{activeTab === 'overview' && <button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className={theme.btnAccent}><Plus size={18} /> Nova Transação</button>}</div></header>
                 
-                {/* MODALS */}
-                <Modal isOpen={modals.transaction} onClose={() => toggleModal('transaction', false)} title={editingTransaction?"Editar":"Nova Transação"}>
-                    <form onSubmit={handleAddTrans} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div><label className={theme.label}>Tipo</label><select name="type" className={theme.input} defaultValue={editingTransaction?.type||transType} onChange={e => {setTransType(e.target.value); setTransCat(Object.keys(CATEGORIES[e.target.value])[0])}}><option value="expense">Saída</option><option value="income">Entrada</option></select></div>
-                            <div><label className={theme.label}>Valor</label><input name="amount" type="number" step="0.01" defaultValue={editingTransaction?.amount} className={theme.input} required /></div>
-                        </div>
-                        <div><label className={theme.label}>Descrição</label><input name="description" defaultValue={editingTransaction?.description} className={theme.input} required /></div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div><label className={theme.label}>Categoria</label><select name="category" defaultValue={editingTransaction?.category||transCat} className={theme.input} onChange={e => setTransCat(e.target.value)}>{Object.keys(CATEGORIES[transType]).map(c=><option key={c} value={c}>{c}</option>)}</select></div>
-                            <div><label className={theme.label}>Data</label><input name="date" type="date" defaultValue={editingTransaction?.date||prefilledDate} className={theme.input} required /></div>
-                        </div>
-                        <div className="flex items-center gap-2"><input type="checkbox" name="isRecurring" defaultChecked={editingTransaction?.isRecurring} className="accent-violet-500"/><label className="text-sm text-slate-400">Recorrente</label></div>
-                        <button className={theme.btnPrimary}>Salvar</button>
-                    </form>
-                </Modal>
-                <Modal isOpen={modals.subscription} onClose={() => toggleModal('subscription', false)} title="Nova Recorrência">
-                     <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); const body = { description: fd.get('description'), amount: Number(fd.get('amount')), type: 'expense', category: transCat, subcategory: 'Assinatura', date: fd.get('date'), isRecurring: true }; fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'user-id': user.id }, body: JSON.stringify(body) }).then(() => { addToast("Criado!"); fetchAll(user); toggleModal('subscription', false); }); }} className="space-y-4">
-                        <div><label className={theme.label}>Descrição</label><input name="description" className={theme.input} required /></div>
-                        <div><label className={theme.label}>Valor</label><input name="amount" type="number" step="0.01" className={theme.input} required /></div>
-                        <div><label className={theme.label}>Data</label><input name="date" type="date" defaultValue={prefilledDate} className={theme.input} required /></div>
-                        <button className={theme.btnPrimary}>Salvar</button>
-                     </form>
-                </Modal>
-                <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem('transactions', id)} onAdd={() => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); }} onEdit={(t) => { toggleModal('dayDetails', false); setEditingTransaction(t); toggleModal('transaction', true); }} />
-                <SettingsModal isOpen={modals.settings} onClose={() => toggleModal('settings', false)} onLogout={handleLogout} />
-            </div>
-        );
+                {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
+                {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={(t) => { setEditingTransaction(t); setTransType(t.type); setTransCat(t.category); setPrefilledDate(t.date); toggleModal('transaction', true); }} />}
+                {activeTab === 'goals' && <GoalsView goals={goals} onRefresh={fetchGoals} onDelete={(id) => deleteItem(setGoals, id)} privacyMode={privacyMode} />}
+                {activeTab === 'budgets' && <BudgetView transactions={transactions} budgets={budgets} onRefresh={fetchBudgets} privacyMode={privacyMode} />}
+                {activeTab === 'calculator' && <CalculatorView />}
+                {activeTab === 'calendar' && <CalendarView transactions={transactions} onDayClick={(dateStr, dayTrans) => { if(dayTrans?.length > 0) { setSelectedDateDetails({date: dateStr, transactions: dayTrans}); toggleModal('dayDetails', true); } else { setPrefilledDate(dateStr); toggleModal('transaction', true); }}} />}
+                {activeTab === 'investments' && <InvestmentsView investments={investments} cards={cards} onAddCard={handleCardActions.add} onUpdateCard={handleCardActions.update} onDeleteCard={handleCardActions.delete} onAddInvest={handleInvestActions.add} onUpdateInvest={handleInvestActions.update} onDeleteInvest={handleInvestActions.delete} privacyMode={privacyMode} />}
+                {activeTab === 'recurring' && <RecurringView transactions={transactions} cards={cards} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={(t) => { setEditingTransaction(t); toggleModal('transaction', true); }} onAdd={() => { setTransCat('Moradia'); setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('subscription', true); }} privacyMode={privacyMode} />}
+             </div>
+           </main>
+           
+           <div className="md:hidden flex justify-between items-center px-4 py-3 z-30 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 border-b border-slate-200 dark:border-white/5 pt-safe"><div className="flex items-center gap-2"><CustomLogo /><span className="font-bold text-slate-800 dark:text-white text-lg">Prospera</span></div><div className="flex gap-2"><button onClick={() => setPrivacyMode(!privacyMode)} className="p-2 text-slate-400">{privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}</button><button onClick={() => toggleModal('settings', true)} className="p-2 text-emerald-500"><ShieldCheck size={20}/></button></div></div>
+           {activeTab === 'overview' && (<button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className="md:hidden fixed bottom-24 right-4 z-40 w-14 h-14 bg-violet-600 rounded-full text-white shadow-lg shadow-violet-600/40 flex items-center justify-center animate-fade-in hover:scale-110 active:scale-95 transition-all"><Plus size={28} /></button>)}
+           <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-2 py-2 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"><div className="flex justify-between items-center max-w-sm mx-auto">{navItems.slice(0, 4).map(item => (<button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === item.id ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}><item.icon size={22} className={activeTab === item.id ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/><span className="text-[10px] font-bold">{item.label}</span></button>))}<button onClick={() => setActiveTab('investments')} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === 'investments' ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}><TrendingUp size={22} className={activeTab === 'investments' ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/><span className="text-[10px] font-bold">Inv.</span></button></div></div>
+           
+           <ToastContainer toasts={toasts} />
+           
+           {/* Modals */}
+           <Modal isOpen={modals.transaction} onClose={() => { toggleModal('transaction', false); setEditingTransaction(null); }} title={editingTransaction ? "Editar Transação" : "Nova Transação"}><form key={editingTransaction ? editingTransaction.id : 'new'} onSubmit={handleAddTrans} className="space-y-6"><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" className={theme.input} defaultValue={editingTransaction?.type || transType} onChange={handleTypeChange}><option value="expense">Saída</option><option value="income">Entrada</option></select></div><div><label className={theme.label}>Valor</label><input required name="amount" type="number" step="0.01" className={theme.input} placeholder="0,00" defaultValue={editingTransaction?.amount} /></div></div><div><label className={theme.label}>Descrição</label><input required name="description" className={theme.input} placeholder="Ex: Netflix" defaultValue={editingTransaction?.description} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Categoria</label><select name="category" className={theme.input} defaultValue={editingTransaction?.category || transCat} onChange={(e) => setTransCat(e.target.value)}>{Object.keys(CATEGORIES[transType]).map(c=><option key={c} value={c}>{c}</option>)}</select></div><div><label className={theme.label}>Subcategoria</label><select name="subcategory" className={theme.input} defaultValue={editingTransaction?.subcategory}>{CATEGORIES[transType][transCat]?.map(s=><option key={s} value={s}>{s}</option>)}</select></div></div><div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4"><div className="flex items-center gap-2 mb-2"><Wallet size={16} className="text-violet-500"/><span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pagamento</span></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Método</label><select name="paymentMethod" className={theme.input} defaultValue={editingTransaction?.paymentMethod || 'pix'}>{PAYMENT_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select></div><div><label className={theme.label}>Cartão</label><select name="cardId" className={theme.input} defaultValue={editingTransaction?.cardId || ''}><option value="">Nenhum</option>{cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div></div></div><div className="flex items-center gap-3"><input type="checkbox" name="isRecurring" id="toggle" defaultChecked={editingTransaction?.isRecurring} className="w-5 h-5 rounded border-slate-300 text-violet-600 focus:ring-violet-500"/><label htmlFor="toggle" className="text-sm font-medium text-slate-600 dark:text-slate-300">Cobrança Recorrente</label></div><div><label className={theme.label}>Data</label><input required name="date" type="date" defaultValue={editingTransaction?.date || prefilledDate} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>{editingTransaction ? 'Atualizar' : 'Confirmar'}</button></form></Modal>
+           <Modal isOpen={modals.subscription} onClose={() => toggleModal('subscription', false)} title="Nova Assinatura"><form onSubmit={handleAddSubscription} className="space-y-6"><div><label className={theme.label}>Valor Mensal</label><input required name="amount" type="number" step="0.01" className={theme.input} placeholder="0,00" /></div><div><label className={theme.label}>Serviço (Descrição)</label><input required name="description" className={theme.input} placeholder="Ex: Spotify" /></div><div><label className={theme.label}>Categoria</label><select name="category" className={theme.input} defaultValue={transCat} onChange={(e) => setTransCat(e.target.value)}>{Object.keys(CATEGORIES['expense']).map(c=><option key={c} value={c}>{c}</option>)}</select></div><div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4"><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Método</label><select name="paymentMethod" className={theme.input} defaultValue="credit_card">{PAYMENT_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select></div><div><label className={theme.label}>Cartão</label><select name="cardId" className={theme.input}><option value="">Nenhum</option>{cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div></div></div><div><label className={theme.label}>Dia de Cobrança</label><input required name="date" type="date" defaultValue={prefilledDate} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Confirmar Assinatura</button></form></Modal>
+           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem(setTransactions, id)} onAdd={() => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); }} onEdit={(t) => { toggleModal('dayDetails', false); setEditingTransaction(t); toggleModal('transaction', true); }} />
+           <SettingsModal isOpen={modals.settings} onClose={() => toggleModal('settings', false)} onLogout={handleLogout} />
+        </div>
+      );
     }
 
     const root = createRoot(document.getElementById('root'));
