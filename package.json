@@ -1,7 +1,7 @@
 {
-  "name": "prospera-api",
+  "name": "prosperaweb",
   "version": "1.0.0",
-  "description": "API para o Prospera Finance",
+  "description": "Site conectado ao Postgres no Easypanel",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,5 +11,8 @@
     "pg": "^8.11.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
