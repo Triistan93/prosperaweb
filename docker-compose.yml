@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./backend
+    ports:
+      - "8000:80"
+    environment:
+      - DATABASE_URL=postgresql://prospera:prosperapass@db:5432/prosperadb
+      - SECRET_KEY=changeme_in_production
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: prospera
+      POSTGRES_PASSWORD: prosperapass
+      POSTGRES_DB: prosperadb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

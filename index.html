@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Prospera - Gestão Inteligente</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            background: '#09090b',
+            surface: '#18181b',
+            primary: '#8b5cf6',
+            secondary: '#ec4899',
+            accent: '#06b6d4',
+            gold: '#fbbf24',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            'slide-in-right': 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shimmer': 'shimmer 2s infinite',
+            'spin-slow': 'spin 3s linear infinite',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+            slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+            shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
+          },
+          screens: {
+            'xs': '375px',
+            // Padrões do Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px
+          }
+        }
+      }
+    }
+  </script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom": "https://esm.sh/react-dom@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom",
+        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom"
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
+    
+    /* Scrollbar Personalizada (Desktop) */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+    /* Glass Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .bg-gradient-animate {
+      background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%),
+                  radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%);
+    }
+
+    /* Fix Inputs & Mobile Utilities */
+    select { color-scheme: dark; }
+    option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
+    .dark option { background-color: #18181b !important; color: #ffffff !important; }
+    ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
+    
+    /* Safe Area Spacing for iOS */
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    .pt-safe { padding-top: env(safe-area-inset-top); }
+    
+    /* Hide scrollbar for clean UI but keep functionality */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect, useMemo, useRef } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { 
+      PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line 
+    } from 'recharts';
+    import { 
+      Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, 
+      Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save,
+      Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock
+    } from 'lucide-react';
+
+    // --- DADOS INICIAIS ---
+    const getToday = () => new Date();
+    const today = getToday();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const prevM = String(today.getMonth() === 0 ? 12 : today.getMonth()).padStart(2, '0');
+    const prevY = today.getMonth() === 0 ? y - 1 : y;
+
+    const INITIAL_TRANSACTIONS = [
+      { id: 1, type: 'expense', category: 'Moradia', description: 'Aluguel', amount: 2500, date: `${y}-${m}-05`, isRecurring: true, paymentMethod: 'pix' },
+      { id: 2, type: 'income', category: 'Salário', description: 'Pagamento Mensal', amount: 8500, date: `${y}-${m}-01`, isRecurring: true, paymentMethod: 'pix' },
+      { id: 3, type: 'expense', category: 'Alimentação', description: 'Supermercado', amount: 850, date: `${y}-${m}-08`, isRecurring: false, paymentMethod: 'debit' },
+      { id: 4, type: 'expense', category: 'Lazer', description: 'Netflix', amount: 55.90, date: `${y}-${m}-12`, isRecurring: true, paymentMethod: 'credit_card', cardId: 1 },
+      { id: 5, type: 'income', category: 'Freelance', description: 'Projeto Web', amount: 1200, date: `${y}-${m}-15`, isRecurring: false, paymentMethod: 'pix' },
+      { id: 6, type: 'expense', category: 'Moradia', description: 'Aluguel Jan', amount: 2500, date: `${prevY}-${prevM}-05`, isRecurring: true, paymentMethod: 'pix' },
+    ];
+
+    const INITIAL_CARDS = [
+      { id: 1, name: 'Nubank Platinum', limit: 12000, used: 4555.90, dueDay: 10, color: 'bg-purple-600' },
+      { id: 2, name: 'XP Visa Infinite', limit: 35000, used: 2100, dueDay: 25, color: 'bg-slate-900' },
+    ];
+
+    const CATEGORIES = {
+      expense: {
+        'Moradia': ['Aluguel', 'Condomínio', 'Energia', 'Água', 'Internet', 'Gás', 'Manutenção'],
+        'Alimentação': ['Supermercado', 'Restaurante', 'Delivery', 'Lanches'],
+        'Transporte': ['Combustível', 'Uber', 'Ônibus', 'IPVA'],
+        'Lazer': ['Viagens', 'Cinema', 'Streaming', 'Jogos', 'Assinaturas'],
+        'Pessoal': ['Roupas', 'Estética', 'Academia', 'Farmácia'],
+        'Serviços': ['Seguros', 'Bancos', 'Contador'],
+        'Outros': ['Presentes', 'Imprevistos']
+      },
+      income: {
+        'Salário': ['Mensal', 'Adiantamento', '13º', 'Férias', 'Bônus'],
+        'Extra': ['Freelance', 'Vendas', 'Investimentos'],
+      }
+    };
+
+    const CATEGORY_COLORS = {
+      'Moradia': '#8b5cf6', 'Alimentação': '#f59e0b', 'Transporte': '#ef4444',
+      'Lazer': '#06b6d4', 'Pessoal': '#ec4899', 'Serviços': '#6366f1',
+      'Outros': '#64748b', 'Salário': '#10b981', 'Extra': '#3b82f6',
+    };
+
+    const PAYMENT_METHODS = [
+      { id: 'pix', label: 'Pix' },
+      { id: 'money', label: 'Dinheiro' },
+      { id: 'debit', label: 'Débito' },
+      { id: 'credit_card', label: 'Cartão de Crédito' },
+    ];
+
+    // --- DESIGN SYSTEM ---
+    const theme = {
+      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 transition-all hover:border-white/20 dark:hover:border-white/10 relative overflow-hidden group",
+      input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base shadow-sm",
+      label: "mb-1.5 md:mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1",
+      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide w-full cursor-pointer touch-manipulation",
+      btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 md:py-3.5 md:px-6 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] text-xs md:text-sm tracking-wide cursor-pointer touch-manipulation",
+    };
+
+    const formatCurrency = (value, isHidden) => isHidden ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    };
+
+    // --- COMPONENTES UI GERAIS ---
+    const Modal = ({ isOpen, onClose, title, children }) => {
+      useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
+      if (!isOpen) return null;
+      return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e) => e.target === e.currentTarget && onClose()}>
+          <div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up relative overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh]">
+            <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between shrink-0">
+              <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate">{title}</h3>
+              <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+            <div className="overflow-y-auto custom-scrollbar p-4 md:p-5">{children}</div>
+          </div>
+        </div>
+      );
+    };
+
+    const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
+    const ProgressBar = ({ current, target, color }) => {
+      const percentage = Math.min((current / target) * 100, 100);
+      return (
+        <div className="w-full bg-slate-200 dark:bg-white/5 rounded-full h-2 md:h-3 overflow-hidden mt-3 md:mt-4">
+          <div className="h-full rounded-full transition-all duration-1000 ease-out relative" style={{ width: `${percentage}%`, background: color }}>
+            <div className="absolute inset-0 bg-white/30 animate-[pulse_2s_infinite]"></div>
+          </div>
+        </div>
+      );
+    };
+    const CustomLogo = () => (
+      <div className="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-0 md:mb-8 md:animate-float shrink-0"><Sprout className="text-white" size={20} /></div>
+    );
+    const ToastContainer = ({ toasts }) => (
+      <div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] md:w-auto">
+        {toasts.map(t => (
+          <div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type === 'error' ? 'bg-rose-600' : 'bg-[#18181b]'} backdrop-blur-xl`}>
+              {t.type === 'success' ? <CheckCircle size={20} className="text-emerald-400 shrink-0"/> : <XCircle size={20} className="text-white shrink-0"/>}
+              <span className="truncate">{t.msg}</span>
+          </div>
+        ))}
+      </div>
+    );
+    const MonthSelector = ({ currentDate, onChange }) => {
+      const handlePrev = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+      const handleNext = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+      return (
+        <div className="flex items-center gap-1 md:gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5">
+          <button onClick={handlePrev} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronLeft size={18}/></button>
+          <span className="text-xs md:text-sm font-bold text-slate-800 dark:text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
+          <button onClick={handleNext} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronRight size={18}/></button>
+        </div>
+      );
+    };
+
+    // --- AUTH SCREEN ---
+    const AuthScreen = ({ mode, onLogin, onRegister }) => {
+      const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [error, setError] = useState('');
+      const handleSubmit = (e) => { e.preventDefault(); setError(''); if (mode === 'register') { if (pin.length < 4) return setError('Mínimo 4 dígitos'); if (pin !== confirmPin) return setError('PINs não conferem'); if (!name) return setError('Digite seu nome'); onRegister(name, pin); } else { onLogin(pin); } };
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+          <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in">
+            <div className="text-center mb-8 flex flex-col items-center"><div className="mb-4 scale-125"><CustomLogo /></div><h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1><p className="text-slate-400 font-medium">O cofre do seu futuro</p></div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {mode === 'register' && <div><label className={theme.label}>Seu Nome</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Seu nome" autoFocus /></div>}
+              <div><label className={theme.label}>Código de Acesso</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
+              {mode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
+              {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-2xl border border-rose-500/20 font-medium">{error}</div>}
+              <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Acessar' : 'Iniciar Jornada'}</button>
+            </form>
+          </div>
+        </div>
+      );
+    };
+
+    // --- MODAIS ---
+    const SettingsModal = ({ isOpen, onClose, onExport, onImport, onLogout }) => {
+      const fileInputRef = useRef(null);
+      const handleFileChange = (e) => { const file = e.target.files[0]; if (file) onImport(file); };
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Segurança e Dados">
+          <div className="space-y-6">
+            <div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2"><Download size={20}/> Backup Local</h4><p className="text-slate-400 text-sm mb-4 leading-relaxed">Baixe uma cópia criptografada de todos os seus dados para segurança.</p><button onClick={onExport} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20">Baixar Backup</button></div>
+            <div className="bg-[#1e293b]/50 border border-emerald-500/20 rounded-2xl p-5"><h4 className="text-emerald-400 font-bold flex items-center gap-2 mb-2"><Upload size={20}/> Restaurar Dados</h4><p className="text-slate-400 text-sm mb-4 leading-relaxed">Recupere seus dados carregando o arquivo de backup (.json).</p><input type="file" accept=".json" ref={fileInputRef} onChange={handleFileChange} className="hidden" /><button onClick={() => fileInputRef.current.click()} className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20">Selecionar Arquivo</button></div>
+            <div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div>
+          </div>
+        </Modal>
+      );
+    };
+
+    const DayDetailsModal = ({ isOpen, onClose, date, transactions, onDelete, onAdd, onEdit }) => {
+      if (!isOpen) return null;
+      const dayIncome = transactions.filter(t => t.type === 'income').reduce((a,c) => a+c.amount, 0);
+      const dayExpense = transactions.filter(t => t.type === 'expense').reduce((a,c) => a+c.amount, 0);
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title={`Resumo do dia ${formatDate(date)}`}>
+          <div className="space-y-6">
+            <div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 text-center"><span className="text-xs font-bold text-emerald-400 uppercase">Entradas</span><p className="text-lg font-bold text-white">{formatCurrency(dayIncome, false)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20 text-center"><span className="text-xs font-bold text-rose-400 uppercase">Saídas</span><p className="text-lg font-bold text-white">{formatCurrency(dayExpense, false)}</p></div></div>
+            <div>
+              <h4 className="text-slate-400 text-sm font-bold mb-3 uppercase tracking-wider">Transações</h4>
+              <div className="space-y-3">{transactions.map(t => (<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category} {t.subcategory && `• ${t.subcategory}`}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount, false)}</span><button onClick={() => { onClose(); onEdit(t); }} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}{transactions.length === 0 && <p className="text-center text-slate-500 text-sm">Sem movimentos neste dia.</p>}</div>
+            </div>
+            <button onClick={onAdd} className={theme.btnAccent}><Plus size={18} /> Adicionar Nova Transação</button>
+          </div>
+        </Modal>
+      );
+    };
+
+    // --- VIEWS ---
+    const Overview = ({ transactions, goals, privacyMode, toggleModal, setPrefilledDate, user }) => {
+      const [currentDate, setCurrentDate] = useState(new Date());
+
+      const filteredTransactions = useMemo(() => {
+        return transactions.filter(t => {
+          const tDate = new Date(t.date);
+          const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
+          return adjustedDate.getMonth() === currentDate.getMonth() && 
+                 adjustedDate.getFullYear() === currentDate.getFullYear();
+        });
+      }, [transactions, currentDate]);
+
+      const previousBalance = useMemo(() => {
+        const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        startOfCurrentMonth.setHours(0,0,0,0);
+        return transactions.filter(t => {
+            const tDate = new Date(t.date);
+            const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
+            return adjustedDate < startOfCurrentMonth;
+        }).reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
+      }, [transactions, currentDate]);
+
+      const income = filteredTransactions.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+      const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
+      const currentMonthResult = income - expense;
+      const totalAccumulatedBalance = previousBalance + currentMonthResult;
+      
+      const currentMonthName = currentDate.toLocaleDateString('pt-BR', { month: 'long' });
+
+      const areaData = useMemo(() => {
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+        return Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const dayTrans = filteredTransactions.filter(t => t.date === dateStr);
+          return {
+            name: String(day),
+            Entradas: dayTrans.filter(t => t.type === 'income').reduce((a, c) => a + c.amount, 0),
+            Saídas: dayTrans.filter(t => t.type === 'expense').reduce((a, c) => a + c.amount, 0),
+          };
+        });
+      }, [filteredTransactions, currentDate]);
+
+      const categoryData = useMemo(() => {
+        const catMap = {};
+        filteredTransactions.filter(t => t.type === 'expense').forEach(t => {
+           catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+        });
+        return Object.entries(catMap)
+           .map(([name, value]) => ({ name, value }))
+           .sort((a,b) => b.value - a.value)
+           .slice(0, 5);
+      }, [filteredTransactions]);
+
+      return (
+        <div className="space-y-6 md:space-y-8 animate-slide-up">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"><div className="flex justify-between items-center w-full md:w-auto"><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            
+            {/* CARD ATUALIZADO - SALDO ACUMULADO */}
+            <Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible flex flex-col justify-between">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                
+                <div className="relative z-10 flex flex-col h-full justify-between">
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-2">
+                        <p className="text-violet-200 font-medium text-sm md:text-base">Saldo Acumulado</p>
+                        <span className="bg-white/20 text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-md">Atualizado</span>
+                    </div>
+
+                    {/* Main Value */}
+                    <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight mb-6 ${privacyMode ? 'blur-md' : ''}`}>
+                        {formatCurrency(totalAccumulatedBalance, privacyMode)}
+                    </h2>
+
+                    {/* Details Box */}
+                    <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-3">
+                        {/* Row 1: Saldo Anterior */}
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-violet-200 font-medium">Saldo Anterior</span>
+                            <span className={`font-bold ${privacyMode ? 'blur-sm' : ''} ${previousBalance < 0 ? 'text-rose-300' : 'text-white'}`}>
+                                {formatCurrency(previousBalance, privacyMode)}
+                            </span>
+                        </div>
+                        
+                        {/* Divider */}
+                        <div className="h-px bg-white/10 w-full"></div>
+
+                        {/* Row 2: Resultado Mês */}
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-violet-200 font-medium capitalize">Resultado {currentMonthName}</span>
+                            <span className={`font-bold ${currentMonthResult >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${privacyMode ? 'blur-sm' : ''}`}>
+                                {currentMonthResult > 0 ? '+' : ''}{formatCurrency(currentMonthResult, privacyMode)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </Card>
+
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Entradas</p></div><div className="p-2 bg-emerald-100 dark:bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400"><ArrowUpRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(income, privacyMode)}</h2></Card>
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Saídas</p></div><div className="p-2 bg-rose-100 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400"><ArrowDownRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(expense, privacyMode)}</h2></Card>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <Card className="lg:col-span-2 min-h-[350px] md:min-h-[400px]"><div className="flex justify-between items-center mb-6 md:mb-8"><h3 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Fluxo Diário</h3><div className="flex gap-4"><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500"></span>Entradas</span><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-rose-500"></span>Saídas</span></div></div><div className={`h-[250px] md:h-[300px] w-full ${privacyMode ? 'opacity-20 blur-sm' : ''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} interval={2} /><YAxis hide /><RechartsTooltip cursor={{stroke: '#ffffff10', strokeWidth: 1}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} itemStyle={{color: '#fff'}} /><Area type="monotone" dataKey="Entradas" stroke="#10B981" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={3} /><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={3} /></AreaChart></ResponsiveContainer></div></Card>
+            <Card className="min-h-[350px] md:min-h-[400px] flex flex-col"><h3 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white mb-6">Top Despesas</h3><div className="flex-1 relative flex items-center justify-center">{categoryData.length > 0 ? (<div className="w-full h-full flex flex-col items-center justify-center"><div className="w-full h-40 md:h-48 relative"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{categoryData.map((entry, index) => (<Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || '#94a3b8'} />))}</Pie><RechartsTooltip formatter={(value) => formatCurrency(value, false)} itemStyle={{color: '#fff'}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} /></PieChart></ResponsiveContainer></div><div className="w-full mt-4 space-y-2 px-2 overflow-y-auto max-h-40 custom-scrollbar">{categoryData.map((entry, index) => (<div key={index} className="flex items-center justify-between text-sm"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[entry.name] || '#94a3b8' }}></div><span className="text-slate-500 dark:text-slate-300">{entry.name}</span></div><span className="font-bold text-slate-800 dark:text-white">{formatCurrency(entry.value, false)}</span></div>))}</div></div>) : (<div className="absolute inset-0 flex items-center justify-center text-slate-500 text-sm">Sem despesas no período</div>)}</div></Card>
+          </div>
+        </div>
+      );
+    };
+
+    const TransactionsView = ({ transactions, onDelete, onEdit }) => {
+      const [filterDesc, setFilterDesc] = useState('');
+      const [filterCategory, setFilterCategory] = useState('');
+      const [filterDate, setFilterDate] = useState('');
+      const [filterType, setFilterType] = useState('all');
+      const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+      const allCategories = Array.from(new Set(transactions.map(t => t.category))).sort();
+
+      const handleSort = (key) => {
+        let direction = 'desc';
+        if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
+        setSortConfig({ key, direction });
+      };
+
+      const filteredTransactions = useMemo(() => {
+        let items = transactions.filter(t => {
+           const matchDesc = t.description.toLowerCase().includes(filterDesc.toLowerCase());
+           const matchCat = filterCategory ? t.category === filterCategory : true;
+           const matchDate = filterDate ? t.date === filterDate : true;
+           const matchType = filterType !== 'all' ? t.type === filterType : true;
+           return matchDesc && matchCat && matchDate && matchType;
+        });
+        if (sortConfig.key) {
+           items.sort((a, b) => {
+              if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+              if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
+              return 0;
+           });
+        }
+        return items;
+      }, [transactions, filterDesc, filterCategory, filterDate, filterType, sortConfig]);
+
+      const exportCSV = () => { 
+        const headers = "Descrição;Categoria;Valor;Data;Tipo;Recorrente\n"; 
+        
+        const csvContent = filteredTransactions.map(t => {
+            const dateFormatted = formatDate(t.date);
+            const amountFormatted = t.amount.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const typeFormatted = t.type === 'income' ? 'Entrada' : 'Saída';
+            const recurringFormatted = t.isRecurring ? 'Sim' : 'Não';
+            const desc = `"${t.description.replace(/"/g, '""')}"`;
+            
+            return `${desc};${t.category};"${amountFormatted}";${dateFormatted};${typeFormatted};${recurringFormatted}`;
+        }).join("\n");
+        
+        const blob = new Blob(["\uFEFF" + headers + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `extrato_prospera_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      return (
+        <div className="space-y-6 animate-fade-in pb-20 md:pb-0">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+             <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white">Extrato</h2>
+                <span className="text-xs bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-400">{filteredTransactions.length} itens</span>
+             </div>
+             <button onClick={exportCSV} className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-colors text-sm font-medium border border-white/5">
+                <Download size={16}/> Exportar CSV
+             </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-100 dark:bg-[#18181b] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-inner">
+             <div className="relative group">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors pointer-events-none"/>
+                <input 
+                    type="text" 
+                    placeholder="Buscar..." 
+                    value={filterDesc} 
+                    onChange={e => setFilterDesc(e.target.value)} 
+                    className={`${theme.input} !pl-12`} 
+                />
+             </div>
+             <select value={filterType} onChange={e => setFilterType(e.target.value)} className={theme.input}>
+                <option value="all">Todos</option>
+                <option value="income">Receitas</option>
+                <option value="expense">Despesas</option>
+             </select>
+             <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className={theme.input}>
+                <option value="">Categorias (Todas)</option>
+                {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+             </select>
+             <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} className={theme.input}/>
+          </div>
+
+          <Card className="animate-fade-in !p-0 overflow-hidden">
+             <div className="overflow-x-auto">
+                <table className="w-full text-left text-slate-600 dark:text-slate-400 min-w-[700px]">
+                   <thead className="bg-slate-50 dark:bg-white/5 text-xs uppercase font-bold text-slate-500 border-b border-slate-200 dark:border-white/5">
+                      <tr>
+                         <th className="px-6 py-5 w-[30%]">Descrição</th>
+                         <th className="px-6 py-5 w-[20%]">Categoria</th>
+                         <th className="px-6 py-5 text-right cursor-pointer w-[20%] hover:text-violet-500 transition-colors" onClick={() => handleSort('amount')}>
+                            <div className="flex items-center justify-end gap-1">Valor <ArrowUpDown size={14}/></div>
+                         </th>
+                         <th className="px-6 py-5 text-center cursor-pointer w-[15%] hover:text-violet-500 transition-colors" onClick={() => handleSort('date')}>
+                            <div className="flex items-center justify-center gap-1">Data <ArrowUpDown size={14}/></div>
+                         </th>
+                         <th className="px-6 py-5 text-center w-[15%]">Ações</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                      {filteredTransactions.map(t => (
+                         <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+                            <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                               <div className="flex flex-col">
+                                  <span>{t.description}</span>
+                                  {t.isRecurring && <span className="text-[10px] text-violet-500 flex items-center gap-1 mt-0.5"><Repeat size={10}/> Mensal</span>}
+                               </div>
+                            </td>
+                            <td className="px-6 py-4">
+                               <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/10 shadow-sm" style={{ backgroundColor: CATEGORY_COLORS[t.category] || '#64748b' }}>
+                                  {t.category}
+                               </span>
+                            </td>
+                            <td className={`px-6 py-4 text-right font-bold text-base ${t.type==='income'?'text-emerald-500 dark:text-emerald-400':'text-rose-500 dark:text-rose-400'} `}>
+                               {t.type==='income'?'+':'-'} {formatCurrency(t.amount, false)}
+                            </td>
+                            <td className="px-6 py-4 text-center text-slate-500 text-sm font-medium bg-slate-50/50 dark:bg-white/5 rounded-lg mx-2 my-2">
+                               {formatDate(t.date)}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                               <div className="flex justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
+                                  <button onClick={() => onEdit(t)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all" title="Editar"><Edit2 size={16}/></button>
+                                  <button onClick={() => onDelete(t.id)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all" title="Excluir"><Trash2 size={16}/></button>
+                               </div>
+                            </td>
+                         </tr>
+                      ))}
+                   </tbody>
+                </table>
+             </div>
+             {filteredTransactions.length === 0 && (
+                <div className="p-16 text-center text-slate-500 flex flex-col items-center">
+                   <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+                      <Search size={24} className="opacity-50"/>
+                   </div>
+                   <p className="font-medium">Nenhuma transação encontrada.</p>
+                   <p className="text-sm opacity-60 mt-1">Tente ajustar os filtros.</p>
+                </div>
+             )}
+          </Card>
+        </div>
+      );
+    };
+
+    const RecurringView = ({ transactions, cards, onEdit, onDelete, onAdd, privacyMode }) => {
+       // Filter recurring and group by description (taking the most recent one to show as the 'active subscription')
+       const recurringMap = new Map();
+       transactions
+        .filter(t => t.isRecurring)
+        .forEach(t => {
+            const existing = recurringMap.get(t.description);
+            if (!existing || new Date(t.date) > new Date(existing.date)) {
+                recurringMap.set(t.description, t);
+            }
+        });
+        
+       const recurringTrans = Array.from(recurringMap.values());
+       
+       const totalRecurring = recurringTrans.reduce((acc, t) => acc + (t.type === 'expense' ? t.amount : 0), 0);
+       
+       const getPaymentIcon = (t) => { 
+           if (t.paymentMethod === 'credit_card') return <CreditCard size={16} className="text-violet-400"/>;
+           if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; // Using Gem for Pix abstraction
+           return <DollarSign size={16} className="text-slate-400"/>;
+       };
+
+       const getStatus = (dateStr) => {
+           const today = new Date();
+           const dueDay = new Date(dateStr).getDate();
+           if (today.getDate() > dueDay) return { label: 'Pago', color: 'text-emerald-500 bg-emerald-500/10' };
+           if (today.getDate() === dueDay) return { label: 'Hoje', color: 'text-amber-500 bg-amber-500/10' };
+           return { label: 'Em breve', color: 'text-blue-500 bg-blue-500/10' };
+       };
+
+       return (
+         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+            {/* Header & Summary */}
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div>
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <Repeat className="text-violet-500"/> Cobranças Recorrentes
+                    </h2>
+                    <p className="text-slate-500 text-sm mt-1">Gerencie suas assinaturas e custos fixos mensais</p>
+                </div>
+                <button onClick={onAdd} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}>
+                    <Plus size={18} className="mr-2"/> Nova Recorrência
+                </button>
+            </div>
+
+            {/* Dashboard Summary Card */}
+            <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10">
+                <div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div>
+                <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
+                    <div className="flex-1 w-full">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span>
+                            <p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p>
+                        </div>
+                        <h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>
+                            {formatCurrency(totalRecurring, privacyMode)}
+                        </h3>
+                        <p className="text-slate-400 text-xs mt-2">{recurringTrans.length} assinaturas ativas</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Subscriptions Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recurringTrans.length > 0 ? recurringTrans.map(t => {
+                    const status = getStatus(t.date);
+                    return (
+                        <div key={t.id} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                             {/* Category Stripe */}
+                             <div className="absolute top-0 left-0 bottom-0 w-1.5" style={{backgroundColor: CATEGORY_COLORS[t.category] || '#64748b'}}></div>
+                             
+                             <div className="pl-3 flex flex-col justify-between h-full">
+                                <div>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h4 className="font-bold text-slate-800 dark:text-white text-lg line-clamp-1">{t.description}</h4>
+                                            <p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">{t.category}</p>
+                                        </div>
+                                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${status.color}`}>
+                                            {status.label}
+                                        </span>
+                                    </div>
+                                    
+                                    <h3 className={`text-2xl font-extrabold text-slate-800 dark:text-white mb-4 ${privacyMode ? 'blur-sm' : ''}`}>
+                                        {formatCurrency(t.amount, privacyMode)}
+                                    </h3>
+                                </div>
+
+                                <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
+                                    <div className="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg">
+                                        {getPaymentIcon(t)}
+                                        <span>Dia {new Date(t.date).getDate()}</span>
+                                    </div>
+                                    
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => onEdit(t)} className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-500 rounded-lg transition-colors"><Edit2 size={16}/></button>
+                                        <button onClick={() => onDelete(t.id)} className="p-2 hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-lg transition-colors"><Trash2 size={16}/></button>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    );
+                }) : (
+                    <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700/50 rounded-[32px] bg-slate-800/20">
+                        <RefreshCw size={48} className="mb-4 opacity-30"/>
+                        <p className="text-lg font-medium">Nenhuma assinatura cadastrada.</p>
+                        <button onClick={onAdd} className="text-violet-400 font-bold text-sm mt-2 hover:underline">Adicionar Recorrência</button>
+                    </div>
+                )}
+            </div>
+         </div>
+       );
+    };
+
+    const BudgetView = ({ transactions, budgets, setBudgets, privacyMode }) => {
+      const [editingBudget, setEditingBudget] = useState(null);
+      const [isAdding, setIsAdding] = useState(false);
+      const [deletingBudget, setDeletingBudget] = useState(null);
+      
+      const currentMonth = new Date(); 
+      
+      // Calculate expenses per category
+      const currentMonthExpenses = useMemo(() => {
+        return transactions.filter(t => { 
+            const d = new Date(t.date); 
+            const adjusted = new Date(d.getTime() + d.getTimezoneOffset() * 60000); 
+            return t.type === 'expense' && adjusted.getMonth() === currentMonth.getMonth() && adjusted.getFullYear() === currentMonth.getFullYear(); 
+        }).reduce((acc, curr) => { 
+            acc[curr.category] = (acc[curr.category] || 0) + curr.amount; 
+            return acc; 
+        }, {});
+      }, [transactions]);
+
+      // Totals for the summary header
+      const totalBudget = budgets.reduce((acc, b) => acc + b.limit, 0);
+      const totalSpent = budgets.reduce((acc, b) => acc + (currentMonthExpenses[b.category] || 0), 0);
+      const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+      const handleUpdate = (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('limit')); setBudgets(budgets.map(b => b.category === editingBudget.category ? { ...b, limit: val } : b)); setEditingBudget(null); };
+      const handleAdd = (e) => { e.preventDefault(); const fd = new FormData(e.target); const cat = fd.get('category'); const lim = parseFloat(fd.get('limit')); if (budgets.find(b => b.category === cat)) { alert('Categoria já existe'); return; } setBudgets([...budgets, { category: cat, limit: lim }]); setIsAdding(false); };
+      const confirmDelete = () => { if (deletingBudget) { setBudgets(budgets.filter(b => b.category !== deletingBudget.category)); setDeletingBudget(null); } };
+
+      return (
+        <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+          
+          {/* Header & Summary */}
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+             <div>
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <PiggyBank className="text-violet-500"/> Planejamento Mensal
+                </h2>
+                <p className="text-slate-500 text-sm mt-1">Gerencie seus limites de gastos por categoria</p>
+             </div>
+             <button onClick={() => setIsAdding(true)} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}>
+                <Plus size={18} className="mr-2"/> Novo Orçamento
+             </button>
+          </div>
+
+          {/* Global Summary Card */}
+          <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-2xl">
+             <div className="absolute top-0 right-0 p-4 opacity-10"><PiggyBank size={120}/></div>
+             <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1 w-full">
+                    <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Total Previsto</p>
+                    <h3 className={`text-3xl font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(totalBudget, privacyMode)}</h3>
+                </div>
+                <div className="flex-1 w-full">
+                    <div className="flex justify-between text-sm mb-2">
+                        <span className="text-slate-300">Total Gasto</span>
+                        <span className="font-bold">{Math.round(totalProgress)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-1000 ${totalProgress > 100 ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{width: `${Math.min(totalProgress, 100)}%`}}></div>
+                    </div>
+                    <p className={`text-right text-xs text-slate-400 mt-2 ${privacyMode ? 'blur-sm' : ''}`}>Restante: {formatCurrency(totalBudget - totalSpent, privacyMode)}</p>
+                </div>
+             </div>
+          </div>
+
+          {/* Budget Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {budgets.map(b => {
+                const spent = currentMonthExpenses[b.category] || 0;
+                const percentage = (spent / b.limit) * 100;
+                const remaining = b.limit - spent;
+                const isOver = spent > b.limit;
+                const catColor = CATEGORY_COLORS[b.category] || '#64748b'; // Default color
+
+                return (
+                    <div key={b.category} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        {/* Status Bar Indicator */}
+                        <div className="absolute top-0 left-0 right-0 h-1" style={{background: isOver ? '#ef4444' : catColor}}></div>
+                        
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: catColor}}>
+                                    {/* Ideally map icons, but using generic first letter or generic icon is fine */}
+                                    <span className="font-bold text-lg">{b.category[0]}</span>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 dark:text-white">{b.category}</h3>
+                                    <p className={`text-xs text-slate-500 ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(b.limit, privacyMode)} limite</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => setEditingBudget(b)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"><Edit2 size={16}/></button>
+                                <button onClick={() => setDeletingBudget(b)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-1 mb-4">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Gasto Atual</p>
+                            <p className={`text-2xl font-extrabold ${isOver ? 'text-rose-500' : 'text-slate-800 dark:text-white'} ${privacyMode ? 'blur-sm' : ''}`}>
+                                {formatCurrency(spent, privacyMode)}
+                            </p>
+                        </div>
+
+                        {/* Custom Progress */}
+                        <div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                                className={`absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-rose-500' : ''}`}
+                                style={{
+                                    width: `${Math.min(percentage, 100)}%`,
+                                    background: isOver ? undefined : catColor // use category color for progress
+                                }}
+                            ></div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-3 text-xs font-bold">
+                            <span className={`${isOver ? 'text-rose-500' : 'text-slate-400'}`}>
+                                {percentage.toFixed(0)}% usado
+                            </span>
+                            <span className={`${remaining < 0 ? 'text-rose-500' : 'text-emerald-500'} ${privacyMode ? 'blur-sm' : ''}`}>
+                                {remaining < 0 ? 'Excedido' : 'Disponível'}: {formatCurrency(Math.abs(remaining), privacyMode)}
+                            </span>
+                        </div>
+                    </div>
+                );
+            })}
+          </div>
+          
+          {editingBudget && <Modal isOpen={!!editingBudget} onClose={() => setEditingBudget(null)} title={`Ajustar: ${editingBudget.category}`}><form onSubmit={handleUpdate} className="space-y-6"><div><label className={theme.label}>Novo Limite (R$)</label><input autoFocus name="limit" type="number" min="0" defaultValue={editingBudget.limit} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+          {isAdding && <Modal isOpen={isAdding} onClose={() => setIsAdding(false)} title="Novo Orçamento"><form onSubmit={handleAdd} className="space-y-6"><div><label className={theme.label}>Categoria</label><input required name="category" className={theme.input} /></div><div><label className={theme.label}>Limite (R$)</label><input required name="limit" type="number" min="0" className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Criar</button></form></Modal>}
+          {deletingBudget && <Modal isOpen={!!deletingBudget} onClose={() => setDeletingBudget(null)} title="Excluir"><div className="space-y-6"><p className="text-slate-300">Excluir orçamento de <strong className="text-white">{deletingBudget.category}</strong>?</p><div className="flex gap-4"><button onClick={() => setDeletingBudget(null)} className="w-full py-3 bg-white/5 text-white rounded-xl">Cancelar</button><button onClick={confirmDelete} className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold">Excluir</button></div></div></Modal>}
+        </div>
+      );
+    };
+
+    const CalculatorView = () => {
+       const [values, setValues] = useState({ initial: 1000, monthly: 500, rate: 10, years: 10 });
+       const [data, setData] = useState([]);
+       useEffect(() => { const newData = []; let current = Number(values.initial), invested = Number(values.initial); const rate = values.rate / 100 / 12, months = values.years * 12; for (let i = 0; i <= months; i++) { if (i % 12 === 0) newData.push({ year: `Ano ${i/12}`, Total: Math.round(current), Investido: Math.round(invested) }); current = current * (1 + rate) + Number(values.monthly); invested += Number(values.monthly); } setData(newData); }, [values]);
+       const handleChange = (e) => setValues({ ...values, [e.target.name]: e.target.value });
+       return (
+         <div className="space-y-6 animate-fade-in pb-20 md:pb-0">
+           <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Calculator className="text-violet-400"/> Juros Compostos</h2>
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+             <Card><form className="space-y-5"><div><label className={theme.label}>Inicial (R$)</label><input name="initial" type="number" value={values.initial} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Mensal (R$)</label><input name="monthly" type="number" value={values.monthly} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Juros Anual (%)</label><input name="rate" type="number" value={values.rate} onChange={handleChange} className={theme.input} /></div><div><label className={theme.label}>Anos</label><input name="years" type="number" value={values.years} onChange={handleChange} className={theme.input} /></div></form></Card>
+             <Card className="lg:col-span-2 flex flex-col min-h-[400px]"><div className="mb-8 text-center bg-emerald-100 dark:bg-emerald-500/10 p-6 rounded-2xl border border-emerald-200 dark:border-emerald-500/20"><span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Patrimônio Projetado</span><h3 className="text-3xl md:text-5xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{formatCurrency(data[data.length-1]?.Total || 0, false)}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Total investido: {formatCurrency(data[data.length-1]?.Investido || 0, false)}</p></div><div className="flex-1 w-full h-full min-h-[250px]"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data}><defs><linearGradient id="cT" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill:'#666', fontSize:12}} /><YAxis axisLine={false} tickLine={false} tick={{fill:'#666', fontSize:12}} /><RechartsTooltip contentStyle={{borderRadius:'12px', border:'none', backgroundColor:'#0f172a', color:'#fff'}} /><Area type="monotone" dataKey="Total" stroke="#10B981" fillOpacity={1} fill="url(#cT)" strokeWidth={3} /><Legend /></AreaChart></ResponsiveContainer></div></Card>
+           </div>
+         </div>
+       );
+    };
+
+    const GoalsView = ({ goals, setGoals, onDelete, privacyMode }) => {
+      const [editingGoal, setEditingGoal] = useState(null);
+      const [depositGoal, setDepositGoal] = useState(null);
+      const [isAdding, setIsAdding] = useState(false);
+      const [deletingGoal, setDeletingGoal] = useState(null);
+
+      // Calculations for Summary
+      const totalTarget = goals.reduce((acc, g) => acc + g.target, 0);
+      const totalCurrent = goals.reduce((acc, g) => acc + g.current, 0);
+      const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
+      const totalRemaining = Math.max(0, totalTarget - totalCurrent);
+
+      const handleEditSave = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updated = { ...editingGoal, name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }; setGoals(goals.map(g => g.id === editingGoal.id ? updated : g)); setEditingGoal(null); };
+      const handleDepositSave = (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('amount')); if (val > 0) { setGoals(goals.map(g => g.id === depositGoal.id ? { ...g, current: g.current + val } : g)); } setDepositGoal(null); };
+      const handleAdd = (e) => { e.preventDefault(); const fd = new FormData(e.target); setGoals([...goals, { id: Date.now(), name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }]); setIsAdding(false); };
+      const confirmDelete = () => { if (deletingGoal) { onDelete(deletingGoal.id); setDeletingGoal(null); } };
+
+      return (
+        <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+          {/* Header & Summary */}
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+             <div>
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <Target className="text-violet-500"/> Meus Objetivos
+                </h2>
+                <p className="text-slate-500 text-sm mt-1">Acompanhe a evolução dos seus sonhos</p>
+             </div>
+             <button onClick={() => setIsAdding(true)} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}>
+                <Plus size={18} className="mr-2"/> Nova Meta
+             </button>
+          </div>
+
+          {/* Global Summary Card */}
+          <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-emerald-900 to-slate-900 p-6 text-white shadow-2xl border border-emerald-500/10">
+             <div className="absolute top-0 right-0 p-4 opacity-10"><Trophy size={120}/></div>
+             <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1 w-full">
+                    <p className="text-emerald-400 text-sm font-bold uppercase tracking-wider mb-1">Total Guardado</p>
+                    <h3 className={`text-3xl font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(totalCurrent, privacyMode)}</h3>
+                    <p className="text-slate-400 text-xs mt-1">de <span className={privacyMode ? 'blur-sm' : ''}>{formatCurrency(totalTarget, privacyMode)}</span> previstos</p>
+                </div>
+                <div className="flex-1 w-full">
+                    <div className="flex justify-between text-sm mb-2">
+                        <span className="text-slate-300">Progresso Global</span>
+                        <span className="font-bold text-emerald-400">{Math.round(totalProgress)}%</span>
+                    </div>
+                    <div className="w-full bg-black/40 rounded-full h-4 overflow-hidden border border-white/5">
+                        <div className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-emerald-500 to-teal-400" style={{width: `${Math.min(totalProgress, 100)}%`}}></div>
+                    </div>
+                    <p className={`text-right text-xs text-emerald-200/70 mt-2 font-medium ${privacyMode ? 'blur-sm' : ''}`}>Faltam: {formatCurrency(totalRemaining, privacyMode)}</p>
+                </div>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {goals.map(g => {
+                const progress = Math.min((g.current / g.target) * 100, 100);
+                const isCompleted = progress >= 100;
+                
+                return (
+                  <div key={g.id} className={`group relative bg-white dark:bg-[#18181b] border ${isCompleted ? 'border-yellow-500/50 shadow-yellow-500/10' : 'border-slate-200 dark:border-white/5'} rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden`}>
+                    
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: g.color || '#8b5cf6'}}>
+                                <Target size={20}/>
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-800 dark:text-white line-clamp-1">{g.name}</h3>
+                                {isCompleted ? (
+                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-1"><Trophy size={10}/> Concluído</span>
+                                ) : (
+                                    <p className={`text-xs text-slate-500 ${privacyMode ? 'blur-sm' : ''}`}>Meta: {formatCurrency(g.target, privacyMode)}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => setEditingGoal(g)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"><Edit2 size={16}/></button>
+                            <button onClick={() => setDeletingGoal(g)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
+                        </div>
+                    </div>
+
+                    {/* Values */}
+                    <div className="space-y-1 mb-4">
+                        <div className="flex justify-between items-end">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Acumulado</p>
+                            <span className="text-xs font-bold text-slate-400">{progress.toFixed(0)}%</span>
+                        </div>
+                        <p className={`text-2xl font-extrabold text-slate-800 dark:text-white ${privacyMode ? 'blur-sm' : ''}`}>
+                            {formatCurrency(g.current, privacyMode)}
+                        </p>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-6">
+                        <div 
+                            className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
+                            style={{
+                                width: `${progress}%`,
+                                background: isCompleted 
+                                    ? 'linear-gradient(90deg, #EAB308 0%, #FACC15 100%)' 
+                                    : `linear-gradient(90deg, ${g.color || '#8b5cf6'} 0%, ${g.color ? g.color + '80' : '#a78bfa'} 100%)`
+                            }}
+                        >
+                            <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={() => setDepositGoal(g)} 
+                        className="w-full py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-700 dark:text-white font-medium transition-all flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 group-hover:shadow-lg"
+                    >
+                        <Plus size={16} className={`transition-transform group-hover:rotate-90 ${isCompleted ? 'text-yellow-500' : 'text-slate-400'}`}/> 
+                        {isCompleted ? 'Adicionar Bônus' : 'Depositar'}
+                    </button>
+                  </div>
+                );
+            })}
+            
+            {goals.length === 0 && (
+                <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700/50 rounded-[32px] bg-slate-800/20">
+                    <Target size={48} className="mb-4 opacity-30"/>
+                    <p className="text-lg font-medium">Nenhum objetivo definido.</p>
+                    <button onClick={() => setIsAdding(true)} className="text-violet-400 font-bold text-sm mt-2 hover:underline">Criar primeira meta</button>
+                </div>
+            )}
+          </div>
+
+          {/* Modals */}
+          {editingGoal && <Modal isOpen={!!editingGoal} onClose={() => setEditingGoal(null)} title="Editar Meta"><form onSubmit={handleEditSave} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" defaultValue={editingGoal.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" defaultValue={editingGoal.target} className={theme.input} /></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue={editingGoal.current} className={theme.input} /></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked={editingGoal.color === '#8b5cf6'} className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" defaultChecked={editingGoal.color === '#ec4899'} className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" defaultChecked={editingGoal.color === '#06b6d4'} className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" defaultChecked={editingGoal.color === '#10b981'} className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
+          
+          {isAdding && <Modal isOpen={isAdding} onClose={() => setIsAdding(false)} title="Novo Objetivo"><form onSubmit={handleAdd} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" className={theme.input} placeholder="Ex: Viagem, Carro Novo..."/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" className={theme.input}/></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue="0" className={theme.input}/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Criar Meta</button></form></Modal>}
+          
+          {depositGoal && <Modal isOpen={!!depositGoal} onClose={() => setDepositGoal(null)} title={`Depositar em: ${depositGoal.name}`}><form onSubmit={handleDepositSave} className="space-y-6"><div><label className={theme.label}>Valor do Aporte</label><input required name="amount" type="number" step="0.01" min="0" autoFocus className={`${theme.input} text-3xl font-bold text-emerald-500 text-center py-6`} placeholder="R$ 0,00" /></div><div className="flex justify-between text-xs text-slate-500 px-2"><span>Atual: {formatCurrency(depositGoal.current, false)}</span><span>Meta: {formatCurrency(depositGoal.target, false)}</span></div><button type="submit" className={theme.btnAccent}>Confirmar Depósito</button></form></Modal>}
+          
+          {deletingGoal && <Modal isOpen={!!deletingGoal} onClose={() => setDeletingGoal(null)} title="Excluir Meta"><div className="space-y-6"><p className="text-slate-300">Tem certeza que deseja excluir a meta <strong className="text-white">{deletingGoal.name}</strong>? Todo o histórico de progresso será perdido.</p><div className="flex gap-4"><button onClick={() => setDeletingGoal(null)} className="w-full py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors">Cancelar</button><button onClick={confirmDelete} className="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-600/20 transition-all">Excluir Definitivamente</button></div></div></Modal>}
+        </div>
+      );
+    };
+
+    const InvestmentsView = ({ investments, cards, onDeleteCard, onEditCard, onDeleteInvest, onEditInvest, privacyMode }) => {
+        const [editingCard, setEditingCard] = useState(null);
+        const [editingInvest, setEditingInvest] = useState(null);
+        const [isAddingCard, setIsAddingCard] = useState(false);
+        const [isAddingInvest, setIsAddingInvest] = useState(false);
+
+        const totalInvested = investments.reduce((a,c) => a + c.value, 0);
+        
+        // Data for PieChart distribution
+        const distributionData = useMemo(() => {
+            const counts = {};
+            investments.forEach(i => counts[i.type] = (counts[i.type] || 0) + i.value);
+            return Object.entries(counts).map(([name, value]) => ({ name, value }));
+        }, [investments]);
+
+        const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'];
+
+        const getIconForType = (type) => {
+            switch(type) {
+                case 'Renda Fixa': return <Building2 size={20} className="text-emerald-400"/>;
+                case 'Ações': return <TrendingUp size={20} className="text-blue-400"/>;
+                case 'Cripto': return <Coins size={20} className="text-amber-400"/>;
+                case 'FIIs': return <Briefcase size={20} className="text-violet-400"/>;
+                default: return <Target size={20} className="text-slate-400"/>;
+            }
+        };
+
+        const getBgColorForType = (type) => {
+            switch(type) {
+                case 'Renda Fixa': return 'bg-emerald-500/10 border-emerald-500/20';
+                case 'Ações': return 'bg-blue-500/10 border-blue-500/20';
+                case 'Cripto': return 'bg-amber-500/10 border-amber-500/20';
+                case 'FIIs': return 'bg-violet-500/10 border-violet-500/20';
+                default: return 'bg-slate-500/10 border-slate-500/20';
+            }
+        };
+
+        const handleCardUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedCard = { ...editingCard, name: fd.get('name'), limit: parseFloat(fd.get('limit')), dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; onEditCard(updatedCard); setEditingCard(null); };
+        const handleInvestUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedInvest = { ...editingInvest, name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }; onEditInvest(updatedInvest); setEditingInvest(null); };
+        
+        const handleAddCardSubmit = (e) => { 
+            e.preventDefault(); 
+            const fd = new FormData(e.target); 
+            const newCard = { id: Date.now(), name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; 
+            onEditCard(newCard); 
+            setIsAddingCard(false); 
+        };
+
+        const handleAddInvestSubmit = (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const newInvest = { id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') };
+            onEditInvest(newInvest);
+            setIsAddingInvest(false);
+        };
+
+        return (
+            <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+                
+                {/* Header Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2 relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-900 border border-white/5 p-6 flex flex-col md:flex-row items-center justify-between shadow-2xl">
+                        <div className="z-10">
+                            <h2 className="text-slate-400 font-medium mb-1">Patrimônio Total</h2>
+                            <h3 className={`text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight ${privacyMode ? 'blur-md' : ''}`}>
+                                {formatCurrency(totalInvested, privacyMode)}
+                            </h3>
+                            <div className="flex gap-3">
+                                <button onClick={() => setIsAddingInvest(true)} className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all flex items-center gap-2 text-sm">
+                                    <Plus size={18}/> Novo Ativo
+                                </button>
+                                <button onClick={() => setIsAddingCard(true)} className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all flex items-center gap-2 text-sm border border-white/10">
+                                    <CreditCard size={18}/> Novo Cartão
+                                </button>
+                            </div>
+                        </div>
+                        {/* Mini Chart */}
+                        <div className="w-32 h-32 md:w-40 md:h-40 relative mt-6 md:mt-0 opacity-80">
+                             <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={distributionData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value" stroke="none">
+                                        {distributionData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                    
+                    {/* Quick Stats or Filler */}
+                    <div className="hidden md:flex flex-col justify-center bg-slate-100 dark:bg-white/5 rounded-[32px] p-6 border border-slate-200 dark:border-white/5">
+                        <h4 className="text-slate-500 font-bold uppercase text-xs mb-4">Diversificação</h4>
+                        <div className="space-y-3">
+                            {distributionData.map((d, i) => (
+                                <div key={d.name} className="flex justify-between items-center text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}}></div>
+                                        <span className="text-slate-700 dark:text-slate-300">{d.name}</span>
+                                    </div>
+                                    <span className={`font-bold text-slate-900 dark:text-white ${privacyMode ? 'blur-sm' : ''}`}>
+                                        {Math.round((d.value / totalInvested) * 100) || 0}%
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Credit Cards Section - Horizontal Scroll on Mobile */}
+                <div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Cartões</h3>
+                    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x no-scrollbar">
+                        {cards.map(c => (
+                            <div key={c.id} className={`snap-center shrink-0 w-[85vw] md:w-auto h-52 rounded-[28px] p-6 text-white relative overflow-hidden shadow-xl transition-transform hover:-translate-y-1 ${c.color} bg-gradient-to-br from-white/10 to-black/30 backdrop-blur-xl border border-white/10 group`}>
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div>
+                                
+                                <div className="relative z-10 flex flex-col justify-between h-full">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-bold text-lg tracking-wide">{c.name}</p>
+                                            <p className="text-[10px] opacity-70 uppercase tracking-widest mt-0.5">Crédito</p>
+                                        </div>
+                                        <CreditCard size={28} className="opacity-80"/>
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-xs font-medium opacity-60 mb-1">Fatura Atual</p>
+                                                <p className={`text-2xl font-bold tracking-tight ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(c.used, privacyMode)}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs font-medium opacity-60 mb-1">Limite</p>
+                                                <p className={`text-sm font-bold ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(c.limit, privacyMode)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="w-full bg-black/30 rounded-full h-1.5 overflow-hidden">
+                                            <div className={`h-full rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] ${c.used/c.limit > 0.9 ? 'bg-rose-400' : 'bg-white'}`} style={{ width: `${Math.min((c.used/c.limit)*100, 100)}%` }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Actions overlay */}
+                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                    <button onClick={() => setEditingCard(c)} className="p-2 bg-black/20 hover:bg-black/40 rounded-full text-white backdrop-blur-md"><Edit2 size={14}/></button>
+                                    <button onClick={() => onDeleteCard(c.id)} className="p-2 bg-black/20 hover:bg-rose-500/80 rounded-full text-white backdrop-blur-md"><Trash2 size={14}/></button>
+                                </div>
+                            </div>
+                        ))}
+                        {/* Add Card Button (Visible if empty or at end) */}
+                        <button onClick={() => setIsAddingCard(true)} className="snap-center shrink-0 w-[85vw] md:w-auto h-52 rounded-[28px] border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-violet-500 hover:border-violet-500/50 hover:bg-violet-500/5 transition-all gap-3 group">
+                            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-white/5 group-hover:bg-violet-500/20 flex items-center justify-center transition-colors">
+                                <Plus size={24}/>
+                            </div>
+                            <span className="font-medium">Adicionar Cartão</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Investments Grid */}
+                <div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Ativos</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {investments.map(i => (
+                            <div key={i.id} className={`group bg-white dark:bg-[#18181b] border rounded-[24px] p-5 hover:shadow-lg transition-all relative overflow-hidden ${getBgColorForType(i.type)}`}>
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-white dark:bg-white/5 shadow-sm`}>
+                                        {getIconForType(i.type)}
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => setEditingInvest(i)} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-blue-500"><Edit2 size={14}/></button>
+                                        <button onClick={() => onDeleteInvest(i.id)} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-rose-500"><Trash2 size={14}/></button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-wider opacity-50 mb-1">{i.type}</p>
+                                    <h4 className="font-bold text-slate-800 dark:text-white text-lg truncate mb-1">{i.name}</h4>
+                                    <h3 className={`text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight ${privacyMode ? 'blur-sm' : ''}`}>
+                                        {formatCurrency(i.value, privacyMode)}
+                                    </h3>
+                                </div>
+
+                                {i.returnRate && (
+                                    <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center gap-2">
+                                        <div className={`text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-500`}>
+                                            {i.returnRate.includes('+') ? '' : '+'}{i.returnRate}
+                                        </div>
+                                        <span className="text-[10px] text-slate-400 uppercase font-bold">Rentabilidade</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {editingCard && <Modal isOpen={!!editingCard} onClose={() => setEditingCard(null)} title="Editar Cartão"><form onSubmit={handleCardUpdate} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" defaultValue={editingCard.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" defaultValue={editingCard.limit} className={theme.input} /></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" defaultValue={editingCard.dueDay} className={theme.input} /></div></div><div><label className={theme.label}>Estilo</label><select name="color" defaultValue={editingCard.color} className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option><option value="bg-rose-600">Rose</option></select></div><button type="submit" className={theme.btnPrimary}>Salvar Alterações</button></form></Modal>}
+                {isAddingCard && <Modal isOpen={isAddingCard} onClose={() => setIsAddingCard(null)} title="Novo Cartão"><form onSubmit={handleAddCardSubmit} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" className={theme.input} placeholder="Ex: Nubank"/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" className={theme.input} placeholder="0.00"/></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" className={theme.input} placeholder="Dia"/></div></div><div><label className={theme.label}>Estilo</label><select name="color" className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option><option value="bg-rose-600">Rose</option></select></div><button type="submit" className={theme.btnPrimary}>Criar Cartão</button></form></Modal>}
+
+                {editingInvest && <Modal isOpen={!!editingInvest} onClose={() => setEditingInvest(null)} title="Editar Ativo"><form onSubmit={handleInvestUpdate} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" defaultValue={editingInvest.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" defaultValue={editingInvest.type} className={theme.input}><option value="Renda Fixa">Renda Fixa</option><option value="Ações">Ações</option><option value="Cripto">Cripto</option><option value="FIIs">FIIs</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" defaultValue={editingInvest.value} className={theme.input} /></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" defaultValue={editingInvest.returnRate} className={theme.input} /></div><button type="submit" className={theme.btnPrimary}>Salvar Alterações</button></form></Modal>}
+                {isAddingInvest && <Modal isOpen={isAddingInvest} onClose={() => setIsAddingInvest(null)} title="Novo Ativo"><form onSubmit={handleAddInvestSubmit} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" className={theme.input} placeholder="Ex: Bitcoin, Tesouro Direto"/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" className={theme.input}><option value="Renda Fixa">Renda Fixa</option><option value="Ações">Ações</option><option value="Cripto">Cripto</option><option value="FIIs">FIIs</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" className={theme.input} placeholder="0.00"/></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" className={theme.input} placeholder="+10%"/></div><button type="submit" className={theme.btnPrimary}>Adicionar Ativo</button></form></Modal>}
+            </div>
+        );
+    };
+
+    const CalendarView = ({ transactions, onDayClick }) => {
+      const [currentDate, setCurrentDate] = useState(new Date());
+      const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+      
+      const getTransactionsForDay = (day) => {
+        return transactions.filter(t => {
+          const tDate = new Date(t.date);
+          const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
+          return adjustedDate.getDate() === day && adjustedDate.getMonth() === currentDate.getMonth() && adjustedDate.getFullYear() === currentDate.getFullYear();
+        });
+      };
+
+      const handleDayClick = (day) => {
+        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayTrans = getTransactionsForDay(day);
+        onDayClick(dateStr, dayTrans);
+      };
+
+      return (
+        <div className="space-y-6 animate-fade-in pb-20 md:pb-0">
+          <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-4 rounded-3xl border border-slate-200 dark:border-white/5 shadow-sm">
+            <h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><CalendarIcon className="text-violet-400"/> Agenda</h2>
+            <MonthSelector currentDate={currentDate} onChange={setCurrentDate} />
+          </div>
+          <Card className="!p-0 overflow-hidden">
+            <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/5">
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => <div key={day} className="py-3 md:py-4 text-center text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">{day}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-px bg-slate-200 dark:bg-white/5">
+              {Array(firstDay).fill(null).map((_, i) => <div key={`empty-${i}`} className="bg-white dark:bg-[#0c0c0e] h-20 md:h-32 opacity-50"></div>)}
+              {Array(daysInMonth).fill(null).map((_, i) => {
+                const day = i + 1;
+                const dayTrans = getTransactionsForDay(day);
+                const income = dayTrans.filter(t => t.type === 'income').reduce((a,c) => a + c.amount, 0);
+                const expense = dayTrans.filter(t => t.type === 'expense').reduce((a,c) => a + c.amount, 0);
+                const hasActivity = income > 0 || expense > 0;
+                
+                return (
+                  <div key={day} onClick={() => handleDayClick(day)} className="bg-white dark:bg-[#0c0c0e] h-20 md:h-32 p-1 md:p-3 transition-colors hover:bg-slate-50 dark:hover:bg-white/10 relative group cursor-pointer">
+                    <span className={`text-xs md:text-sm font-bold ${hasActivity ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-600'} mb-1 md:mb-2 block`}>{day}</span>
+                    <div className="space-y-0.5 md:space-y-1">
+                      {income > 0 && <div className="text-[9px] md:text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1 md:px-2 py-0.5 md:py-1 rounded-lg flex justify-between font-bold overflow-hidden"><span className="hidden md:inline">+</span><span>{Math.round(income)}</span></div>}
+                      {expense > 0 && <div className="text-[9px] md:text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 px-1 md:px-2 py-0.5 md:py-1 rounded-lg flex justify-between font-bold overflow-hidden"><span className="hidden md:inline">-</span><span>{Math.round(expense)}</span></div>}
+                    </div>
+
+                    {/* Tooltip on Hover */}
+                    {hasActivity && (
+                      <div className="hidden group-hover:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl z-50 pointer-events-none">
+                        <div className="flex justify-between mb-1"><span className="text-emerald-400">Ent:</span> <span>{formatCurrency(income, false)}</span></div>
+                        <div className="flex justify-between"><span className="text-rose-400">Sai:</span> <span>{formatCurrency(expense, false)}</span></div>
+                        <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      );
+    };
+
+    // --- MAIN APP ---
+    function App() {
+      // ... states ...
+      const [toasts, setToasts] = useState([]);
+      const [authMode, setAuthMode] = useState('loading');
+      // ... other states (user, privacy, tabs...)
+      const [user, setUser] = useState(null);
+      const [privacyMode, setPrivacyMode] = useState(false);
+      const [activeTab, setActiveTab] = useState('overview');
+      const [isDarkMode, setIsDarkMode] = useState(true);
+      const [modals, setModals] = useState({ transaction: false, goal: false, card: false, investment: false, settings: false, dayDetails: false, subscription: false });
+      const [transactions, setTransactions] = useState([]);
+      // ... (data states) ...
+      const [goals, setGoals] = useState([]);
+      const [investments, setInvestments] = useState([]);
+      const [cards, setCards] = useState(INITIAL_CARDS);
+      const [budgets, setBudgets] = useState([]);
+      // Form states
+      const [transType, setTransType] = useState('expense');
+      const [transCat, setTransCat] = useState(Object.keys(CATEGORIES.expense)[0]);
+      const [selectedDateDetails, setSelectedDateDetails] = useState(null);
+      const [prefilledDate, setPrefilledDate] = useState(new Date().toISOString().split('T')[0]);
+      const [editingTransaction, setEditingTransaction] = useState(null);
+
+      // Toast Helper
+      const addToast = (msg, type = 'success') => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, msg, type }]);
+        setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+      };
+
+      // Effects (Load/Save Data/Auth) ... [Manter lógica anterior]
+      useEffect(() => {
+        document.documentElement.classList.add('dark');
+        const savedUser = localStorage.getItem('prospera_user');
+        if (savedUser) { setUser(JSON.parse(savedUser)); setAuthMode('login'); } else { setAuthMode('register'); }
+      }, []);
+      
+      const loadData = () => {
+          const get = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) || def; } catch { return def; } };
+          setTransactions(get('prospera_transactions', INITIAL_TRANSACTIONS));
+          setGoals(get('prospera_goals', []));
+          setInvestments(get('prospera_investments', []));
+          setCards(get('prospera_cards', INITIAL_CARDS));
+          setBudgets(get('prospera_budgets', []));
+      };
+
+      // Handlers com TOASTS
+      const handleTypeChange = (e) => {
+        const type = e.target.value;
+        setTransType(type);
+        setTransCat(Object.keys(CATEGORIES[type])[0]);
+      };
+
+      const handleEditTransaction = (t) => {
+          setEditingTransaction(t);
+          setTransType(t.type);
+          setTransCat(t.category);
+          setPrefilledDate(t.date);
+          toggleModal('transaction', true);
+      };
+
+      const handleAddTrans = (e) => {
+        e.preventDefault(); const fd = new FormData(e.target);
+        // ... (logica de extração do form)
+        const type = fd.get('type');
+        const amount = parseFloat(fd.get('amount'));
+        const newTrans = { 
+          id: editingTransaction ? editingTransaction.id : Date.now(), 
+          type, 
+          description: fd.get('description'), 
+          category: transCat, 
+          subcategory: fd.get('subcategory'),
+          amount, 
+          date: fd.get('date'), 
+          isRecurring: fd.get('isRecurring') === 'on',
+          paymentMethod: fd.get('paymentMethod'),
+          cardId: fd.get('cardId')
+        };
+        
+        if (editingTransaction) {
+            setTransactions(prev => prev.map(t => t.id === editingTransaction.id ? newTrans : t));
+            addToast("Transação atualizada! 📝");
+            setEditingTransaction(null);
+        } else {
+            setTransactions([newTrans, ...transactions]);
+            addToast("Transação adicionada! 💸");
+        }
+        toggleModal('transaction', false);
+        setModals(prev => ({ ...prev, dayDetails: false })); // Close day details if open
+      };
+      
+      const handleAddSubscription = (e) => {
+         e.preventDefault();
+         const fd = new FormData(e.target);
+         const amount = parseFloat(fd.get('amount'));
+         const newSub = {
+            id: Date.now(),
+            type: 'expense',
+            description: fd.get('description'),
+            category: transCat,
+            subcategory: 'Assinatura',
+            amount,
+            date: fd.get('date'),
+            isRecurring: true, // Força recorrência
+            paymentMethod: fd.get('paymentMethod'),
+            cardId: fd.get('cardId')
+          };
+          setTransactions([newSub, ...transactions]);
+          addToast("Assinatura criada! 🔄");
+          toggleModal('subscription', false);
+      };
+
+      const handleAddRecurringFromView = () => { 
+        setTransCat('Moradia'); 
+        setPrefilledDate(new Date().toISOString().split('T')[0]); 
+        toggleModal('subscription', true); 
+      };
+
+      const deleteItem = (setList, id) => {
+         setList(prev => prev.filter(i => i.id !== id));
+         addToast("Item excluído 🗑️", 'error');
+         // update day details view if open
+         if (selectedDateDetails) {
+            setSelectedDateDetails(prev => ({
+              ...prev,
+              transactions: prev.transactions.filter(t => t.id !== id)
+            }));
+         }
+      };
+      
+      const handleImportBackup = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+           try {
+              const data = JSON.parse(e.target.result);
+              if (data.user && data.transactions) {
+                 // ... restore logic
+                 setUser(data.user); setTransactions(data.transactions); setGoals(data.goals); 
+                 addToast("Backup restaurado com sucesso! 🚀"); // Toast instead of alert
+                 setModals({ ...modals, settings: false });
+              }
+           } catch { addToast("Erro ao ler arquivo", 'error'); }
+        };
+        reader.readAsText(file);
+      };
+
+      // ... (Restante dos handlers: Login, Register, Goals, Cards mantendo a logica, adicionando addToast onde relevante) ...
+      const handleRegister = (name, pin) => { const newUser = { name, pin }; localStorage.setItem('prospera_user', JSON.stringify(newUser)); setUser(newUser); loadData(); setAuthMode('app'); addToast(`Bem-vindo, ${name}!`); };
+      const handleLogin = (pin) => { if (user && user.pin === pin) { loadData(); setAuthMode('app'); } else { addToast("Código incorreto", 'error'); } };
+      
+      const handleAddGoal = (e) => { e.preventDefault(); const fd = new FormData(e.target); setGoals([...goals, { id: Date.now(), name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }]); addToast("Objetivo criado! 🎯"); toggleModal('goal', false); };
+      const handleAddCard = (e) => { e.preventDefault(); const fd = new FormData(e.target); setCards([...cards, { id: Date.now(), name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }]); addToast("Cartão adicionado! 💳"); toggleModal('card', false); };
+      const handleUpdateCard = (updatedCard) => { setCards(cards.map(c => c.id === updatedCard.id ? updatedCard : c)); addToast("Cartão atualizado! 💳"); };
+      const handleAddInv = (e) => { e.preventDefault(); const fd = new FormData(e.target); setInvestments([...investments, { id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }]); addToast("Investimento adicionado! 📈"); toggleModal('investment', false); };
+      const handleUpdateInvest = (updatedInvest) => { setInvestments(investments.map(i => i.id === updatedInvest.id ? updatedInvest : i)); addToast("Investimento atualizado! 📈"); };
+      const handleDayClick = (dateStr, dayTransactions) => { if (dayTransactions && dayTransactions.length > 0) { setSelectedDateDetails({ date: dateStr, transactions: dayTransactions }); toggleModal('dayDetails', true); } else { setPrefilledDate(dateStr); toggleModal('transaction', true); } };
+      const handleAddFromDetails = () => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); };
+      const handleExportBackup = () => { const blob = new Blob([JSON.stringify({ user, transactions, goals, investments, cards, budgets, timestamp: new Date().toISOString() })], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `prospera_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
+      const handleLogout = () => { setAuthMode('login'); setModals({ ...modals, settings: false }); };
+      
+      const toggleModal = (key, val) => setModals(prev => ({ ...prev, [key]: val }));
+      const toggleDarkMode = () => {
+        if (isDarkMode) { document.documentElement.classList.remove('dark'); setIsDarkMode(false); }
+        else { document.documentElement.classList.add('dark'); setIsDarkMode(true); }
+      };
+
+      // Persistência
+      useEffect(() => { if(authMode === 'app') localStorage.setItem('prospera_transactions', JSON.stringify(transactions)); }, [transactions, authMode]);
+      useEffect(() => { if(authMode === 'app') localStorage.setItem('prospera_goals', JSON.stringify(goals)); }, [goals, authMode]);
+      useEffect(() => { if(authMode === 'app') localStorage.setItem('prospera_investments', JSON.stringify(investments)); }, [investments, authMode]);
+      useEffect(() => { if(authMode === 'app') localStorage.setItem('prospera_cards', JSON.stringify(cards)); }, [cards, authMode]);
+      useEffect(() => { if(authMode === 'app') localStorage.setItem('prospera_budgets', JSON.stringify(budgets)); }, [budgets, authMode]);
+      // ... outros useEffects
+
+      // ... Renderização Condicional (Auth/Loading) ...
+      if (authMode === 'login') return <AuthScreen mode="login" onLogin={handleLogin} />;
+      if (authMode === 'register') return <AuthScreen mode="register" onRegister={handleRegister} />;
+
+      // Nav Items
+      const navItems = [
+        { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'transactions', label: 'Extrato', icon: ListFilter },
+        { id: 'calendar', label: 'Agenda', icon: CalendarIcon },
+        { id: 'budgets', label: 'Orçamentos', icon: PiggyBank },
+        { id: 'goals', label: 'Objetivos', icon: Target },
+        { id: 'investments', label: 'Carteira', icon: TrendingUp },
+        { id: 'recurring', label: 'Recorrência', icon: Repeat },
+        { id: 'calculator', label: 'Calculadora', icon: Calculator },
+      ];
+
+      return (
+        <div className="flex flex-col md:flex-row h-screen bg-slate-50 dark:bg-[#050505] overflow-hidden bg-gradient-animate relative transition-colors duration-500">
+           {/* Sidebar */}
+           <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm">
+             <div className="mb-8 scale-75"><CustomLogo /></div>
+             <div className="flex-1 flex flex-col gap-4 w-full px-4 overflow-y-auto no-scrollbar">
+               {navItems.map(item => (
+                 <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 transition-all duration-300 group ${activeTab === item.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-inner ring-1 ring-slate-200 dark:ring-white/10' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-300'}`} title={item.label}>
+                   <item.icon size={22} className={activeTab === item.id ? 'scale-110' : 'group-hover:scale-110'} />
+                   <span className="text-[9px] font-medium">{item.label}</span>
+                 </button>
+               ))}
+             </div>
+             {/* ... Footer Actions ... */}
+             <div className="flex flex-col gap-4 px-4 mt-4 mb-4">
+                 <button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">
+                    {privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}
+                 </button>
+                 <button onClick={() => toggleModal('settings', true)} className="w-full aspect-square rounded-2xl bg-white/5 text-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center"><ShieldCheck size={20}/></button>
+                 <button onClick={() => {if(isDarkMode){document.documentElement.classList.remove('dark');setIsDarkMode(false)}else{document.documentElement.classList.add('dark');setIsDarkMode(true)}}} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">{isDarkMode?<Sun size={20}/>:<Moon size={20}/>}</button>
+                 <button className="w-full aspect-square rounded-2xl bg-white/5 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center" onClick={() => setAuthMode('login')}><LogOut size={20}/></button>
+             </div>
+           </aside>
+
+           <main className="flex-1 overflow-y-auto relative z-20 pb-24 md:pb-0 pt-safe">
+             <div className="max-w-7xl mx-auto p-4 md:p-10">
+                {/* Header (Desktop) */}
+                <header className="hidden md:flex justify-between items-center mb-10">
+                   <div><h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-1">{navItems.find(i=>i.id===activeTab)?.label}</h1><p className="text-slate-500 dark:text-slate-400 font-medium">Bem-vindo, <span className="text-violet-500">{user?.name}</span></p></div>
+                   <div className="flex gap-4">
+                      {/* Contextual Buttons */}
+                      {activeTab === 'overview' && <button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className={theme.btnAccent}><Plus size={18} /> Nova Transação</button>}
+                      {/* ... outros botões ... */}
+                   </div>
+                </header>
+
+                {/* --- RENDERIZAÇÃO DAS TELAS --- */}
+                {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
+                {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={handleEditTransaction} />}
+                {/* ... Outras abas (Budget, Goals, etc) usando os componentes definidos anteriormente ... */}
+                {activeTab === 'goals' && <GoalsView goals={goals} setGoals={setGoals} onDelete={(id) => deleteItem(setGoals, id)} privacyMode={privacyMode} />}
+                {activeTab === 'budgets' && <BudgetView transactions={transactions} budgets={budgets} setBudgets={setBudgets} privacyMode={privacyMode} />}
+                {activeTab === 'calculator' && <CalculatorView />}
+                {activeTab === 'calendar' && <CalendarView transactions={transactions} onDayClick={handleDayClick} />}
+                {activeTab === 'investments' && <InvestmentsView investments={investments} cards={cards} 
+                    onDeleteCard={(id) => deleteItem(setCards, id)} 
+                    onDeleteInvest={(id) => deleteItem(setInvestments, id)} 
+                    onEditCard={(c) => {
+                        if(cards.find(old => old.id === c.id)) {
+                            setCards(cards.map(old=>old.id===c.id?c:old)); 
+                            addToast("Cartão atualizado");
+                        } else {
+                            setCards([...cards, c]);
+                            addToast("Cartão criado");
+                        }
+                    }} 
+                    onEditInvest={(i) => {
+                         if(investments.find(old => old.id === i.id)) {
+                            setInvestments(investments.map(old=>old.id===i.id?i:old)); 
+                            addToast("Ativo atualizado");
+                         } else {
+                            setInvestments([...investments, i]);
+                            addToast("Ativo criado");
+                         }
+                    }}
+                    privacyMode={privacyMode} 
+                />}
+                {activeTab === 'recurring' && <RecurringView transactions={transactions} cards={cards} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={handleEditTransaction} onAdd={handleAddRecurringFromView} privacyMode={privacyMode} />}
+             </div>
+           </main>
+           
+           {/* Mobile Header & Bottom Dock */}
+           <div className="md:hidden flex justify-between items-center px-4 py-3 z-30 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 border-b border-slate-200 dark:border-white/5 pt-safe"><div className="flex items-center gap-2"><CustomLogo /><span className="font-bold text-slate-800 dark:text-white text-lg">Prospera</span></div>
+             <div className="flex gap-2">
+                <button onClick={() => setPrivacyMode(!privacyMode)} className="p-2 text-slate-400">
+                    {privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}
+                </button>
+                <button onClick={() => toggleModal('settings', true)} className="p-2 text-emerald-500"><ShieldCheck size={20}/></button>
+             </div>
+           </div>
+           
+           {/* Mobile Floating Action Button (FAB) for Overview */}
+           {activeTab === 'overview' && (
+             <button 
+               onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }}
+               className="md:hidden fixed bottom-24 right-4 z-40 w-14 h-14 bg-violet-600 rounded-full text-white shadow-lg shadow-violet-600/40 flex items-center justify-center animate-fade-in hover:scale-110 active:scale-95 transition-all"
+             >
+               <Plus size={28} />
+             </button>
+           )}
+
+           <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-2 py-2 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+             <div className="flex justify-between items-center max-w-sm mx-auto">
+               {navItems.slice(0, 4).map(item => (
+                 <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === item.id ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                   <item.icon size={22} className={activeTab === item.id ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/>
+                   <span className="text-[10px] font-bold">{item.label}</span>
+                 </button>
+               ))}
+               <button onClick={() => setActiveTab('investments')} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === 'investments' ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                 <TrendingUp size={22} className={activeTab === 'investments' ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/>
+                 <span className="text-[10px] font-bold">Inv.</span>
+               </button>
+             </div>
+           </div>
+
+           {/* --- MODAIS E TOASTS --- */}
+           <ToastContainer toasts={toasts} />
+           
+           {/* Transaction Modal (Com edição) */}
+           <Modal isOpen={modals.transaction} onClose={() => { toggleModal('transaction', false); setEditingTransaction(null); }} title={editingTransaction ? "Editar Transação" : "Nova Transação"}>
+             <form key={editingTransaction ? editingTransaction.id : 'new'} onSubmit={handleAddTrans} className="space-y-6">
+               <div className="grid grid-cols-2 gap-4">
+                 <div><label className={theme.label}>Tipo</label><select name="type" className={theme.input} defaultValue={editingTransaction?.type || transType} onChange={handleTypeChange}><option value="expense">Saída</option><option value="income">Entrada</option></select></div>
+                 <div><label className={theme.label}>Valor</label><input required name="amount" type="number" step="0.01" className={theme.input} placeholder="0,00" defaultValue={editingTransaction?.amount} /></div>
+               </div>
+               <div><label className={theme.label}>Descrição</label><input required name="description" className={theme.input} placeholder="Ex: Netflix" defaultValue={editingTransaction?.description} /></div>
+               <div className="grid grid-cols-2 gap-4">
+                  <div><label className={theme.label}>Categoria</label><select name="category" className={theme.input} defaultValue={editingTransaction?.category || transCat} onChange={(e) => setTransCat(e.target.value)}>{Object.keys(CATEGORIES[transType]).map(c=><option key={c} value={c}>{c}</option>)}</select></div>
+                  <div><label className={theme.label}>Subcategoria</label><select name="subcategory" className={theme.input} defaultValue={editingTransaction?.subcategory}>{CATEGORIES[transType][transCat]?.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+               </div>
+
+               {/* Seção de Pagamento */}
+               <div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4">
+                  <div className="flex items-center gap-2 mb-2"><Wallet size={16} className="text-violet-500"/><span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pagamento</span></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className={theme.label}>Método</label><select name="paymentMethod" className={theme.input} defaultValue={editingTransaction?.paymentMethod || 'pix'} onChange={(e) => {
+                       const val = e.target.value;
+                       if (val !== 'credit_card') {
+                          const cardSelect = document.getElementById('cardSelect');
+                          if(cardSelect) cardSelect.value = "";
+                       }
+                    }}>
+                      {PAYMENT_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                    </select></div>
+                    <div><label className={theme.label}>Cartão</label><select name="cardId" id="cardSelect" className={theme.input} defaultValue={editingTransaction?.cardId || ''}><option value="">Nenhum</option>{cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+                  </div>
+               </div>
+               <div className="flex items-center gap-3"><input type="checkbox" name="isRecurring" id="toggle" defaultChecked={editingTransaction?.isRecurring} className="w-5 h-5 rounded border-slate-300 text-violet-600 focus:ring-violet-500"/><label htmlFor="toggle" className="text-sm font-medium text-slate-600 dark:text-slate-300">Cobrança Recorrente</label></div>
+               <div><label className={theme.label}>Data</label><input required name="date" type="date" defaultValue={editingTransaction?.date || prefilledDate} className={theme.input} /></div>
+               <button type="submit" className={theme.btnPrimary}>{editingTransaction ? 'Atualizar' : 'Confirmar'}</button>
+             </form>
+           </Modal>
+
+           <Modal isOpen={modals.subscription} onClose={() => toggleModal('subscription', false)} title="Nova Assinatura">
+             <form onSubmit={handleAddSubscription} className="space-y-6">
+               <div><label className={theme.label}>Valor Mensal</label><input required name="amount" type="number" step="0.01" className={theme.input} placeholder="0,00" /></div>
+               <div><label className={theme.label}>Serviço (Descrição)</label><input required name="description" className={theme.input} placeholder="Ex: Spotify" /></div>
+               <div><label className={theme.label}>Categoria</label><select name="category" className={theme.input} defaultValue={transCat} onChange={(e) => setTransCat(e.target.value)}>{Object.keys(CATEGORIES['expense']).map(c=><option key={c} value={c}>{c}</option>)}</select></div>
+               <div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className={theme.label}>Método</label><select name="paymentMethod" className={theme.input} defaultValue="credit_card">{PAYMENT_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select></div>
+                    <div><label className={theme.label}>Cartão</label><select name="cardId" className={theme.input}><option value="">Nenhum</option>{cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+                  </div>
+               </div>
+               <div><label className={theme.label}>Dia de Cobrança</label><input required name="date" type="date" defaultValue={prefilledDate} className={theme.input} /></div>
+               <button type="submit" className={theme.btnPrimary}>Confirmar Assinatura</button>
+             </form>
+           </Modal>
+
+           <Modal isOpen={modals.goal} onClose={() => toggleModal('goal', false)} title="Novo Objetivo"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setGoals([...goals, {id: Date.now(), name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color')}]); addToast("Objetivo criado!"); toggleModal('goal', false);}} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" className={theme.input}/></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue="0" className={theme.input}/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Criar Meta</button></form></Modal>
+           <Modal isOpen={modals.card} onClose={() => toggleModal('card', false)} title="Novo Cartão"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setCards([...cards, {id: Date.now(), name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color')}]); addToast("Cartão adicionado!"); toggleModal('card', false);}} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" className={theme.input}/></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" className={theme.input}/></div></div><div><label className={theme.label}>Estilo</label><select name="color" className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option></select></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>
+           <Modal isOpen={modals.investment} onClose={() => toggleModal('investment', false)} title="Novo Ativo"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setInvestments([...investments, {id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate')}]); addToast("Investimento adicionado!"); toggleModal('investment', false);}} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" className={theme.input}><option>Renda Fixa</option><option>Ações</option><option>Cripto</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" className={theme.input}/></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" className={theme.input}/></div><button type="submit" className={theme.btnPrimary}>Adicionar</button></form></Modal>
+           
+           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem(setTransactions, id)} onAdd={handleAddFromDetails} onEdit={handleEditTransaction} />
+           <SettingsModal isOpen={modals.settings} onClose={() => toggleModal('settings', false)} onExport={handleExportBackup} onImport={handleImportBackup} onLogout={handleLogout} />
+        </div>
+      );
+    }
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
