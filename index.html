@@ -923,7 +923,8 @@
         } catch (e2) {
           addToast(e2.message, 'error');
         }
-      }; setGoals(goals.map(g => g.id === editingGoal.id ? updated : g)); setEditingGoal(null); };
+      };
+
       const handleDepositSave = async (e) => {
         e.preventDefault();
         const fd = new FormData(e.target);
@@ -943,7 +944,24 @@
           addToast(e2.message, 'error');
         }
       };
-      const handleAdd = (e) => { e.preventDefault(); const fd = new FormData(e.target); setGoals([...goals, { id: Date.now(), name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }]); setIsAdding(false); };
+      const handleAdd = async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const payload = {
+          name: fd.get('name'),
+          target: parseFloat(fd.get('target')),
+          current: parseFloat(fd.get('current')) || 0,
+          color: fd.get('color'),
+        };
+        try {
+          await apiFetch('/api/goals', { method: 'POST', body: payload });
+          setIsAdding(false);
+          addToast('Meta adicionada! 🎯');
+          await loadData();
+        } catch (e2) {
+          addToast(e2.message, 'error');
+        }
+      };
       const confirmDelete = () => { if (deletingGoal) { onDelete(deletingGoal.id); setDeletingGoal(null); } };
 
       return (
