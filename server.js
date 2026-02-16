@@ -84,8 +84,10 @@ async function ensureColumn(table, columnSql) {
   await pool.query(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS ${columnSql};`);
 }
 
-async function ensureIndex(name, sql) {
-  await pool.query(`CREATE INDEX IF NOT EXISTS ${name} ${sql};`);
+// NOTE: Fixed! CREATE INDEX requires "ON <table> (...)".
+// We accept a full SQL statement (without the trailing semicolon) to avoid mistakes.
+async function ensureIndex(sql) {
+  await pool.query(sql.endsWith(';') ? sql : `${sql};`);
 }
 
 const initDB = async () => {
@@ -101,7 +103,6 @@ const initDB = async () => {
     `);
 
     // Unique PIN per user (recommended for your current login model)
-    // If you want "PIN + name", change this constraint and login logic.
     await pool.query(`
       DO $$
       BEGIN
@@ -131,7 +132,7 @@ const initDB = async () => {
       );
     `);
     await ensureColumn('transactions', 'user_id INTEGER');
-    await ensureIndex('idx_transactions_user_date', '(user_id, date DESC, id DESC)');
+    await ensureIndex('CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON transactions (user_id, date DESC, id DESC)');
 
     // 3) Goals
     await pool.query(`
@@ -146,7 +147,7 @@ const initDB = async () => {
       );
     `);
     await ensureColumn('goals', 'user_id INTEGER');
-    await ensureIndex('idx_goals_user', '(user_id, id ASC)');
+    await ensureIndex('CREATE INDEX IF NOT EXISTS idx_goals_user ON goals (user_id, id ASC)');
 
     // 4) Cards
     await pool.query(`
@@ -162,7 +163,7 @@ const initDB = async () => {
       );
     `);
     await ensureColumn('cards', 'user_id INTEGER');
-    await ensureIndex('idx_cards_user', '(user_id, id ASC)');
+    await ensureIndex('CREATE INDEX IF NOT EXISTS idx_cards_user ON cards (user_id, id ASC)');
 
     // 5) Investments
     await pool.query(`
@@ -177,7 +178,7 @@ const initDB = async () => {
       );
     `);
     await ensureColumn('investments', 'user_id INTEGER');
-    await ensureIndex('idx_investments_user', '(user_id, id ASC)');
+    await ensureIndex('CREATE INDEX IF NOT EXISTS idx_investments_user ON investments (user_id, id ASC)');
 
     // 6) Budgets (unique per user+category)
     await pool.query(`
@@ -218,7 +219,7 @@ const initDB = async () => {
       END $$;
     `);
 
-    await ensureIndex('idx_budgets_user', '(user_id, id ASC)');
+    await ensureIndex('CREATE INDEX IF NOT EXISTS idx_budgets_user ON budgets (user_id, id ASC)');
 
     // Foreign keys (optional, but helps integrity). Best-effort.
     await pool.query(`
@@ -297,8 +298,6 @@ const initDB = async () => {
           ALTER TABLE budgets ALTER COLUMN user_id SET NOT NULL;
         END IF;
       EXCEPTION WHEN others THEN
-        -- If your DB user doesn't have permission for ALTERs, app still runs with nullable user_id,
-        -- but API requires user_id on inserts/reads.
         NULL;
       END $$;
     `);
