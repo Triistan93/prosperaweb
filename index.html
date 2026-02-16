@@ -1259,21 +1259,44 @@
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
       };
 
-      // Effects (Load/Save Data/Auth) ... [Manter lógica anterior]
-      useEffect(() => {
-        document.documentElement.classList.add('dark');
-        const savedUser = localStorage.getItem('prospera_user');
-        if (savedUser) { setUser(JSON.parse(savedUser)); setAuthMode('login'); } else { setAuthMode('register'); }
-      }, []);
+      // --- 1. Nova função para buscar transações no Banco (Postgres) ---
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch('/api/transactions');
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        addToast("Erro ao carregar dados", "error");
+        console.error(error);
+      }
+    };
+
+    // --- 2. Função antiga modificada (Carrega o resto do LocalStorage) ---
+    const loadData = () => {
+        const get = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) || def; } catch { return def; } };
+        
+        // REMOVI a linha setTransactions daqui, pois agora ela vem do fetchTransactions acima
+        setGoals(get('prospera_goals', []));
+        setInvestments(get('prospera_investments', []));
+        setCards(get('prospera_cards', INITIAL_CARDS));
+        setBudgets(get('prospera_budgets', []));
+    };
+
+    // --- 3. UseEffect Inicial (O disparador) ---
+    useEffect(() => {
+      document.documentElement.classList.add('dark');
+      const savedUser = localStorage.getItem('prospera_user');
       
-      const loadData = () => {
-          const get = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) || def; } catch { return def; } };
-          setTransactions(get('prospera_transactions', INITIAL_TRANSACTIONS));
-          setGoals(get('prospera_goals', []));
-          setInvestments(get('prospera_investments', []));
-          setCards(get('prospera_cards', INITIAL_CARDS));
-          setBudgets(get('prospera_budgets', []));
-      };
+      if (savedUser) { 
+        setUser(JSON.parse(savedUser)); 
+        setAuthMode('app'); // Pula a tela de login (PIN) e vai direto
+        
+        fetchTransactions(); // Chama o Banco de Dados
+        loadData();          // Chama o LocalStorage (Metas/Cartões)
+      } else { 
+        setAuthMode('register'); 
+      }
+    }, []);
 
       // Handlers com TOASTS
       const handleTypeChange = (e) => {
@@ -1594,3 +1617,4 @@
   </script>
 </body>
 </html>
+
