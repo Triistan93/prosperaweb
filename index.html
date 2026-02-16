@@ -12,88 +12,37 @@
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            body: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            background: '#09090b',
-            surface: '#18181b',
-            primary: '#8b5cf6',
-            secondary: '#ec4899',
-            accent: '#06b6d4',
-            gold: '#fbbf24',
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-            'slide-in-right': 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            'float': 'float 6s ease-in-out infinite',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'shimmer': 'shimmer 2s infinite',
-            'spin-slow': 'spin 3s linear infinite',
-          },
-          keyframes: {
-            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-            slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-            slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
-            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-            shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
-          },
-          screens: {
-            'xs': '375px',
-          }
+          fontFamily: { sans: ['Outfit', 'sans-serif'], body: ['Inter', 'sans-serif'] },
+          colors: { background: '#09090b', surface: '#18181b', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4', gold: '#fbbf24' },
+          animation: { 'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)', 'pulse-slow': 'pulse 4s infinite' },
+          keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } } },
+          screens: { 'xs': '375px' }
         }
       }
     }
   </script>
-  
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
   <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom": "https://esm.sh/react-dom@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom",
-        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom"
-      }
+    { 
+      "imports": { 
+        "react": "https://esm.sh/react@18.2.0", 
+        "react-dom": "https://esm.sh/react-dom@18.2.0", 
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client", 
+        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom", 
+        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom" 
+      } 
     }
   </script>
-
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
-    
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
-
-    .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .bg-gradient-animate {
-      background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%),
-                  radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%);
-    }
-
-    select { color-scheme: dark; }
-    option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
-    .dark option { background-color: #18181b !important; color: #ffffff !important; }
-    ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
-    
-    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-    .pt-safe { padding-top: env(safe-area-inset-top); }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+    .bg-gradient-animate { background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%), radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%); }
+    select { color-scheme: dark; } option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); }
+    .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
@@ -106,37 +55,32 @@
     import { Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save, Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock } from 'lucide-react';
 
     // CONSTANTES
-    const CATEGORIES = {
-      expense: { 'Moradia': [], 'Alimentação': [], 'Transporte': [], 'Lazer': [], 'Pessoal': [], 'Serviços': [], 'Outros': [] },
-      income: { 'Salário': [], 'Extra': [] }
-    };
+    const CATEGORIES = { expense: { 'Moradia': [], 'Alimentação': [], 'Transporte': [], 'Lazer': [], 'Pessoal': [], 'Serviços': [], 'Outros': [] }, income: { 'Salário': [], 'Extra': [] } };
     const CATEGORY_COLORS = { 'Moradia': '#8b5cf6', 'Alimentação': '#f59e0b', 'Transporte': '#ef4444', 'Lazer': '#06b6d4', 'Pessoal': '#ec4899', 'Serviços': '#6366f1', 'Outros': '#64748b', 'Salário': '#10b981', 'Extra': '#3b82f6' };
     const PAYMENT_METHODS = [ { id: 'pix', label: 'Pix' }, { id: 'money', label: 'Dinheiro' }, { id: 'debit', label: 'Débito' }, { id: 'credit_card', label: 'Cartão de Crédito' } ];
-    
-    // HELPERS
     const formatCurrency = (val, hid) => hid ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
     const formatDate = (s) => { if (!s) return ''; const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
 
     const theme = {
-      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 transition-all hover:border-white/20 dark:hover:border-white/10 relative overflow-hidden group",
-      input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base shadow-sm",
-      label: "mb-1.5 md:mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1",
-      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide w-full cursor-pointer touch-manipulation",
-      btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 md:py-3.5 md:px-6 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] text-xs md:text-sm tracking-wide cursor-pointer touch-manipulation",
+      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 relative overflow-hidden group",
+      input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all font-medium shadow-sm",
+      label: "mb-1.5 block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1",
+      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer w-full",
+      btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] cursor-pointer",
     };
 
-    // COMPONENTS UI
+    // COMPONENTS
     const Modal = ({ isOpen, onClose, title, children }) => {
-      useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
+      useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if(isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
       if (!isOpen) return null;
-      return (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e)=>e.target===e.currentTarget&&onClose()}><div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up relative overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh]"><div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between shrink-0"><h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate">{title}</h3><button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"><X size={20}/></button></div><div className="overflow-y-auto custom-scrollbar p-4 md:p-5">{children}</div></div></div>);
+      return (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e)=>e.target===e.currentTarget&&onClose()}><div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up flex flex-col max-h-[90vh]"><div className="p-5 border-b border-white/5 flex justify-between items-center"><h3 className="text-xl font-bold text-white">{title}</h3><button onClick={onClose} className="p-2 text-slate-400 hover:text-white"><X size={20}/></button></div><div className="overflow-y-auto p-5 custom-scrollbar">{children}</div></div></div>);
     };
     const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
-    const CustomLogo = () => (<div className="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-0 md:mb-8 md:animate-float shrink-0"><Sprout className="text-white" size={20} /></div>);
-    const ToastContainer = ({ toasts }) => (<div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] md:w-auto">{toasts.map(t=><div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type==='error'?'bg-rose-600':'bg-[#18181b]'} backdrop-blur-xl`}>{t.type==='success'?<CheckCircle size={20} className="text-emerald-400 shrink-0"/>:<XCircle size={20} className="text-white shrink-0"/>}<span className="truncate">{t.msg}</span></div>)}</div>);
-    const MonthSelector = ({ currentDate, onChange }) => (<div className="flex items-center gap-1 md:gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5"><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1))} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronLeft size={18}/></button><span className="text-xs md:text-sm font-bold text-slate-800 dark:text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1))} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronRight size={18}/></button></div>);
+    const CustomLogo = () => (<div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mb-8 shrink-0"><Sprout className="text-white" size={32} /></div>);
+    const ToastContainer = ({ toasts }) => (<div className="fixed bottom-10 right-10 z-[100] flex flex-col gap-3 pointer-events-none">{toasts.map(t=><div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type==='error'?'bg-rose-600':'bg-[#18181b]'}`}>{t.type==='success'?<CheckCircle size={20} className="text-emerald-400 shrink-0"/>:<XCircle size={20} className="text-white shrink-0"/>}<span>{t.msg}</span></div>)}</div>);
+    const MonthSelector = ({ currentDate, onChange }) => (<div className="flex items-center gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5"><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1))} className="p-1.5 hover:text-white"><ChevronLeft size={18}/></button><span className="text-sm font-bold capitalize min-w-[100px] text-center">{currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1))} className="p-1.5 hover:text-white"><ChevronRight size={18}/></button></div>);
 
-    // --- AUTH SCREEN ---
+    // AUTH SCREEN
     const AuthScreen = ({ onLogin, onRegister, onRecover }) => {
         const [mode, setMode] = useState('login'); 
         const [formData, setFormData] = useState({ name: '', pin: '', confirmPin: '', question: 'Qual o nome do seu primeiro animal de estimação?', answer: '' });
@@ -162,7 +106,7 @@
         return (
             <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
                 <div className="absolute w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-                <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in flex flex-col items-center">
+                <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-10 relative z-10 animate-fade-in flex flex-col items-center">
                     <div className="mb-4 scale-125"><CustomLogo /></div>
                     <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1>
                     <p className="text-slate-400 font-medium mb-6">O cofre do seu futuro</p>
@@ -186,7 +130,7 @@
         );
     };
 
-    // --- SUB-COMPONENTS (RESTORED) ---
+    // --- SUB-COMPONENTS ---
     const SettingsModal = ({ isOpen, onClose, onLogout }) => (<Modal isOpen={isOpen} onClose={onClose} title="Segurança"><div className="space-y-6"><div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados na Nuvem</h4><p className="text-slate-400 text-sm mb-4">Seus dados estão salvos no banco de dados.</p></div><div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div></div></Modal>);
     
     const DayDetailsModal = ({ isOpen, onClose, date, transactions, onDelete, onAdd, onEdit }) => { if (!isOpen) return null; const inc = transactions.filter(t=>t.type==='income').reduce((a,c)=>a+c.amount,0); const exp = transactions.filter(t=>t.type==='expense').reduce((a,c)=>a+c.amount,0); return (<Modal isOpen={isOpen} onClose={onClose} title={`Dia ${formatDate(date)}`}><div className="space-y-6"><div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-emerald-400">ENTRADAS</span><p className="text-lg font-bold text-white">{formatCurrency(inc)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-rose-400">SAÍDAS</span><p className="text-lg font-bold text-white">{formatCurrency(exp)}</p></div></div><div><h4 className="text-slate-400 text-sm font-bold mb-3 uppercase">Transações</h4><div className="space-y-3">{transactions.map(t=>(<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount)}</span><button onClick={()=>{onClose();onEdit(t)}} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}</div></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div></Modal>); };
@@ -213,7 +157,7 @@
             <Card><div className="flex justify-between mb-2"><span className="text-slate-400 text-sm font-bold uppercase">Saídas</span><ArrowDownRight className="text-rose-500"/></div><h2 className={`text-3xl font-bold text-slate-800 dark:text-white ${privacyMode?'blur-md':''}`}>{formatCurrency(exp, privacyMode)}</h2></Card>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 min-h-[350px]"><h3 className="text-lg font-bold text-white mb-6">Fluxo Diário</h3><div className={`h-[250px] w-full ${privacyMode?'opacity-20 blur-sm':''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="cInc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="cExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333"/><XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false}/><Tooltip contentStyle={{background:'#18181b', border:'none', borderRadius:'12px', color:'#fff'}}/><Area type="monotone" dataKey="Entradas" stroke="#10B981" fill="url(#cInc)" strokeWidth={3}/><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fill="url(#cExp)" strokeWidth={3}/></AreaChart></ResponsiveContainer></div></Card>
+            <Card className="lg:col-span-2 min-h-[350px]"><h3 className="text-lg font-bold text-white mb-6">Fluxo Diário</h3><div className={`h-[250px] w-full ${privacyMode?'opacity-20 blur-sm':''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="cInc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="cExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333"/><XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false}/><RechartsTooltip contentStyle={{background:'#18181b', border:'none', borderRadius:'12px', color:'#fff'}}/><Area type="monotone" dataKey="Entradas" stroke="#10B981" fill="url(#cInc)" strokeWidth={3}/><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fill="url(#cExp)" strokeWidth={3}/></AreaChart></ResponsiveContainer></div></Card>
             <Card className="min-h-[350px] flex flex-col"><h3 className="text-lg font-bold text-white mb-6">Top Despesas</h3><div className="flex-1 flex items-center justify-center relative">{catData.length>0?(<><div className="w-full h-48 absolute inset-0"><ResponsiveContainer><PieChart><Pie data={catData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{catData.map((e,i)=><Cell key={i} fill={CATEGORY_COLORS[e.name]||'#666'}/>)}</Pie></PieChart></ResponsiveContainer></div><div className="w-full mt-48 space-y-2">{catData.map((e,i)=>(<div key={i} className="flex justify-between text-sm"><div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{backgroundColor:CATEGORY_COLORS[e.name]}}></div><span className="text-slate-300">{e.name}</span></div><span className="font-bold text-white">{formatCurrency(e.value)}</span></div>))}</div></>):(<p className="text-slate-500 text-sm">Sem dados</p>)}</div></Card>
           </div>
         </div>
