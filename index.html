@@ -1125,8 +1125,8 @@
             }
         };
 
-        const handleCardUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedCard = { .....editingCard, name: fd.get('name'), limit: parseFloat(fd.get('limit')), dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; onEditCard(updatedCard); setEditingCard(null); };
-        const handleInvestUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedInvest = { .....editingInvest, name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }; onEditInvest(updatedInvest); setEditingInvest(null); };
+        const handleCardUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedCard = { ...editingCard, name: fd.get('name'), limit: parseFloat(fd.get('limit')), dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; onEditCard(updatedCard); setEditingCard(null); };
+        const handleInvestUpdate = (e) => { e.preventDefault(); const fd = new FormData(e.target); const updatedInvest = { ...editingInvest, name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }; onEditInvest(updatedInvest); setEditingInvest(null); };
         
         const handleAddCardSubmit = (e) => { 
             e.preventDefault(); 
@@ -1147,7 +1147,7 @@
             };
             try {
               if (editingInvest) {
-                await apiFetch(`/api/investments/${editingInvest.id}`, { method: 'PUT', body: { .....editingInvest, ...payload } });
+                await apiFetch(`/api/investments/${editingInvest.id}`, { method: 'PUT', body: { ...editingInvest, ...payload } });
                 addToast('Investimento atualizado! 📈');
                 setEditingInvest(null);
               } else {
@@ -1401,7 +1401,7 @@
       // Toast Helper
       const addToast = (msg, type = 'success') => {
         const id = Date.now();
-        setToasts(prev => [.....prev, { id, msg, type }]);
+        setToasts(prev => [...prev, { id, msg, type }]);
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
       };
 
@@ -1468,24 +1468,13 @@
 
           await loadData();
           toggleModal('transaction', false);
-          setModals((prev) => ({ .....prev, dayDetails: false }));
+          setModals((prev) => ({ ...prev, dayDetails: false }));
         } catch (e2) {
           addToast(e2.message, 'error');
         }
       };
         
-        if (editingTransaction) {
-            setTransactions(prev => prev.map(t => t.id === editingTransaction.id ? newTrans : t));
-            addToast("Transação atualizada! 📝");
-            setEditingTransaction(null);
-        } else {
-            setTransactions([newTrans, .....transactions]);
-            addToast("Transação adicionada! 💸");
-        }
-        toggleModal('transaction', false);
-        setModals(prev => ({ .....prev, dayDetails: false })); // Close day details if open
-      };
-      
+
       const handleAddSubscription = (e) => {
          e.preventDefault();
          const fd = new FormData(e.target);
@@ -1502,7 +1491,7 @@
             paymentMethod: fd.get('paymentMethod'),
             cardId: fd.get('cardId')
           };
-          setTransactions([newSub, .....transactions]);
+          setTransactions([newSub, ...transactions]);
           addToast("Assinatura criada! 🔄");
           toggleModal('subscription', false);
       };
@@ -1519,7 +1508,7 @@
          // update day details view if open
          if (selectedDateDetails) {
             setSelectedDateDetails(prev => ({
-              .....prev,
+              ...prev,
               transactions: prev.transactions.filter(t => t.id !== id)
             }));
          }
@@ -1534,7 +1523,7 @@
                  // ... restore logic
                  setUser(data.user); setTransactions(data.transactions); setGoals(data.goals); 
                  addToast("Backup restaurado com sucesso! 🚀"); // Toast instead of alert
-                 setModals({ .....modals, settings: false });
+                 setModals({ ...modals, settings: false });
               }
            } catch { addToast("Erro ao ler arquivo", 'error'); }
         };
@@ -1553,7 +1542,7 @@
         } catch (e) {
           addToast(e.message, 'error');
         }
-      }; localStorage.setItem('prospera_user', JSON.stringify(newUser)); setUser(newUser); loadData(); setAuthMode('app'); addToast(`Bem-vindo, ${name}!`); };
+      };
       const handleLogin = async (pin) => {
         try {
           const r = await apiFetch('/api/auth/login', { method: 'POST', body: { pin } });
@@ -1627,9 +1616,9 @@
       const handleDayClick = (dateStr, dayTransactions) => { if (dayTransactions && dayTransactions.length > 0) { setSelectedDateDetails({ date: dateStr, transactions: dayTransactions }); toggleModal('dayDetails', true); } else { setPrefilledDate(dateStr); toggleModal('transaction', true); } };
       const handleAddFromDetails = () => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); };
       const handleExportBackup = () => { const blob = new Blob([JSON.stringify({ user, transactions, goals, investments, cards, budgets, timestamp: new Date().toISOString() })], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `prospera_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
-      const handleLogout = () => { setAuthMode('login'); setModals({ .....modals, settings: false }); };
+      const handleLogout = () => { setAuthMode('login'); setModals({ ...modals, settings: false }); };
       
-      const toggleModal = (key, val) => setModals(prev => ({ .....prev, [key]: val }));
+      const toggleModal = (key, val) => setModals(prev => ({ ...prev, [key]: val }));
       const toggleDarkMode = () => {
         if (isDarkMode) { document.documentElement.classList.remove('dark'); setIsDarkMode(false); }
         else { document.documentElement.classList.add('dark'); setIsDarkMode(true); }
