@@ -13,10 +13,10 @@ const pool = new Pool({
     `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
 });
 
-// --- INICIALIZAÇÃO DE TABELAS ---
+// --- CRIAÇÃO AUTOMÁTICA DAS TABELAS ---
 const initDB = async () => {
   try {
-    // 1. Usuários (Simples: Nome e PIN)
+// 1. Tabela de Usuários (Simples)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -25,8 +25,12 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    
+    // --- ADICIONE ESTA LINHA ABAIXO ---
+    // Garante que a coluna PIN exista mesmo se a tabela for antiga
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin VARCHAR(50);`);
 
-    // 2. Transações
+    // 2. Tabela de Transações
     await pool.query(`
       CREATE TABLE IF NOT EXISTS transactions (
         id SERIAL PRIMARY KEY,
@@ -43,7 +47,7 @@ const initDB = async () => {
       );
     `);
 
-    // 3. Metas
+    // 3. Tabela de Metas (Goals)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS goals (
         id SERIAL PRIMARY KEY,
@@ -55,7 +59,7 @@ const initDB = async () => {
       );
     `);
 
-    // 4. Cartões
+    // 4. Tabela de Cartões (Cards)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS cards (
         id SERIAL PRIMARY KEY,
@@ -68,7 +72,7 @@ const initDB = async () => {
       );
     `);
 
-    // 5. Investimentos
+    // 5. Tabela de Investimentos
     await pool.query(`
       CREATE TABLE IF NOT EXISTS investments (
         id SERIAL PRIMARY KEY,
@@ -80,7 +84,7 @@ const initDB = async () => {
       );
     `);
 
-    // 6. Orçamentos
+    // 6. Tabela de Orçamentos (Budgets)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS budgets (
         id SERIAL PRIMARY KEY,
@@ -90,28 +94,36 @@ const initDB = async () => {
       );
     `);
     
-    console.log("Banco de dados conectado e tabelas verificadas.");
+    console.log("Banco de dados e tabelas inicializados com sucesso!");
   } catch (err) {
     console.error("Erro ao inicializar tabelas:", err);
   }
 };
 
+// Inicializa tabelas
 initDB();
 
+// --- MIDDLEWARES ---
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/')));
 
-// --- ROTAS DA API ---
+// ==========================================
+//               ROTAS DA API
+// ==========================================
 
-// AUTH SIMPLES
+// --- USUÁRIOS (AUTH SIMPLES) ---
 app.post('/api/auth/register', async (req, res) => {
   const { name, pin } = req.body;
   try {
-    const result = await pool.query(
-        'INSERT INTO users (name, pin) VALUES ($1, $2) RETURNING *', 
-        [name, pin]
-    );
+    // Verifica se já existe (opcional, mas bom para evitar duplicatas em app de 1 usuário)
+    const check = await pool.query('SELECT * FROM users LIMIT 1');
+    if (check.rows.length > 0) {
+        // Atualiza o existente se já houver um usuário (comportamento de app pessoal)
+        await pool.query('UPDATE users SET name=$1, pin=$2 WHERE id=$3', [name, pin, check.rows[0].id]);
+        return res.json({ success: true, user: { name, pin } });
+    }
+    const result = await pool.query('INSERT INTO users (name, pin) VALUES ($1, $2) RETURNING *', [name, pin]);
     res.json({ success: true, user: result.rows[0] });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no registro' }); }
 });
@@ -128,7 +140,8 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no login' }); }
 });
 
-// TRANSAÇÕES
+
+// --- TRANSAÇÕES ---
 app.get('/api/transactions', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM transactions ORDER BY date DESC');
@@ -161,137 +174,199 @@ app.post('/api/transactions', async (req, res) => {
 });
 
 app.delete('/api/transactions/:id', async (req, res) => {
-  try { await pool.query('DELETE FROM transactions WHERE id = $1', [req.params.id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar' }); }
+  try {
+    await pool.query('DELETE FROM transactions WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar' }); }
 });
 
-// METAS
+
+// --- METAS (GOALS) ---
 app.get('/api/goals', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM goals ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id, name: r.name, target: parseFloat(r.target), current: parseFloat(r.current_amount), color: r.color
+      id: r.id,
+      name: r.name,
+      target: parseFloat(r.target),
+      current: parseFloat(r.current_amount),
+      color: r.color
     }));
     res.json(formatted);
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar metas' }); }
 });
 
 app.post('/api/goals', async (req, res) => {
   const { name, target, current, color } = req.body;
   try {
-    const result = await pool.query('INSERT INTO goals (name, target, current_amount, color) VALUES ($1, $2, $3, $4) RETURNING id', [name, target, current || 0, color]);
+    const result = await pool.query(
+      'INSERT INTO goals (name, target, current_amount, color) VALUES ($1, $2, $3, $4) RETURNING id',
+      [name, target, current || 0, color]
+    );
     res.json({ success: true, id: result.rows[0].id });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao criar meta' }); }
 });
 
 app.put('/api/goals/:id', async (req, res) => {
   const { name, target, current, color } = req.body;
   const { id } = req.params;
-  try { await pool.query('UPDATE goals SET name=$1, target=$2, current_amount=$3, color=$4 WHERE id=$5', [name, target, current, color, id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try {
+    await pool.query(
+      'UPDATE goals SET name=$1, target=$2, current_amount=$3, color=$4 WHERE id=$5',
+      [name, target, current, color, id]
+    );
+    res.json({ success: true });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao atualizar meta' }); }
 });
 
 app.delete('/api/goals/:id', async (req, res) => {
   try { await pool.query('DELETE FROM goals WHERE id = $1', [req.params.id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar' }); }
 });
 
-// CARTÕES
+
+// --- CARTÕES (CARDS) ---
 app.get('/api/cards', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM cards ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id, name: r.name, limit: parseFloat(r.limit_amount), used: parseFloat(r.used_amount), dueDay: r.due_day, color: r.color
+      id: r.id,
+      name: r.name,
+      limit: parseFloat(r.limit_amount),
+      used: parseFloat(r.used_amount),
+      dueDay: r.due_day,
+      color: r.color
     }));
     res.json(formatted);
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar cartões' }); }
 });
 
 app.post('/api/cards', async (req, res) => {
   const { name, limit, used, dueDay, color } = req.body;
   try {
-    const result = await pool.query('INSERT INTO cards (name, limit_amount, used_amount, due_day, color) VALUES ($1, $2, $3, $4, $5) RETURNING id', [name, limit, used || 0, dueDay, color]);
+    const result = await pool.query(
+      'INSERT INTO cards (name, limit_amount, used_amount, due_day, color) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [name, limit, used || 0, dueDay, color]
+    );
     res.json({ success: true, id: result.rows[0].id });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao criar cartão' }); }
 });
 
 app.put('/api/cards/:id', async (req, res) => {
   const { name, limit, used, dueDay, color } = req.body;
   const { id } = req.params;
-  try { await pool.query('UPDATE cards SET name=$1, limit_amount=$2, used_amount=$3, due_day=$4, color=$5 WHERE id=$6', [name, limit, used, dueDay, color, id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try {
+    await pool.query(
+      'UPDATE cards SET name=$1, limit_amount=$2, used_amount=$3, due_day=$4, color=$5 WHERE id=$6',
+      [name, limit, used, dueDay, color, id]
+    );
+    res.json({ success: true });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao atualizar cartão' }); }
 });
 
 app.delete('/api/cards/:id', async (req, res) => {
-  try { await pool.query('DELETE FROM cards WHERE id = $1', [req.params.id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try { await pool.query('DELETE FROM cards WHERE id = $1', [req.params.id]); res.json({ success: true }); }
+  catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar cartão' }); }
 });
 
-// INVESTIMENTOS
+
+// --- INVESTIMENTOS ---
 app.get('/api/investments', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM investments ORDER BY id ASC');
     const formatted = result.rows.map(r => ({
-      id: r.id, name: r.name, type: r.type, value: parseFloat(r.value_amount), returnRate: r.return_rate
+      id: r.id,
+      name: r.name,
+      type: r.type,
+      value: parseFloat(r.value_amount),
+      returnRate: r.return_rate
     }));
     res.json(formatted);
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar investimentos' }); }
 });
 
 app.post('/api/investments', async (req, res) => {
   const { name, type, value, returnRate } = req.body;
   try {
-    const result = await pool.query('INSERT INTO investments (name, type, value_amount, return_rate) VALUES ($1, $2, $3, $4) RETURNING id', [name, type, value, returnRate]);
+    const result = await pool.query(
+      'INSERT INTO investments (name, type, value_amount, return_rate) VALUES ($1, $2, $3, $4) RETURNING id',
+      [name, type, value, returnRate]
+    );
     res.json({ success: true, id: result.rows[0].id });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao criar investimento' }); }
 });
 
 app.put('/api/investments/:id', async (req, res) => {
   const { name, type, value, returnRate } = req.body;
   const { id } = req.params;
-  try { await pool.query('UPDATE investments SET name=$1, type=$2, value_amount=$3, return_rate=$4 WHERE id=$5', [name, type, value, returnRate, id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try {
+    await pool.query(
+      'UPDATE investments SET name=$1, type=$2, value_amount=$3, return_rate=$4 WHERE id=$5',
+      [name, type, value, returnRate, id]
+    );
+    res.json({ success: true });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao atualizar investimento' }); }
 });
 
 app.delete('/api/investments/:id', async (req, res) => {
-  try { await pool.query('DELETE FROM investments WHERE id = $1', [req.params.id]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try { await pool.query('DELETE FROM investments WHERE id = $1', [req.params.id]); res.json({ success: true }); }
+  catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar investimento' }); }
 });
 
-// ORÇAMENTOS
+
+// --- ORÇAMENTOS (BUDGETS) ---
 app.get('/api/budgets', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM budgets ORDER BY id ASC');
-    const formatted = result.rows.map(r => ({ id: r.id, category: r.category, limit: parseFloat(r.limit_amount) }));
+    const formatted = result.rows.map(r => ({
+      id: r.id, // O front pode usar isso ou a categoria como chave
+      category: r.category,
+      limit: parseFloat(r.limit_amount)
+    }));
     res.json(formatted);
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar orçamentos' }); }
 });
 
 app.post('/api/budgets', async (req, res) => {
   const { category, limit } = req.body;
   try {
+    // Upsert simples: se já existe a categoria, atualiza
     const check = await pool.query('SELECT id FROM budgets WHERE category = $1', [category]);
     if (check.rows.length > 0) {
        await pool.query('UPDATE budgets SET limit_amount = $1 WHERE category = $2', [limit, category]);
        res.json({ success: true, id: check.rows[0].id });
     } else {
-       const result = await pool.query('INSERT INTO budgets (category, limit_amount) VALUES ($1, $2) RETURNING id', [category, limit]);
+       const result = await pool.query(
+         'INSERT INTO budgets (category, limit_amount) VALUES ($1, $2) RETURNING id',
+         [category, limit]
+       );
        res.json({ success: true, id: result.rows[0].id });
     }
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao criar orçamento' }); }
 });
 
 app.put('/api/budgets/:category', async (req, res) => {
-  const { limit } = req.body; const { category } = req.params;
-  try { await pool.query('UPDATE budgets SET limit_amount=$1 WHERE category=$2', [limit, category]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  // Nota: o front manda a categoria, que é única
+  const { limit } = req.body;
+  const { category } = req.params;
+  try {
+    await pool.query('UPDATE budgets SET limit_amount=$1 WHERE category=$2', [limit, category]);
+    res.json({ success: true });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao atualizar orçamento' }); }
 });
 
 app.delete('/api/budgets/:category', async (req, res) => {
-  try { await pool.query('DELETE FROM budgets WHERE category = $1', [req.params.category]); res.json({ success: true }); } 
-  catch (err) { console.error(err); res.status(500).json({ error: 'Erro' }); }
+  try { await pool.query('DELETE FROM budgets WHERE category = $1', [req.params.category]); res.json({ success: true }); }
+  catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao deletar orçamento' }); }
 });
 
-app.get('*', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
-app.listen(port, '0.0.0.0', () => { console.log(`Servidor rodando na porta ${port}`); });
+// --- ROTA FINAL (SPA) ---
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// O '0.0.0.0' é essencial para o Docker/Easypanel enxergar o site
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor rodando na porta ${port}`);
+});
