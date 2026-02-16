@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Prospera - Gestão Inteligente</title>
-  
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -14,7 +12,7 @@
         extend: {
           fontFamily: { sans: ['Outfit', 'sans-serif'], body: ['Inter', 'sans-serif'] },
           colors: { background: '#09090b', surface: '#18181b', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4', gold: '#fbbf24' },
-          animation: { 'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)', 'pulse-slow': 'pulse 4s infinite' },
+          animation: { 'fade-in': 'fadeIn 0.4s ease-out', 'slide-up': 'slideUp 0.5s ease-out' },
           keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } } },
           screens: { 'xs': '375px' }
         }
@@ -23,17 +21,7 @@
   </script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <script type="importmap">
-    { 
-      "imports": { 
-        "react": "https://esm.sh/react@18.2.0", 
-        "react-dom": "https://esm.sh/react-dom@18.2.0", 
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client", 
-        "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom", 
-        "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom" 
-      } 
-    }
-  </script>
+  <script type="importmap">{ "imports": { "react": "https://esm.sh/react@18.2.0", "react-dom": "https://esm.sh/react-dom@18.2.0", "react-dom/client": "https://esm.sh/react-dom@18.2.0/client", "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom", "lucide-react": "https://esm.sh/lucide-react@0.300.0?external=react,react-dom" } }</script>
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
@@ -51,7 +39,7 @@
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useMemo, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line } from 'recharts';
+    import { PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
     import { Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save, Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock } from 'lucide-react';
 
     // CONSTANTES
@@ -69,37 +57,35 @@
       btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] cursor-pointer",
     };
 
-    // COMPONENTS
+    // COMPONENTS UI
     const Modal = ({ isOpen, onClose, title, children }) => {
       useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if(isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
       if (!isOpen) return null;
-      return (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e)=>e.target===e.currentTarget&&onClose()}><div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up flex flex-col max-h-[90vh]"><div className="p-5 border-b border-white/5 flex justify-between items-center"><h3 className="text-xl font-bold text-white">{title}</h3><button onClick={onClose} className="p-2 text-slate-400 hover:text-white"><X size={20}/></button></div><div className="overflow-y-auto p-5 custom-scrollbar">{children}</div></div></div>);
+      return (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e)=>e.target===e.currentTarget&&onClose()}><div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up flex flex-col max-h-[90vh]"><div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between shrink-0"><h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate">{title}</h3><button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"><X size={20}/></button></div><div className="overflow-y-auto custom-scrollbar p-4 md:p-5">{children}</div></div></div>);
     };
     const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
     const CustomLogo = () => (<div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mb-8 shrink-0"><Sprout className="text-white" size={32} /></div>);
-    const ToastContainer = ({ toasts }) => (<div className="fixed bottom-10 right-10 z-[100] flex flex-col gap-3 pointer-events-none">{toasts.map(t=><div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type==='error'?'bg-rose-600':'bg-[#18181b]'}`}>{t.type==='success'?<CheckCircle size={20} className="text-emerald-400 shrink-0"/>:<XCircle size={20} className="text-white shrink-0"/>}<span>{t.msg}</span></div>)}</div>);
-    const MonthSelector = ({ currentDate, onChange }) => (<div className="flex items-center gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5"><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1))} className="p-1.5 hover:text-white"><ChevronLeft size={18}/></button><span className="text-sm font-bold capitalize min-w-[100px] text-center">{currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1))} className="p-1.5 hover:text-white"><ChevronRight size={18}/></button></div>);
+    const ToastContainer = ({ toasts }) => (<div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] md:w-auto">{toasts.map(t=><div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type==='error'?'bg-rose-600':'bg-[#18181b]'} backdrop-blur-xl`}>{t.type==='success'?<CheckCircle size={20} className="text-emerald-400 shrink-0"/>:<XCircle size={20} className="text-white shrink-0"/>}<span className="truncate">{t.msg}</span></div>)}</div>);
+    const MonthSelector = ({ currentDate, onChange }) => (<div className="flex items-center gap-1 md:gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5"><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1))} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronLeft size={18}/></button><span className="text-xs md:text-sm font-bold text-slate-800 dark:text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1))} className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"><ChevronRight size={18}/></button></div>);
 
-    // AUTH SCREEN
-    const AuthScreen = ({ onLogin, onRegister, onRecover }) => {
+    // --- AUTH SCREEN (SIMPLES) ---
+    const AuthScreen = ({ onLogin, onRegister }) => {
         const [mode, setMode] = useState('login'); 
-        const [formData, setFormData] = useState({ name: '', pin: '', confirmPin: '', question: 'Qual o nome do seu primeiro animal de estimação?', answer: '' });
+        const [name, setName] = useState('');
+        const [pin, setPin] = useState('');
+        const [confirmPin, setConfirmPin] = useState('');
         const [keepLogged, setKeepLogged] = useState(false);
         const [error, setError] = useState('');
-        const [success, setSuccess] = useState('');
-
-        const handleChange = (e) => setFormData({...formData, [e.target.name]: e.target.value});
 
         const handleSubmit = (e) => {
-            e.preventDefault(); setError(''); setSuccess('');
+            e.preventDefault(); setError('');
             if(mode === 'login') {
-                onLogin(formData.pin, keepLogged, setError);
-            } else if (mode === 'register') {
-                if(formData.pin !== formData.confirmPin) return setError('PINs não conferem');
-                if(formData.pin.length < 4) return setError('Mínimo 4 dígitos');
-                onRegister(formData, setError, () => { setSuccess('Conta criada! Faça login.'); setMode('login'); });
+                onLogin(pin, keepLogged, setError);
             } else {
-                onRecover(formData, setError, () => { setSuccess('Senha alterada! Faça login.'); setMode('login'); });
+                if(pin !== confirmPin) return setError('PINs não conferem');
+                if(pin.length < 4) return setError('Mínimo 4 dígitos');
+                if(!name) return setError('Nome obrigatório');
+                onRegister(name, pin, setError);
             }
         };
 
@@ -111,19 +97,15 @@
                     <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1>
                     <p className="text-slate-400 font-medium mb-6">O cofre do seu futuro</p>
                     <form onSubmit={handleSubmit} className="w-full space-y-4">
-                        {(mode === 'register' || mode === 'recover') && (<div><label className={theme.label}>Seu Nome</label><input name="name" value={formData.name} onChange={handleChange} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>)}
-                        {mode === 'register' && (<div><label className={theme.label}>Pergunta Secreta</label><select name="question" value={formData.question} onChange={handleChange} className={theme.input}><option>Qual o nome do seu primeiro animal de estimação?</option><option>Qual a cidade onde você nasceu?</option><option>Qual sua comida favorita?</option></select></div>)}
-                        {(mode === 'register' || mode === 'recover') && (<div><label className={theme.label}>Resposta Secreta</label><input name="answer" value={formData.answer} onChange={handleChange} className={theme.input} placeholder="Sua resposta" /></div>)}
-                        <div><label className={theme.label}>{mode === 'recover' ? 'Novo PIN' : 'Código PIN'}</label><input type="password" inputMode="numeric" name="pin" value={formData.pin} onChange={handleChange} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>
-                        {mode === 'register' && (<div><label className={theme.label}>Confirmar PIN</label><input type="password" inputMode="numeric" name="confirmPin" value={formData.confirmPin} onChange={handleChange} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>)}
+                        {mode === 'register' && (<div><label className={theme.label}>Seu Nome</label><input value={name} onChange={e=>setName(e.target.value)} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>)}
+                        <div><label className={theme.label}>Código PIN</label><input type="password" inputMode="numeric" value={pin} onChange={e=>setPin(e.target.value)} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>
+                        {mode === 'register' && (<div><label className={theme.label}>Confirmar PIN</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e=>setConfirmPin(e.target.value)} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>)}
                         {mode === 'login' && (<div className="flex items-center gap-2 justify-center py-2"><input type="checkbox" id="keep" checked={keepLogged} onChange={e => setKeepLogged(e.target.checked)} className="w-4 h-4 accent-violet-600 rounded cursor-pointer" /><label htmlFor="keep" className="text-sm text-slate-400 cursor-pointer">Manter conectado</label></div>)}
                         {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">{error}</div>}
-                        {success && <div className="text-emerald-400 text-sm text-center bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">{success}</div>}
-                        <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Entrar' : mode === 'register' ? 'Criar Conta' : 'Redefinir Senha'}</button>
+                        <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Entrar' : 'Criar Conta'}</button>
                     </form>
                     <div className="mt-6 flex justify-center gap-4 text-sm font-medium">
-                        {mode === 'login' && (<><button onClick={() => setMode('recover')} className="text-slate-400 hover:text-white">Esqueci PIN</button><span className="text-slate-600">|</span><button onClick={() => setMode('register')} className="text-violet-400 hover:text-violet-300 font-bold">Criar conta</button></>)}
-                        {mode !== 'login' && (<button onClick={() => setMode('login')} className="text-slate-400 hover:text-white">Voltar para Login</button>)}
+                        {mode === 'login' ? <button onClick={() => setMode('register')} className="text-violet-400 hover:text-violet-300 font-bold">Criar uma conta</button> : <button onClick={() => setMode('login')} className="text-slate-400 hover:text-white">Voltar para Login</button>}
                     </div>
                 </div>
             </div>
@@ -212,6 +194,15 @@
         const [prefilledDate, setPrefilledDate] = useState(new Date().toISOString().split('T')[0]);
         const [selectedDateDetails, setSelectedDateDetails] = useState(null);
 
+        // Sub-Views States
+        const [editingCard, setEditingCard] = useState(null);
+        const [isAddingCard, setIsAddingCard] = useState(false);
+        const [editingInvest, setEditingInvest] = useState(null);
+        const [isAddingInvest, setIsAddingInvest] = useState(false);
+        const [editingBudget, setEditingBudget] = useState(null);
+        const [isAddingBudget, setIsAddingBudget] = useState(false);
+        const [deletingBudget, setDeletingBudget] = useState(null);
+
         const addToast = (msg, type='success') => { const id=Date.now(); setToasts(p=>[...p,{id,msg,type}]); setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),3000); };
         const toggleModal = (k,v) => setModals(p=>({...p,[k]:v}));
 
@@ -242,30 +233,25 @@
             try { const res = await fetch('/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pin})}); const d=await res.json();
             if(d.success) { if(keep) localStorage.setItem('prospera_keep_login', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAll(); } else setError(d.error); } catch { setError("Erro"); }
         };
-        const handleRegister = async (data, setError, onSuccess) => {
-            try { const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)}); const d=await res.json();
-            if(d.success) onSuccess(); else setError(d.error); } catch { setError("Erro"); }
-        };
-        const handleRecover = async (data, setError, onSuccess) => {
-            try { const res = await fetch('/api/auth/reset', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:data.name, answer:data.answer, newPin:data.pin})}); const d=await res.json();
-            if(d.success) onSuccess(); else setError(d.error); } catch { setError("Erro"); }
+        const handleRegister = async (name, pin, setError) => {
+            try { const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, pin})}); const d=await res.json();
+            if(d.success) { 
+                localStorage.setItem('prospera_keep_login', JSON.stringify(d.user)); 
+                setUser(d.user); setAuthMode('app'); fetchAll(); addToast(`Bem-vindo, ${name}!`);
+            } else setError(d.error); } catch { setError("Erro"); }
         };
         const handleLogout = () => { localStorage.removeItem('prospera_keep_login'); setUser(null); setAuthMode('login'); };
 
         const handleAddTrans = async (e) => {
             e.preventDefault(); const fd=new FormData(e.target);
             const body = { description:fd.get('description'), amount:Number(fd.get('amount')), type:fd.get('type'), category:transCat, subcategory:fd.get('subcategory'), date:fd.get('date'), paymentMethod:fd.get('paymentMethod'), isRecurring:fd.get('isRecurring')==='on', cardId:fd.get('cardId') };
-            const url = editingTransaction ? `/api/transactions/${editingTransaction.id}` : '/api/transactions'; // Note: Server needs PUT for update, assuming delete+post for now or update server.js later.
-            // Simplified: Always create new for now based on previous server code, or handle edit.
-            // Since previous server.js didn't have PUT for transactions, we'll assume create only or delete+create logic if complex. 
-            // For now, let's just create.
             await fetch('/api/transactions', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
             addToast("Salvo!"); fetchAll(); toggleModal('transaction', false); setEditingTransaction(null);
         };
-        const deleteItem = async (type, id) => { await fetch(`/api/${type}/${id}`, {method:'DELETE'}); addToast("Excluído"); fetchAll(); };
+        const deleteItem = async (type, id) => { await fetch(`/api/${type}/${id}`, {method:'DELETE'}); addToast("Excluído"); fetchAll(); if(type==='transactions') setModals(p=>({...p,dayDetails:false})); };
 
         if (authMode === 'loading') return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div></div>;
-        if (authMode !== 'app') return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} onRecover={handleRecover} />;
+        if (authMode !== 'app') return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} />;
 
         const navItems = [ { id: 'overview', label: 'Dashboard', icon: LayoutDashboard }, { id: 'transactions', label: 'Extrato', icon: ListFilter }, { id: 'goals', label: 'Objetivos', icon: Target }, { id: 'budgets', label: 'Orçamentos', icon: PiggyBank }, { id: 'investments', label: 'Carteira', icon: TrendingUp }, { id: 'recurring', label: 'Recorrência', icon: Repeat }, { id: 'calculator', label: 'Calculadora', icon: Calculator } ];
 
