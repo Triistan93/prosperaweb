@@ -66,10 +66,14 @@
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
+    
+    /* Scrollbar Personalizada (Desktop) */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+    /* Glass Effect */
     .glass {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(16px);
@@ -77,16 +81,23 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
+    
     .bg-gradient-animate {
       background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%),
                   radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%);
     }
+
+    /* Fix Inputs & Mobile Utilities */
     select { color-scheme: dark; }
     option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
     .dark option { background-color: #18181b !important; color: #ffffff !important; }
     ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
+    
+    /* Safe Area Spacing for iOS */
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     .pt-safe { padding-top: env(safe-area-inset-top); }
+    
+    /* Hide scrollbar for clean UI but keep functionality */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -97,13 +108,18 @@
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useMemo, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line } from 'recharts';
-    import { Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save, Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock } from 'lucide-react';
+    import { 
+      PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line 
+    } from 'recharts';
+    import { 
+      Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, 
+      Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save,
+      Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock
+    } from 'lucide-react';
 
     // --- DADOS E CONSTANTES ---
     const getToday = () => new Date();
     
-    // As constantes de Categoria e Cores permanecem iguais para o visual
     const CATEGORIES = {
       expense: {
         'Moradia': ['Aluguel', 'Condomínio', 'Energia', 'Água', 'Internet', 'Gás', 'Manutenção'],
@@ -133,15 +149,15 @@
       { id: 'credit_card', label: 'Cartão de Crédito' },
     ];
 
-    // --- HELPERS ---
-    const formatCurrency = (value, isHidden) => isHidden ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    // --- HELPER FUNCTIONS ---
+    const formatCurrency = (value, isHidden) => isHidden ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     const formatDate = (dateString) => {
       if (!dateString) return '';
       const [year, month, day] = dateString.split('-');
       return `${day}/${month}/${year}`;
     };
 
-    // --- DESIGN SYSTEM (Mantido Igual) ---
+    // --- COMPONENTES BÁSICOS ---
     const theme = {
       card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 transition-all hover:border-white/20 dark:hover:border-white/10 relative overflow-hidden group",
       input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base shadow-sm",
@@ -150,7 +166,6 @@
       btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 md:py-3.5 md:px-6 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] text-xs md:text-sm tracking-wide cursor-pointer touch-manipulation",
     };
 
-    // --- COMPONENTES UI (Mantidos Iguais) ---
     const Modal = ({ isOpen, onClose, title, children }) => {
       useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
       if (!isOpen) return null;
@@ -169,6 +184,7 @@
 
     const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
     const CustomLogo = () => (<div className="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-0 md:mb-8 md:animate-float shrink-0"><Sprout className="text-white" size={20} /></div>);
+    
     const ToastContainer = ({ toasts }) => (
       <div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] md:w-auto">
         {toasts.map(t => (
@@ -192,22 +208,11 @@
       );
     };
 
-    // --- AUTH SCREEN (Conectada ao Banco) ---
+    // --- TELAS / VIEWS ---
+
     const AuthScreen = ({ mode, onLogin, onRegister }) => {
       const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [error, setError] = useState('');
-      
-      const handleSubmit = (e) => { 
-          e.preventDefault(); setError(''); 
-          if (mode === 'register') { 
-              if (pin.length < 4) return setError('Mínimo 4 dígitos'); 
-              if (pin !== confirmPin) return setError('PINs não conferem'); 
-              if (!name) return setError('Digite seu nome'); 
-              onRegister(name, pin, setError); 
-          } else { 
-              onLogin(pin, setError); 
-          } 
-      };
-      
+      const handleSubmit = (e) => { e.preventDefault(); setError(''); if (mode === 'register') { if (pin.length < 4) return setError('Mínimo 4 dígitos'); if (pin !== confirmPin) return setError('PINs não conferem'); if (!name) return setError('Digite seu nome'); onRegister(name, pin); } else { onLogin(pin); } };
       return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
@@ -227,9 +232,9 @@
 
     const SettingsModal = ({ isOpen, onClose, onLogout }) => {
       return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Segurança e Dados">
+        <Modal isOpen={isOpen} onClose={onClose} title="Segurança">
           <div className="space-y-6">
-            <div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados na Nuvem</h4><p className="text-slate-400 text-sm mb-4 leading-relaxed">Seus dados estão seguros no banco de dados.</p></div>
+            <div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados Seguros</h4><p className="text-slate-400 text-sm mb-4 leading-relaxed">Seus dados estão sincronizados na nuvem.</p></div>
             <div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div>
           </div>
         </Modal>
@@ -238,17 +243,15 @@
 
     const DayDetailsModal = ({ isOpen, onClose, date, transactions, onDelete, onAdd, onEdit }) => {
       if (!isOpen) return null;
-      // Garante que é array
-      const safeTrans = Array.isArray(transactions) ? transactions : [];
-      const dayIncome = safeTrans.filter(t => t.type === 'income').reduce((a,c) => a+Number(c.amount), 0);
-      const dayExpense = safeTrans.filter(t => t.type === 'expense').reduce((a,c) => a+Number(c.amount), 0);
+      const dayIncome = transactions.filter(t => t.type === 'income').reduce((a,c) => a+c.amount, 0);
+      const dayExpense = transactions.filter(t => t.type === 'expense').reduce((a,c) => a+c.amount, 0);
       return (
         <Modal isOpen={isOpen} onClose={onClose} title={`Resumo do dia ${formatDate(date)}`}>
           <div className="space-y-6">
             <div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 text-center"><span className="text-xs font-bold text-emerald-400 uppercase">Entradas</span><p className="text-lg font-bold text-white">{formatCurrency(dayIncome, false)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20 text-center"><span className="text-xs font-bold text-rose-400 uppercase">Saídas</span><p className="text-lg font-bold text-white">{formatCurrency(dayExpense, false)}</p></div></div>
             <div>
               <h4 className="text-slate-400 text-sm font-bold mb-3 uppercase tracking-wider">Transações</h4>
-              <div className="space-y-3">{safeTrans.map(t => (<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category} {t.subcategory && `• ${t.subcategory}`}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount, false)}</span><button onClick={() => { onClose(); onEdit(t); }} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}{safeTrans.length === 0 && <p className="text-center text-slate-500 text-sm">Sem movimentos neste dia.</p>}</div>
+              <div className="space-y-3">{transactions.map(t => (<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category} {t.subcategory && `• ${t.subcategory}`}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount, false)}</span><button onClick={() => { onClose(); onEdit(t); }} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}{transactions.length === 0 && <p className="text-center text-slate-500 text-sm">Sem movimentos neste dia.</p>}</div>
             </div>
             <button onClick={onAdd} className={theme.btnAccent}><Plus size={18} /> Adicionar Nova Transação</button>
           </div>
@@ -256,32 +259,28 @@
       );
     };
 
-    // --- VIEWS ---
-    const Overview = ({ transactions = [], goals, privacyMode, toggleModal, setPrefilledDate, user }) => {
+    const Overview = ({ transactions, goals, privacyMode, toggleModal, setPrefilledDate, user }) => {
       const [currentDate, setCurrentDate] = useState(new Date());
-      const safeTrans = Array.isArray(transactions) ? transactions : [];
-
       const filteredTransactions = useMemo(() => {
-        return safeTrans.filter(t => {
-          const tDate = new Date(t.date);
-          const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
-          return adjustedDate.getMonth() === currentDate.getMonth() && 
-                 adjustedDate.getFullYear() === currentDate.getFullYear();
+        return transactions.filter(t => { 
+            const tDate = new Date(t.date); 
+            const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000); 
+            return adjustedDate.getMonth() === currentDate.getMonth() && adjustedDate.getFullYear() === currentDate.getFullYear(); 
         });
-      }, [safeTrans, currentDate]);
+      }, [transactions, currentDate]);
 
       const previousBalance = useMemo(() => {
         const startOfCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         startOfCurrentMonth.setHours(0,0,0,0);
-        return safeTrans.filter(t => {
+        return transactions.filter(t => {
             const tDate = new Date(t.date);
             const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000);
             return adjustedDate < startOfCurrentMonth;
-        }).reduce((acc, t) => acc + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
-      }, [safeTrans, currentDate]);
+        }).reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
+      }, [transactions, currentDate]);
 
-      const income = filteredTransactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0);
-      const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0);
+      const income = filteredTransactions.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+      const expense = filteredTransactions.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
       const currentMonthResult = income - expense;
       const totalAccumulatedBalance = previousBalance + currentMonthResult;
       const currentMonthName = currentDate.toLocaleDateString('pt-BR', { month: 'long' });
@@ -294,21 +293,16 @@
           const dayTrans = filteredTransactions.filter(t => t.date === dateStr);
           return {
             name: String(day),
-            Entradas: dayTrans.filter(t => t.type === 'income').reduce((a, c) => a + Number(c.amount), 0),
-            Saídas: dayTrans.filter(t => t.type === 'expense').reduce((a, c) => a + Number(c.amount), 0),
+            Entradas: dayTrans.filter(t => t.type === 'income').reduce((a, c) => a + c.amount, 0),
+            Saídas: dayTrans.filter(t => t.type === 'expense').reduce((a, c) => a + c.amount, 0),
           };
         });
       }, [filteredTransactions, currentDate]);
 
       const categoryData = useMemo(() => {
         const catMap = {};
-        filteredTransactions.filter(t => t.type === 'expense').forEach(t => {
-           catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount);
-        });
-        return Object.entries(catMap)
-           .map(([name, value]) => ({ name, value }))
-           .sort((a,b) => b.value - a.value)
-           .slice(0, 5);
+        filteredTransactions.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + t.amount; });
+        return Object.entries(catMap).map(([name, value]) => ({ name, value })).sort((a,b) => b.value - a.value).slice(0, 5);
       }, [filteredTransactions]);
 
       return (
@@ -327,90 +321,36 @@
       );
     };
 
-    const TransactionsView = ({ transactions = [], onDelete, onEdit }) => {
-      const [filterDesc, setFilterDesc] = useState('');
-      const [filterCategory, setFilterCategory] = useState('');
-      const [filterDate, setFilterDate] = useState('');
-      const [filterType, setFilterType] = useState('all');
-      const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
-      const safeTrans = Array.isArray(transactions) ? transactions : [];
-      const allCategories = Array.from(new Set(safeTrans.map(t => t.category))).sort();
-
-      const handleSort = (key) => {
-        let direction = 'desc';
-        if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc';
-        setSortConfig({ key, direction });
-      };
-
-      const filteredTransactions = useMemo(() => {
-        let items = safeTrans.filter(t => {
-           const matchDesc = t.description.toLowerCase().includes(filterDesc.toLowerCase());
-           const matchCat = filterCategory ? t.category === filterCategory : true;
-           const matchDate = filterDate ? t.date === filterDate : true;
-           const matchType = filterType !== 'all' ? t.type === filterType : true;
-           return matchDesc && matchCat && matchDate && matchType;
-        });
-        if (sortConfig.key) {
-           items.sort((a, b) => {
-              if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
-              if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
-              return 0;
-           });
-        }
-        return items;
-      }, [safeTrans, filterDesc, filterCategory, filterDate, filterType, sortConfig]);
-
-      const exportCSV = () => { 
-        const headers = "Descrição;Categoria;Valor;Data;Tipo;Recorrente\n"; 
-        const csvContent = filteredTransactions.map(t => {
-            const dateFormatted = formatDate(t.date);
-            const amountFormatted = Number(t.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            const typeFormatted = t.type === 'income' ? 'Entrada' : 'Saída';
-            const recurringFormatted = t.isRecurring ? 'Sim' : 'Não';
-            const desc = `"${t.description.replace(/"/g, '""')}"`;
-            return `${desc};${t.category};"${amountFormatted}";${dateFormatted};${typeFormatted};${recurringFormatted}`;
-        }).join("\n");
-        const blob = new Blob(["\uFEFF" + headers + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `extrato_prospera_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      };
-
-      return ( <div className="space-y-6 animate-fade-in pb-20 md:pb-0"> <div className="flex flex-col md:flex-row justify-between items-center gap-4"> <div className="flex items-center gap-2"> <h2 className="text-xl font-bold text-slate-800 dark:text-white">Extrato</h2> <span className="text-xs bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-400">{filteredTransactions.length} itens</span> </div> <button onClick={exportCSV} className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-colors text-sm font-medium border border-white/5"> <Download size={16}/> Exportar CSV </button> </div> <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-100 dark:bg-[#18181b] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-inner"> <div className="relative group"> <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors pointer-events-none"/> <input type="text" placeholder="Buscar..." value={filterDesc} onChange={e => setFilterDesc(e.target.value)} className={`${theme.input} !pl-12`} /> </div> <select value={filterType} onChange={e => setFilterType(e.target.value)} className={theme.input}> <option value="all">Todos</option> <option value="income">Receitas</option> <option value="expense">Despesas</option> </select> <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className={theme.input}> <option value="">Categorias (Todas)</option> {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)} </select> <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} className={theme.input}/> </div> <Card className="animate-fade-in !p-0 overflow-hidden"> <div className="overflow-x-auto"> <table className="w-full text-left text-slate-600 dark:text-slate-400 min-w-[700px]"> <thead className="bg-slate-50 dark:bg-white/5 text-xs uppercase font-bold text-slate-500 border-b border-slate-200 dark:border-white/5"> <tr> <th className="px-6 py-5 w-[30%]">Descrição</th> <th className="px-6 py-5 w-[20%]">Categoria</th> <th className="px-6 py-5 text-right cursor-pointer w-[20%] hover:text-violet-500 transition-colors" onClick={() => handleSort('amount')}> <div className="flex items-center justify-end gap-1">Valor <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center cursor-pointer w-[15%] hover:text-violet-500 transition-colors" onClick={() => handleSort('date')}> <div className="flex items-center justify-center gap-1">Data <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center w-[15%]">Ações</th> </tr> </thead> <tbody className="divide-y divide-slate-200 dark:divide-white/5"> {filteredTransactions.map(t => ( <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"> <td className="px-6 py-4 font-medium text-slate-900 dark:text-white"> <div className="flex flex-col"> <span>{t.description}</span> {t.isRecurring && <span className="text-[10px] text-violet-500 flex items-center gap-1 mt-0.5"><Repeat size={10}/> Mensal</span>} </div> </td> <td className="px-6 py-4"> <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/10 shadow-sm" style={{ backgroundColor: CATEGORY_COLORS[t.category] || '#64748b' }}> {t.category} </span> </td> <td className={`px-6 py-4 text-right font-bold text-base ${t.type==='income'?'text-emerald-500 dark:text-emerald-400':'text-rose-500 dark:text-rose-400'} `}> {t.type==='income'?'+':'-'} {formatCurrency(t.amount, false)} </td> <td className="px-6 py-4 text-center text-slate-500 text-sm font-medium bg-slate-50/50 dark:bg-white/5 rounded-lg mx-2 my-2"> {formatDate(t.date)} </td> <td className="px-6 py-4 text-center"> <div className="flex justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"> <button onClick={() => onEdit(t)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all" title="Editar"><Edit2 size={16}/></button> <button onClick={() => onDelete(t.id)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all" title="Excluir"><Trash2 size={16}/></button> </div> </td> </tr> ))} </tbody> </table> </div> {filteredTransactions.length === 0 && ( <div className="p-16 text-center text-slate-500 flex flex-col items-center"> <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4"> <Search size={24} className="opacity-50"/> </div> <p className="font-medium">Nenhuma transação encontrada.</p> <p className="text-sm opacity-60 mt-1">Tente ajustar os filtros.</p> </div> )} </Card> </div> );
-    };
-
-    const RecurringView = ({ transactions=[], cards=[], onEdit, onDelete, onAdd, privacyMode }) => {
-       const recurringMap = new Map();
-       const safeTrans = Array.isArray(transactions) ? transactions : [];
-       safeTrans.filter(t => t.isRecurring).forEach(t => { const existing = recurringMap.get(t.description); if (!existing || new Date(t.date) > new Date(existing.date)) { recurringMap.set(t.description, t); } });
-       const recurringTrans = Array.from(recurringMap.values());
-       const totalRecurring = recurringTrans.reduce((acc, t) => acc + (t.type === 'expense' ? Number(t.amount) : 0), 0);
-       const getPaymentIcon = (t) => { if (t.paymentMethod === 'credit_card') return <CreditCard size={16} className="text-violet-400"/>; if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; return <DollarSign size={16} className="text-slate-400"/>; };
-       const getStatus = (dateStr) => { const today = new Date(); const dueDay = new Date(dateStr).getDate(); if (today.getDate() > dueDay) return { label: 'Pago', color: 'text-emerald-500 bg-emerald-500/10' }; if (today.getDate() === dueDay) return { label: 'Hoje', color: 'text-amber-500 bg-amber-500/10' }; return { label: 'Em breve', color: 'text-blue-500 bg-blue-500/10' }; };
-
-       return (
-         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6"><div><h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Repeat className="text-violet-500"/> Cobranças Recorrentes</h2><p className="text-slate-500 text-sm mt-1">Gerencie suas assinaturas e custos fixos mensais</p></div><button onClick={onAdd} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}><Plus size={18} className="mr-2"/> Nova Recorrência</button></div>
-            <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(totalRecurring, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{recurringTrans.length} assinaturas ativas</p></div></div></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{recurringTrans.length > 0 ? recurringTrans.map(t => { const status = getStatus(t.date); return (<div key={t.id} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"><div className="absolute top-0 left-0 bottom-0 w-1.5" style={{backgroundColor: CATEGORY_COLORS[t.category] || '#64748b'}}></div><div className="pl-3 flex flex-col justify-between h-full"><div><div className="flex justify-between items-start mb-3"><div><h4 className="font-bold text-slate-800 dark:text-white text-lg line-clamp-1">{t.description}</h4><p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">{t.category}</p></div><span className={`text-[10px] font-bold px-2 py-1 rounded-full ${status.color}`}>{status.label}</span></div><h3 className={`text-2xl font-extrabold text-slate-800 dark:text-white mb-4 ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(t.amount, privacyMode)}</h3></div><div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5"><div className="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg">{getPaymentIcon(t)}<span>Dia {new Date(t.date).getDate()}</span></div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => onEdit(t)} className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-500 rounded-lg transition-colors"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="p-2 hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-lg transition-colors"><Trash2 size={16}/></button></div></div></div></div>); }) : (<div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700/50 rounded-[32px] bg-slate-800/20"><RefreshCw size={48} className="mb-4 opacity-30"/><p className="text-lg font-medium">Nenhuma assinatura cadastrada.</p><button onClick={onAdd} className="text-violet-400 font-bold text-sm mt-2 hover:underline">Adicionar Recorrência</button></div>)}</div>
-         </div>
-       );
-    };
-
-    const BudgetView = ({ transactions=[], budgets=[], setBudgets, onRefresh, privacyMode }) => {
-      const [editingBudget, setEditingBudget] = useState(null); const [isAdding, setIsAdding] = useState(false); const [deletingBudget, setDeletingBudget] = useState(null); const currentMonth = new Date();
+    const BudgetView = ({ transactions, budgets, onRefresh, privacyMode }) => {
+      const [editingBudget, setEditingBudget] = useState(null);
+      const [isAdding, setIsAdding] = useState(false);
+      const [deletingBudget, setDeletingBudget] = useState(null);
+      const currentMonth = new Date();
       const currentMonthExpenses = useMemo(() => {
-        return transactions.filter(t => { const d = new Date(t.date); const adjusted = new Date(d.getTime() + d.getTimezoneOffset() * 60000); return t.type === 'expense' && adjusted.getMonth() === currentMonth.getMonth() && adjusted.getFullYear() === currentMonth.getFullYear(); }).reduce((acc, curr) => { acc[curr.category] = (acc[curr.category] || 0) + Number(curr.amount); return acc; }, {});
+        return transactions.filter(t => { 
+            const d = new Date(t.date); 
+            const adjusted = new Date(d.getTime() + d.getTimezoneOffset() * 60000); 
+            return t.type === 'expense' && adjusted.getMonth() === currentMonth.getMonth() && adjusted.getFullYear() === currentMonth.getFullYear(); 
+        }).reduce((acc, curr) => { 
+            acc[curr.category] = (acc[curr.category] || 0) + curr.amount; 
+            return acc; 
+        }, {});
       }, [transactions]);
-      const totalBudget = budgets.reduce((acc, b) => acc + Number(b.limit), 0); const totalSpent = budgets.reduce((acc, b) => acc + (currentMonthExpenses[b.category] || 0), 0); const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+      const totalBudget = budgets.reduce((acc, b) => acc + b.limit, 0);
+      const totalSpent = budgets.reduce((acc, b) => acc + (currentMonthExpenses[b.category] || 0), 0);
+      const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
-      const handleUpdate = async (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('limit')); try { await fetch(`/api/budgets/${editingBudget.category}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({limit: val}) }); onRefresh(); setEditingBudget(null); } catch(err) { console.error(err); } };
-      const handleAdd = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const cat = fd.get('category'); const lim = parseFloat(fd.get('limit')); try { await fetch('/api/budgets', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({category: cat, limit: lim}) }); onRefresh(); setIsAdding(false); } catch(err) { console.error(err); } };
-      const confirmDelete = async () => { if (deletingBudget) { try { await fetch(`/api/budgets/${deletingBudget.category}`, { method: 'DELETE' }); onRefresh(); setDeletingBudget(null); } catch(err) { console.error(err); } } };
+      const handleUpdate = async (e) => { 
+          e.preventDefault(); const val = parseFloat(new FormData(e.target).get('limit'));
+          try { await fetch(`/api/budgets/${editingBudget.category}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({limit: val}) }); onRefresh(); setEditingBudget(null); } catch(err) { console.error(err); }
+      };
+      const handleAdd = async (e) => { 
+          e.preventDefault(); const fd = new FormData(e.target); const cat = fd.get('category'); const lim = parseFloat(fd.get('limit'));
+          try { await fetch('/api/budgets', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({category: cat, limit: lim}) }); onRefresh(); setIsAdding(false); } catch(err) { console.error(err); }
+      };
+      const confirmDelete = async () => { 
+          if (deletingBudget) { try { await fetch(`/api/budgets/${deletingBudget.category}`, { method: 'DELETE' }); onRefresh(); setDeletingBudget(null); } catch(err) { console.error(err); } } 
+      };
 
       return (
         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
@@ -424,13 +364,30 @@
       );
     };
 
-    const GoalsView = ({ goals=[], onRefresh, onDelete, privacyMode }) => {
-      const [editingGoal, setEditingGoal] = useState(null); const [depositGoal, setDepositGoal] = useState(null); const [isAdding, setIsAdding] = useState(false); const [deletingGoal, setDeletingGoal] = useState(null);
-      const totalTarget = goals.reduce((acc, g) => acc + Number(g.target), 0); const totalCurrent = goals.reduce((acc, g) => acc + Number(g.current), 0); const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0; const totalRemaining = Math.max(0, totalTarget - totalCurrent);
+    const GoalsView = ({ goals, onRefresh, onDelete, privacyMode }) => {
+      const [editingGoal, setEditingGoal] = useState(null);
+      const [depositGoal, setDepositGoal] = useState(null);
+      const [isAdding, setIsAdding] = useState(false);
+      const [deletingGoal, setDeletingGoal] = useState(null);
+      const totalTarget = goals.reduce((acc, g) => acc + g.target, 0);
+      const totalCurrent = goals.reduce((acc, g) => acc + g.current, 0);
+      const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
+      const totalRemaining = Math.max(0, totalTarget - totalCurrent);
 
-      const handleEditSave = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const updated = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }; try { await fetch(`/api/goals/${editingGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(updated) }); onRefresh(); setEditingGoal(null); } catch(e) { console.error(e); } };
-      const handleDepositSave = async (e) => { e.preventDefault(); const val = parseFloat(new FormData(e.target).get('amount')); if (val > 0) { try { await fetch(`/api/goals/${depositGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({...depositGoal, current: depositGoal.current + val}) }); onRefresh(); setDepositGoal(null); } catch(e) { console.error(e); } } };
-      const handleAdd = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const newGoal = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') }; try { await fetch('/api/goals', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newGoal) }); onRefresh(); setIsAdding(false); } catch(e) { console.error(e); } };
+      const handleEditSave = async (e) => { 
+          e.preventDefault(); const fd = new FormData(e.target); 
+          const updated = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') };
+          try { await fetch(`/api/goals/${editingGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(updated) }); onRefresh(); setEditingGoal(null); } catch(e) { console.error(e); }
+      };
+      const handleDepositSave = async (e) => { 
+          e.preventDefault(); const val = parseFloat(new FormData(e.target).get('amount')); 
+          if (val > 0) { try { await fetch(`/api/goals/${depositGoal.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({...depositGoal, current: depositGoal.current + val}) }); onRefresh(); setDepositGoal(null); } catch(e) { console.error(e); } }
+      };
+      const handleAdd = async (e) => { 
+          e.preventDefault(); const fd = new FormData(e.target); 
+          const newGoal = { name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color') };
+          try { await fetch('/api/goals', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newGoal) }); onRefresh(); setIsAdding(false); } catch(e) { console.error(e); }
+      };
       const confirmDelete = () => { if (deletingGoal) { onDelete(deletingGoal.id); setDeletingGoal(null); } };
 
       return (
@@ -446,13 +403,17 @@
       );
     };
 
-    const InvestmentsView = ({ investments=[], cards=[], onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode }) => {
-        const [editingCard, setEditingCard] = useState(null); const [editingInvest, setEditingInvest] = useState(null); const [isAddingCard, setIsAddingCard] = useState(false); const [isAddingInvest, setIsAddingInvest] = useState(false);
-        const totalInvested = investments.reduce((a,c) => a + Number(c.value), 0);
-        const distributionData = useMemo(() => { const counts = {}; investments.forEach(i => counts[i.type] = (counts[i.type] || 0) + Number(i.value)); return Object.entries(counts).map(([name, value]) => ({ name, value })); }, [investments]);
+    const InvestmentsView = ({ investments, cards, onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode }) => {
+        const [editingCard, setEditingCard] = useState(null);
+        const [editingInvest, setEditingInvest] = useState(null);
+        const [isAddingCard, setIsAddingCard] = useState(false);
+        const [isAddingInvest, setIsAddingInvest] = useState(false);
+        const totalInvested = investments.reduce((a,c) => a + c.value, 0);
+        const distributionData = useMemo(() => { const counts = {}; investments.forEach(i => counts[i.type] = (counts[i.type] || 0) + i.value); return Object.entries(counts).map(([name, value]) => ({ name, value })); }, [investments]);
         const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'];
         const getBgColorForType = (type) => { switch(type) { case 'Renda Fixa': return 'bg-emerald-500/10 border-emerald-500/20'; case 'Ações': return 'bg-blue-500/10 border-blue-500/20'; case 'Cripto': return 'bg-amber-500/10 border-amber-500/20'; case 'FIIs': return 'bg-violet-500/10 border-violet-500/20'; default: return 'bg-slate-500/10 border-slate-500/20'; } };
         const getIconForType = (type) => { switch(type) { case 'Renda Fixa': return <Building2 size={20} className="text-emerald-400"/>; case 'Ações': return <TrendingUp size={20} className="text-blue-400"/>; case 'Cripto': return <Coins size={20} className="text-amber-400"/>; case 'FIIs': return <Briefcase size={20} className="text-violet-400"/>; default: return <Target size={20} className="text-slate-400"/>; } };
+
         const handleCardSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const cardData = { name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color') }; if(editingCard) { onUpdateCard({...editingCard, ...cardData}); setEditingCard(null); } else { onAddCard(cardData); setIsAddingCard(false); } };
         const handleInvestSubmit = (e) => { e.preventDefault(); const fd = new FormData(e.target); const invData = { name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }; if(editingInvest) { onUpdateInvest({...editingInvest, ...invData}); setEditingInvest(null); } else { onAddInvest(invData); setIsAddingInvest(false); } };
 
@@ -485,7 +446,47 @@
        );
     };
 
-    // --- MAIN APP ---
+    const TransactionsView = ({ transactions, onDelete, onEdit }) => {
+      const [filterDesc, setFilterDesc] = useState(''); const [filterCategory, setFilterCategory] = useState(''); const [filterDate, setFilterDate] = useState(''); const [filterType, setFilterType] = useState('all'); const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' }); const allCategories = Array.from(new Set(transactions.map(t => t.category))).sort();
+      const handleSort = (key) => { let direction = 'desc'; if (sortConfig.key === key && sortConfig.direction === 'desc') direction = 'asc'; setSortConfig({ key, direction }); };
+      const filteredTransactions = useMemo(() => { let items = transactions.filter(t => { const matchDesc = t.description.toLowerCase().includes(filterDesc.toLowerCase()); const matchCat = filterCategory ? t.category === filterCategory : true; const matchDate = filterDate ? t.date === filterDate : true; const matchType = filterType !== 'all' ? t.type === filterType : true; return matchDesc && matchCat && matchDate && matchType; }); if (sortConfig.key) { items.sort((a, b) => { if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1; if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1; return 0; }); } return items; }, [transactions, filterDesc, filterCategory, filterDate, filterType, sortConfig]);
+      const exportCSV = () => { const headers = "Descrição;Categoria;Valor;Data;Tipo;Recorrente\n"; const csvContent = filteredTransactions.map(t => { const dateFormatted = formatDate(t.date); const amountFormatted = t.amount.toLocaleString('pt-BR', {minimumFractionDigits: 2}); const typeFormatted = t.type === 'income' ? 'Entrada' : 'Saída'; const recurringFormatted = t.isRecurring ? 'Sim' : 'Não'; const desc = `"${t.description.replace(/"/g, '""')}"`; return `${desc};${t.category};"${amountFormatted}";${dateFormatted};${typeFormatted};${recurringFormatted}`; }).join("\n"); const blob = new Blob(["\uFEFF" + headers + csvContent], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `extrato_prospera_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
+      return ( <div className="space-y-6 animate-fade-in pb-20 md:pb-0"> <div className="flex flex-col md:flex-row justify-between items-center gap-4"> <div className="flex items-center gap-2"> <h2 className="text-xl font-bold text-slate-800 dark:text-white">Extrato</h2> <span className="text-xs bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-400">{filteredTransactions.length} itens</span> </div> <button onClick={exportCSV} className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-colors text-sm font-medium border border-white/5"> <Download size={16}/> Exportar CSV </button> </div> <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-100 dark:bg-[#18181b] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-inner"> <div className="relative group"> <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors pointer-events-none"/> <input type="text" placeholder="Buscar..." value={filterDesc} onChange={e => setFilterDesc(e.target.value)} className={`${theme.input} !pl-12`} /> </div> <select value={filterType} onChange={e => setFilterType(e.target.value)} className={theme.input}> <option value="all">Todos</option> <option value="income">Receitas</option> <option value="expense">Despesas</option> </select> <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className={theme.input}> <option value="">Categorias (Todas)</option> {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)} </select> <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} className={theme.input}/> </div> <Card className="animate-fade-in !p-0 overflow-hidden"> <div className="overflow-x-auto"> <table className="w-full text-left text-slate-600 dark:text-slate-400 min-w-[700px]"> <thead className="bg-slate-50 dark:bg-white/5 text-xs uppercase font-bold text-slate-500 border-b border-slate-200 dark:border-white/5"> <tr> <th className="px-6 py-5 w-[30%]">Descrição</th> <th className="px-6 py-5 w-[20%]">Categoria</th> <th className="px-6 py-5 text-right cursor-pointer w-[20%] hover:text-violet-500 transition-colors" onClick={() => handleSort('amount')}> <div className="flex items-center justify-end gap-1">Valor <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center cursor-pointer w-[15%] hover:text-violet-500 transition-colors" onClick={() => handleSort('date')}> <div className="flex items-center justify-center gap-1">Data <ArrowUpDown size={14}/></div> </th> <th className="px-6 py-5 text-center w-[15%]">Ações</th> </tr> </thead> <tbody className="divide-y divide-slate-200 dark:divide-white/5"> {filteredTransactions.map(t => ( <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"> <td className="px-6 py-4 font-medium text-slate-900 dark:text-white"> <div className="flex flex-col"> <span>{t.description}</span> {t.isRecurring && <span className="text-[10px] text-violet-500 flex items-center gap-1 mt-0.5"><Repeat size={10}/> Mensal</span>} </div> </td> <td className="px-6 py-4"> <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/10 shadow-sm" style={{ backgroundColor: CATEGORY_COLORS[t.category] || '#64748b' }}> {t.category} </span> </td> <td className={`px-6 py-4 text-right font-bold text-base ${t.type==='income'?'text-emerald-500 dark:text-emerald-400':'text-rose-500 dark:text-rose-400'} `}> {t.type==='income'?'+':'-'} {formatCurrency(t.amount, false)} </td> <td className="px-6 py-4 text-center text-slate-500 text-sm font-medium bg-slate-50/50 dark:bg-white/5 rounded-lg mx-2 my-2"> {formatDate(t.date)} </td> <td className="px-6 py-4 text-center"> <div className="flex justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"> <button onClick={() => onEdit(t)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all" title="Editar"><Edit2 size={16}/></button> <button onClick={() => onDelete(t.id)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all" title="Excluir"><Trash2 size={16}/></button> </div> </td> </tr> ))} </tbody> </table> </div> {filteredTransactions.length === 0 && ( <div className="p-16 text-center text-slate-500 flex flex-col items-center"> <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4"> <Search size={24} className="opacity-50"/> </div> <p className="font-medium">Nenhuma transação encontrada.</p> <p className="text-sm opacity-60 mt-1">Tente ajustar os filtros.</p> </div> )} </Card> </div> );
+    };
+
+    const RecurringView = ({ transactions, cards, onEdit, onDelete, onAdd, privacyMode }) => {
+       const recurringMap = new Map();
+       transactions.filter(t => t.isRecurring).forEach(t => { const existing = recurringMap.get(t.description); if (!existing || new Date(t.date) > new Date(existing.date)) { recurringMap.set(t.description, t); } });
+       const recurringTrans = Array.from(recurringMap.values());
+       const totalRecurring = recurringTrans.reduce((acc, t) => acc + (t.type === 'expense' ? t.amount : 0), 0);
+       const getPaymentIcon = (t) => { if (t.paymentMethod === 'credit_card') return <CreditCard size={16} className="text-violet-400"/>; if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; return <DollarSign size={16} className="text-slate-400"/>; };
+       const getStatus = (dateStr) => { const today = new Date(); const dueDay = new Date(dateStr).getDate(); if (today.getDate() > dueDay) return { label: 'Pago', color: 'text-emerald-500 bg-emerald-500/10' }; if (today.getDate() === dueDay) return { label: 'Hoje', color: 'text-amber-500 bg-amber-500/10' }; return { label: 'Em breve', color: 'text-blue-500 bg-blue-500/10' }; };
+
+       return (
+         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6"><div><h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><Repeat className="text-violet-500"/> Cobranças Recorrentes</h2><p className="text-slate-500 text-sm mt-1">Gerencie suas assinaturas e custos fixos mensais</p></div><button onClick={onAdd} className={theme.btnAccent + " !w-auto shadow-lg shadow-violet-500/20"}><Plus size={18} className="mr-2"/> Nova Recorrência</button></div>
+            <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(totalRecurring, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{recurringTrans.length} assinaturas ativas</p></div></div></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{recurringTrans.length > 0 ? recurringTrans.map(t => { const status = getStatus(t.date); return (<div key={t.id} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"><div className="absolute top-0 left-0 bottom-0 w-1.5" style={{backgroundColor: CATEGORY_COLORS[t.category] || '#64748b'}}></div><div className="pl-3 flex flex-col justify-between h-full"><div><div className="flex justify-between items-start mb-3"><div><h4 className="font-bold text-slate-800 dark:text-white text-lg line-clamp-1">{t.description}</h4><p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">{t.category}</p></div><span className={`text-[10px] font-bold px-2 py-1 rounded-full ${status.color}`}>{status.label}</span></div><h3 className={`text-2xl font-extrabold text-slate-800 dark:text-white mb-4 ${privacyMode ? 'blur-sm' : ''}`}>{formatCurrency(t.amount, privacyMode)}</h3></div><div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5"><div className="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg">{getPaymentIcon(t)}<span>Dia {new Date(t.date).getDate()}</span></div><div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => onEdit(t)} className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-500 rounded-lg transition-colors"><Edit2 size={16}/></button><button onClick={() => onDelete(t.id)} className="p-2 hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-lg transition-colors"><Trash2 size={16}/></button></div></div></div></div>); }) : (<div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-700/50 rounded-[32px] bg-slate-800/20"><RefreshCw size={48} className="mb-4 opacity-30"/><p className="text-lg font-medium">Nenhuma assinatura cadastrada.</p><button onClick={onAdd} className="text-violet-400 font-bold text-sm mt-2 hover:underline">Adicionar Recorrência</button></div>)}</div>
+         </div>
+       );
+    };
+
+    const CalendarView = ({ transactions, onDayClick }) => {
+      const [currentDate, setCurrentDate] = useState(new Date());
+      const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+      const getTransactionsForDay = (day) => { return transactions.filter(t => { const tDate = new Date(t.date); const adjustedDate = new Date(tDate.getTime() + tDate.getTimezoneOffset() * 60000); return adjustedDate.getDate() === day && adjustedDate.getMonth() === currentDate.getMonth() && adjustedDate.getFullYear() === currentDate.getFullYear(); }); };
+      const handleDayClick = (day) => { const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; const dayTrans = getTransactionsForDay(day); onDayClick(dateStr, dayTrans); };
+
+      return (
+        <div className="space-y-6 animate-fade-in pb-20 md:pb-0">
+          <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-4 rounded-3xl border border-slate-200 dark:border-white/5 shadow-sm"><h2 className="text-lg md:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><CalendarIcon className="text-violet-400"/> Agenda</h2><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div>
+          <Card className="!p-0 overflow-hidden"><div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/5">{['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => <div key={day} className="py-3 md:py-4 text-center text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">{day}</div>)}</div><div className="grid grid-cols-7 gap-px bg-slate-200 dark:bg-white/5">{Array(firstDay).fill(null).map((_, i) => <div key={`empty-${i}`} className="bg-white dark:bg-[#0c0c0e] h-20 md:h-32 opacity-50"></div>)}{Array(daysInMonth).fill(null).map((_, i) => { const day = i + 1; const dayTrans = getTransactionsForDay(day); const income = dayTrans.filter(t => t.type === 'income').reduce((a,c) => a + c.amount, 0); const expense = dayTrans.filter(t => t.type === 'expense').reduce((a,c) => a + c.amount, 0); const hasActivity = income > 0 || expense > 0; return (<div key={day} onClick={() => handleDayClick(day)} className="bg-white dark:bg-[#0c0c0e] h-20 md:h-32 p-1 md:p-3 transition-colors hover:bg-slate-50 dark:hover:bg-white/10 relative group cursor-pointer"><span className={`text-xs md:text-sm font-bold ${hasActivity ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-600'} mb-1 md:mb-2 block`}>{day}</span><div className="space-y-0.5 md:space-y-1">{income > 0 && <div className="text-[9px] md:text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1 md:px-2 py-0.5 md:py-1 rounded-lg flex justify-between font-bold overflow-hidden"><span className="hidden md:inline">+</span><span>{Math.round(income)}</span></div>}{expense > 0 && <div className="text-[9px] md:text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 px-1 md:px-2 py-0.5 md:py-1 rounded-lg flex justify-between font-bold overflow-hidden"><span className="hidden md:inline">-</span><span>{Math.round(expense)}</span></div>}</div></div>); })}</div></Card>
+        </div>
+      );
+    };
+
+    // --- MAIN APP COMPONENT ---
     function App() {
       const [toasts, setToasts] = useState([]);
       const [authMode, setAuthMode] = useState('loading');
@@ -495,12 +496,14 @@
       const [isDarkMode, setIsDarkMode] = useState(true);
       const [modals, setModals] = useState({ transaction: false, subscription: false, settings: false, dayDetails: false });
       
+      // Dados da Aplicação (Estados)
       const [transactions, setTransactions] = useState([]);
       const [goals, setGoals] = useState([]);
       const [investments, setInvestments] = useState([]);
       const [cards, setCards] = useState([]);
       const [budgets, setBudgets] = useState([]);
 
+      // Estados de Edição/Form
       const [transType, setTransType] = useState('expense');
       const [transCat, setTransCat] = useState(Object.keys(CATEGORIES.expense)[0]);
       const [selectedDateDetails, setSelectedDateDetails] = useState(null);
@@ -514,12 +517,12 @@
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
       };
 
-      // --- API FETCHERS ---
-      const fetchTransactions = async () => { try { const r = await fetch('/api/transactions'); const d = await r.json(); setTransactions(d || []); } catch (e) { console.error(e); } };
-      const fetchGoals = async () => { try { const r = await fetch('/api/goals'); const d = await r.json(); setGoals(d || []); } catch (e) { console.error(e); } };
-      const fetchCards = async () => { try { const r = await fetch('/api/cards'); const d = await r.json(); setCards(d || []); } catch (e) { console.error(e); } };
-      const fetchInvestments = async () => { try { const r = await fetch('/api/investments'); const d = await r.json(); setInvestments(d || []); } catch (e) { console.error(e); } };
-      const fetchBudgets = async () => { try { const r = await fetch('/api/budgets'); const d = await r.json(); setBudgets(d || []); } catch (e) { console.error(e); } };
+      // --- API FETCHERS (Busca dados do servidor) ---
+      const fetchTransactions = async () => { try { const r = await fetch('/api/transactions'); const d = await r.json(); setTransactions(d); } catch (e) { console.error(e); } };
+      const fetchGoals = async () => { try { const r = await fetch('/api/goals'); const d = await r.json(); setGoals(d); } catch (e) { console.error(e); } };
+      const fetchCards = async () => { try { const r = await fetch('/api/cards'); const d = await r.json(); setCards(d); } catch (e) { console.error(e); } };
+      const fetchInvestments = async () => { try { const r = await fetch('/api/investments'); const d = await r.json(); setInvestments(d); } catch (e) { console.error(e); } };
+      const fetchBudgets = async () => { try { const r = await fetch('/api/budgets'); const d = await r.json(); setBudgets(d); } catch (e) { console.error(e); } };
 
       const fetchAllData = () => {
           fetchTransactions(); fetchGoals(); fetchCards(); fetchInvestments(); fetchBudgets();
@@ -538,26 +541,26 @@
         }
       }, []);
 
-      const handleRegister = async (name, pin, setError) => { 
+      const handleRegister = async (name, pin) => { 
           try {
              const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, pin}) });
              const d = await r.json();
              if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); addToast(`Bem-vindo, ${name}!`); }
-             else { setError(d.error); }
-          } catch(e) { setError("Erro ao registrar"); }
+          } catch(e) { addToast("Erro ao registrar", "error"); }
       };
       
-      const handleLogin = async (pin, setError) => { 
+      const handleLogin = async (pin) => { 
           try {
              const r = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({pin}) });
              const d = await r.json();
              if(d.success) { localStorage.setItem('prospera_user', JSON.stringify(d.user)); setUser(d.user); setAuthMode('app'); fetchAllData(); }
-             else { setError("PIN Incorreto"); }
-          } catch(e) { setError("Erro de conexão"); }
+             else { addToast("PIN Incorreto", "error"); }
+          } catch(e) { addToast("Erro de conexão", "error"); }
       };
 
       // --- CRUD HANDLERS ---
       
+      // Transações
       const handleAddTrans = async (e) => {
         e.preventDefault(); const fd = new FormData(e.target);
         const newTrans = { 
@@ -577,6 +580,7 @@
          try { const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSub) }); if (res.ok) { addToast("Assinatura criada! 🔄"); fetchTransactions(); toggleModal('subscription', false); } } catch (e) { addToast("Erro", "error"); }
       };
 
+      // Função Genérica de Delete
       const deleteItem = async (setList, id) => {
          let url = '';
          if (setList === setTransactions) url = `/api/transactions/${id}`;
@@ -590,7 +594,7 @@
          }
       };
 
-      // Wrappers
+      // Actions wrappers para componentes filhos
       const handleCardActions = {
           add: async (data) => { await fetch('/api/cards', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchCards(); addToast("Cartão criado"); },
           update: async (data) => { await fetch(`/api/cards/${data.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); fetchCards(); addToast("Cartão atualizado"); },
@@ -607,9 +611,8 @@
       const handleTypeChange = (e) => { const type = e.target.value; setTransType(type); setTransCat(Object.keys(CATEGORIES[type])[0]); };
 
       // --- RENDER ---
-      if (authMode === 'login') return <AuthScreen mode="login" onLogin={handleLogin} onRegister={handleRegister} />;
-      if (authMode === 'register') return <AuthScreen mode="register" onLogin={handleLogin} onRegister={handleRegister} />;
-      if (authMode === 'loading') return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div></div>;
+      if (authMode === 'login') return <AuthScreen mode="login" onLogin={handleLogin} />;
+      if (authMode === 'register') return <AuthScreen mode="register" onRegister={handleRegister} />;
 
       const navItems = [ { id: 'overview', label: 'Dashboard', icon: LayoutDashboard }, { id: 'transactions', label: 'Extrato', icon: ListFilter }, { id: 'calendar', label: 'Agenda', icon: CalendarIcon }, { id: 'budgets', label: 'Orçamentos', icon: PiggyBank }, { id: 'goals', label: 'Objetivos', icon: Target }, { id: 'investments', label: 'Carteira', icon: TrendingUp }, { id: 'recurring', label: 'Recorrência', icon: Repeat }, { id: 'calculator', label: 'Calculadora', icon: Calculator } ];
 
@@ -633,6 +636,7 @@
              <div className="max-w-7xl mx-auto p-4 md:p-10">
                 <header className="hidden md:flex justify-between items-center mb-10"><div><h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-1">{navItems.find(i=>i.id===activeTab)?.label}</h1><p className="text-slate-500 dark:text-slate-400 font-medium">Bem-vindo, <span className="text-violet-500">{user?.name}</span></p></div><div className="flex gap-4">{activeTab === 'overview' && <button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className={theme.btnAccent}><Plus size={18} /> Nova Transação</button>}</div></header>
                 
+                {/* Views */}
                 {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
                 {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={(t) => { setEditingTransaction(t); setTransType(t.type); setTransCat(t.category); setPrefilledDate(t.date); toggleModal('transaction', true); }} />}
                 {activeTab === 'goals' && <GoalsView goals={goals} onRefresh={fetchGoals} onDelete={(id) => deleteItem(setGoals, id)} privacyMode={privacyMode} />}
@@ -644,6 +648,7 @@
              </div>
            </main>
            
+           {/* Mobile Elements */}
            <div className="md:hidden flex justify-between items-center px-4 py-3 z-30 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 border-b border-slate-200 dark:border-white/5 pt-safe"><div className="flex items-center gap-2"><CustomLogo /><span className="font-bold text-slate-800 dark:text-white text-lg">Prospera</span></div><div className="flex gap-2"><button onClick={() => setPrivacyMode(!privacyMode)} className="p-2 text-slate-400">{privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}</button><button onClick={() => toggleModal('settings', true)} className="p-2 text-emerald-500"><ShieldCheck size={20}/></button></div></div>
            {activeTab === 'overview' && (<button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className="md:hidden fixed bottom-24 right-4 z-40 w-14 h-14 bg-violet-600 rounded-full text-white shadow-lg shadow-violet-600/40 flex items-center justify-center animate-fade-in hover:scale-110 active:scale-95 transition-all"><Plus size={28} /></button>)}
            <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-2 py-2 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"><div className="flex justify-between items-center max-w-sm mx-auto">{navItems.slice(0, 4).map(item => (<button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === item.id ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}><item.icon size={22} className={activeTab === item.id ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/><span className="text-[10px] font-bold">{item.label}</span></button>))}<button onClick={() => setActiveTab('investments')} className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all min-w-[64px] ${activeTab === 'investments' ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400 dark:text-slate-500'}`}><TrendingUp size={22} className={activeTab === 'investments' ? 'animate-bounce' : ''} style={{ animationIterationCount: 1 }}/><span className="text-[10px] font-bold">Inv.</span></button></div></div>
