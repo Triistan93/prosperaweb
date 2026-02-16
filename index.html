@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR" class="dark"> <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Prospera - Gestão Inteligente</title>
@@ -14,7 +13,7 @@
         extend: {
           fontFamily: { sans: ['Outfit', 'sans-serif'], body: ['Inter', 'sans-serif'] },
           colors: { background: '#09090b', surface: '#18181b', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4', gold: '#fbbf24' },
-          animation: { 'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)', 'pulse-slow': 'pulse 4s infinite' },
+          animation: { 'fade-in': 'fadeIn 0.4s ease-out', 'slide-up': 'slideUp 0.5s ease-out', 'pulse-slow': 'pulse 4s infinite' },
           keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } } },
           screens: { 'xs': '375px' }
         }
@@ -35,17 +34,31 @@
     }
   </script>
   <style>
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #09090b; color: #fff; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
     ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
-    .bg-gradient-animate { background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%), radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%); }
-    select { color-scheme: dark; } option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
+    
+    /* Efeito de Vidro Profundo (Dark Glass) */
+    .glass {
+      background: rgba(24, 24, 27, 0.6); /* #18181b com opacidade */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bg-gradient-animate { 
+        background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 40%), 
+                    radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%); 
+    }
+    
+    select { color-scheme: dark; } 
+    option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); }
     .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
+<body class="bg-[#09090b] text-slate-100 transition-colors duration-500 min-h-screen selection:bg-violet-500/30 overflow-hidden">
   <div id="root"></div>
 
   <script type="text/babel" data-type="module">
@@ -54,49 +67,85 @@
     import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line } from 'recharts';
     import { Wallet, TrendingUp, TrendingDown, Target, CreditCard, DollarSign, Menu, X, Plus, ArrowUpRight, ArrowDownRight, LayoutDashboard, ListFilter, Trash2, Calendar as CalendarIcon, Save, Moon, Sun, Download, Upload, RefreshCw, AlertCircle, Coins, Calculator, PiggyBank, Edit2, Lock, Unlock, Eye, EyeOff, ShieldCheck, LogOut, Gem, Activity, Landmark, CalendarDays, Sprout, MoreHorizontal, ChevronLeft, ChevronRight, Repeat, Search, Filter, ArrowUp, ArrowDown, CheckCircle, XCircle, ArrowUpDown, Trophy, Building2, Briefcase, CalendarClock } from 'lucide-react';
 
+    // CONSTANTES
     const CATEGORIES = { expense: { 'Moradia': [], 'Alimentação': [], 'Transporte': [], 'Lazer': [], 'Pessoal': [], 'Serviços': [], 'Outros': [] }, income: { 'Salário': [], 'Extra': [] } };
     const CATEGORY_COLORS = { 'Moradia': '#8b5cf6', 'Alimentação': '#f59e0b', 'Transporte': '#ef4444', 'Lazer': '#06b6d4', 'Pessoal': '#ec4899', 'Serviços': '#6366f1', 'Outros': '#64748b', 'Salário': '#10b981', 'Extra': '#3b82f6' };
     const PAYMENT_METHODS = [ { id: 'pix', label: 'Pix' }, { id: 'money', label: 'Dinheiro' }, { id: 'debit', label: 'Débito' }, { id: 'credit_card', label: 'Cartão de Crédito' } ];
     const formatCurrency = (val, hid) => hid ? '••••' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
     const formatDate = (s) => { if (!s) return ''; const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
 
+    // TEMA VISUAL (Forçando Dark Mode Styles)
     const theme = {
-      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 relative overflow-hidden group",
-      input: "w-full rounded-xl border-0 bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 px-4 py-3.5 text-slate-900 dark:text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all font-medium shadow-sm",
-      label: "mb-1.5 block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1",
-      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer w-full",
-      btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] cursor-pointer",
+      card: "glass rounded-[24px] md:rounded-[32px] p-5 md:p-6 relative overflow-hidden group bg-[#18181b]/60 border border-white/5 text-white",
+      input: "w-full rounded-xl border-0 bg-[#18181b] border border-white/10 px-4 py-3.5 md:px-5 md:py-4 text-white outline-none ring-1 ring-transparent focus:ring-violet-500/50 transition-all placeholder:text-slate-500 font-medium text-sm md:text-base shadow-sm",
+      label: "mb-1.5 md:mb-2 block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1",
+      btnPrimary: "flex items-center justify-center gap-2 rounded-2xl bg-white text-slate-900 py-3.5 px-5 font-bold shadow-xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide w-full cursor-pointer touch-manipulation",
+      btnAccent: "flex items-center justify-center gap-2 rounded-xl bg-violet-600 text-white py-3 px-4 md:py-3.5 md:px-6 font-bold shadow-xl shadow-violet-600/20 transition-all hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.98] text-xs md:text-sm tracking-wide cursor-pointer touch-manipulation",
     };
 
+    // COMPONENTS UI
     const Modal = ({ isOpen, onClose, title, children }) => {
-      useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if(isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
+      useEffect(() => { const h = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [isOpen, onClose]);
       if (!isOpen) return null;
-      return (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e)=>e.target===e.currentTarget&&onClose()}><div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up flex flex-col max-h-[85vh] md:max-h-[90vh]"><div className="p-5 border-b border-white/5 flex justify-between items-center"><h3 className="text-xl font-bold text-white">{title}</h3><button onClick={onClose} className="p-2 text-slate-400 hover:text-white"><X size={20}/></button></div><div className="overflow-y-auto p-5 custom-scrollbar">{children}</div></div></div>);
+      return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in" onClick={(e) => e.target === e.currentTarget && onClose()}>
+          <div className="w-full max-w-lg bg-[#0f172a] border border-slate-800 rounded-[24px] shadow-2xl animate-slide-up relative overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh]">
+            <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between shrink-0">
+              <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate">{title}</h3>
+              <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+            <div className="overflow-y-auto custom-scrollbar p-4 md:p-5">{children}</div>
+          </div>
+        </div>
+      );
     };
-    const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
-    const CustomLogo = () => (<div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mb-8 shrink-0"><Sprout className="text-white" size={32} /></div>);
-    const ToastContainer = ({ toasts }) => (<div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none">{toasts.map(t=><div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type==='error'?'bg-rose-600':'bg-[#18181b]'} backdrop-blur-xl`}>{t.type==='success'?<CheckCircle size={20} className="text-emerald-400 shrink-0"/>:<XCircle size={20} className="text-white shrink-0"/>}<span className="truncate">{t.msg}</span></div>)}</div>);
-    const MonthSelector = ({ currentDate, onChange }) => (<div className="flex items-center gap-2 bg-slate-200 dark:bg-[#18181b] p-1 rounded-xl border border-slate-300 dark:border-white/5"><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1))} className="p-1.5 hover:text-white"><ChevronLeft size={18}/></button><span className="text-sm font-bold capitalize min-w-[100px] text-center">{currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</span><button onClick={()=>onChange(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1))} className="p-1.5 hover:text-white"><ChevronRight size={18}/></button></div>);
 
-    const AuthScreen = ({ onLogin, onRegister }) => {
-        const [mode, setMode] = useState('login'); 
+    const Card = ({ children, className = "" }) => <div className={`${theme.card} ${className}`}>{children}</div>;
+    const CustomLogo = () => (<div className="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-0 md:mb-8 md:animate-float shrink-0"><Sprout className="text-white" size={20} /></div>);
+    const ToastContainer = ({ toasts }) => (
+      <div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[100] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] md:w-auto">
+        {toasts.map(t => (
+          <div key={t.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border border-white/10 text-white font-medium animate-slide-in-right ${t.type === 'error' ? 'bg-rose-600' : 'bg-[#18181b]'} backdrop-blur-xl`}>
+              {t.type === 'success' ? <CheckCircle size={20} className="text-emerald-400 shrink-0"/> : <XCircle size={20} className="text-white shrink-0"/>}
+              <span className="truncate">{t.msg}</span>
+          </div>
+        ))}
+      </div>
+    );
+
+    const MonthSelector = ({ currentDate, onChange }) => {
+      const handlePrev = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+      const handleNext = () => onChange(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+      return (
+        <div className="flex items-center gap-1 md:gap-2 bg-[#18181b] p-1 rounded-xl border border-white/5">
+          <button onClick={handlePrev} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"><ChevronLeft size={18}/></button>
+          <span className="text-xs md:text-sm font-bold text-white capitalize min-w-[100px] md:min-w-[120px] text-center">{currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
+          <button onClick={handleNext} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"><ChevronRight size={18}/></button>
+        </div>
+      );
+    };
+
+    // --- AUTH SCREEN ---
+    const AuthScreen = ({ mode, onLogin, onRegister }) => {
         const [name, setName] = useState(''); const [pin, setPin] = useState(''); const [confirmPin, setConfirmPin] = useState(''); const [keepLogged, setKeepLogged] = useState(false); const [error, setError] = useState('');
         const handleSubmit = (e) => { e.preventDefault(); setError(''); if(mode==='register') { if(pin.length<4) return setError('Mínimo 4 dígitos'); if(pin!==confirmPin) return setError('PINs não conferem'); if(!name) return setError('Nome obrigatório'); onRegister(name, pin, setError); } else { onLogin(pin, keepLogged, setError); } };
         return (
             <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] relative overflow-hidden">
-                <div className="absolute w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-                <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-10 relative z-10 animate-fade-in flex flex-col items-center">
-                    <div className="mb-4 scale-125"><CustomLogo /></div><h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1><p className="text-slate-400 font-medium mb-6">O cofre do seu futuro</p>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+                <div className="w-full max-w-md bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-6 md:p-10 relative z-10 animate-fade-in flex flex-col items-center">
+                    <div className="mb-4 scale-125"><CustomLogo /></div>
+                    <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Prospera</h1>
+                    <p className="text-slate-400 font-medium mb-8">O cofre do seu futuro</p>
                     <form onSubmit={handleSubmit} className="w-full space-y-4">
-                        {mode==='register' && (<div><label className={theme.label}>Seu Nome</label><input value={name} onChange={e=>setName(e.target.value)} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>)}
-                        <div><label className={theme.label}>Código PIN</label><input type="password" inputMode="numeric" value={pin} onChange={e=>setPin(e.target.value)} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>
-                        {mode==='register' && (<div><label className={theme.label}>Confirmar PIN</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e=>setConfirmPin(e.target.value)} className={`${theme.input} text-center text-2xl tracking-widest`} placeholder="••••" maxLength={6} /></div>)}
-                        {mode==='login' && (<div className="flex items-center gap-2 justify-center py-2"><input type="checkbox" id="keep" checked={keepLogged} onChange={e=>setKeepLogged(e.target.checked)} className="w-4 h-4 accent-violet-600 rounded cursor-pointer" /><label htmlFor="keep" className="text-sm text-slate-400 cursor-pointer">Manter conectado</label></div>)}
-                        {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">{error}</div>}
-                        <button type="submit" className={theme.btnPrimary}>{mode==='login' ? 'Entrar' : 'Criar Conta'}</button>
+                        {mode === 'register' && (<div><label className={theme.label}>Seu Nome</label><input type="text" value={name} onChange={e => setName(e.target.value)} className={theme.input} placeholder="Ex: Eduardo" autoFocus /></div>)}
+                        <div><label className={theme.label}>Código de Acesso</label><input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>
+                        {mode === 'register' && <div><label className={theme.label}>Confirmar Código</label><input type="password" inputMode="numeric" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} className={`${theme.input} text-center text-3xl tracking-[0.5em] font-bold`} placeholder="••••" maxLength={6} /></div>}
+                        {mode === 'login' && (<div className="flex items-center gap-2 justify-center py-2"><input type="checkbox" id="keep" checked={keepLogged} onChange={e=>setKeepLogged(e.target.checked)} className="w-4 h-4 accent-violet-600 rounded cursor-pointer" /><label htmlFor="keep" className="text-sm text-slate-400 cursor-pointer">Manter conectado</label></div>)}
+                        {error && <div className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-2xl border border-rose-500/20 font-medium">{error}</div>}
+                        <button type="submit" className={theme.btnPrimary}>{mode === 'login' ? 'Acessar' : 'Criar Conta'}</button>
                     </form>
                     <div className="mt-6 flex justify-center gap-4 text-sm font-medium">
-                        {mode === 'login' ? <button onClick={() => setMode('register')} className="text-violet-400 hover:text-violet-300 font-bold">Criar uma conta</button> : <button onClick={() => setMode('login')} className="text-slate-400 hover:text-white">Voltar para Login</button>}
+                        {mode === 'login' ? <button onClick={() => window.location.hash = 'register'} className="text-violet-400 hover:text-violet-300 font-bold">Criar uma conta</button> : <button onClick={() => window.location.hash = ''} className="text-slate-400 hover:text-white">Voltar para Login</button>}
                     </div>
                 </div>
             </div>
@@ -104,9 +153,18 @@
     };
 
     const SettingsModal = ({ isOpen, onClose, onLogout }) => (<Modal isOpen={isOpen} onClose={onClose} title="Segurança"><div className="space-y-6"><div className="bg-[#1e293b]/50 border border-blue-500/20 rounded-2xl p-5"><h4 className="text-blue-400 font-bold flex items-center gap-2 mb-2">Dados na Nuvem</h4><p className="text-slate-400 text-sm mb-4">Seus dados estão salvos no banco de dados.</p></div><div className="pt-4 border-t border-slate-800 text-center"><button onClick={onLogout} className="text-rose-500 hover:text-rose-400 font-bold flex items-center justify-center gap-2 w-full py-2 transition-colors"><LogOut size={18}/> Sair e Bloquear</button></div></div></Modal>);
-    const DayDetailsModal = ({ isOpen, onClose, date, transactions=[], onDelete, onAdd, onEdit }) => { if (!isOpen) return null; const safeTrans = Array.isArray(transactions) ? transactions : []; const inc = safeTrans.filter(t=>t.type==='income').reduce((a,c)=>a+Number(c.amount),0); const exp = safeTrans.filter(t=>t.type==='expense').reduce((a,c)=>a+Number(c.amount),0); return (<Modal isOpen={isOpen} onClose={onClose} title={`Dia ${formatDate(date)}`}><div className="space-y-6"><div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-emerald-400">ENTRADAS</span><p className="text-lg font-bold text-white">{formatCurrency(inc)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-rose-400">SAÍDAS</span><p className="text-lg font-bold text-white">{formatCurrency(exp)}</p></div></div><div><h4 className="text-slate-400 text-sm font-bold mb-3 uppercase">Transações</h4><div className="space-y-3">{safeTrans.map(t=>(<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount)}</span><button onClick={()=>{onClose();onEdit(t)}} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}</div></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div></Modal>); };
+    
+    // SAFE MAP
+    const DayDetailsModal = ({ isOpen, onClose, date, transactions=[], onDelete, onAdd, onEdit }) => { 
+        if (!isOpen) return null; 
+        const safeTrans = Array.isArray(transactions) ? transactions : [];
+        const inc = safeTrans.filter(t=>t.type==='income').reduce((a,c)=>a+Number(c.amount),0); 
+        const exp = safeTrans.filter(t=>t.type==='expense').reduce((a,c)=>a+Number(c.amount),0); 
+        return (<Modal isOpen={isOpen} onClose={onClose} title={`Dia ${formatDate(date)}`}><div className="space-y-6"><div className="flex gap-4"><div className="flex-1 bg-emerald-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-emerald-400">ENTRADAS</span><p className="text-lg font-bold text-white">{formatCurrency(inc)}</p></div><div className="flex-1 bg-rose-500/10 p-4 rounded-2xl text-center"><span className="text-xs font-bold text-rose-400">SAÍDAS</span><p className="text-lg font-bold text-white">{formatCurrency(exp)}</p></div></div><div><h4 className="text-slate-400 text-sm font-bold mb-3 uppercase">Transações</h4><div className="space-y-3">{safeTrans.map(t=>(<div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5"><div><p className="font-bold text-white">{t.description}</p><p className="text-xs text-slate-500">{t.category}</p></div><div className="flex items-center gap-3"><span className={t.type==='income'?'text-emerald-400':'text-rose-400'}>{formatCurrency(t.amount)}</span><button onClick={()=>{onClose();onEdit(t)}} className="text-slate-500 hover:text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-slate-500 hover:text-rose-500"><Trash2 size={16}/></button></div></div>))}</div></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div></Modal>); 
+    };
 
-    const Overview = ({ transactions = [], goals, privacyMode }) => {
+    // --- VIEWS ---
+    const Overview = ({ transactions = [], goals, privacyMode, toggleModal, setPrefilledDate, user }) => {
       const [currentDate, setCurrentDate] = useState(new Date());
       const safeTrans = Array.isArray(transactions) ? transactions : [];
       const filtered = useMemo(() => safeTrans.filter(t => { const d = new Date(t.date); const adj = new Date(d.getTime() + d.getTimezoneOffset()*60000); return adj.getMonth()===currentDate.getMonth() && adj.getFullYear()===currentDate.getFullYear(); }), [safeTrans, currentDate]);
@@ -117,8 +175,20 @@
       const total = prevBal + balance;
       const areaData = useMemo(() => { const days = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0).getDate(); return Array.from({length:days},(_,i)=>{ const d=i+1; const dateStr=`${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const dt=filtered.filter(t=>t.date===dateStr); return { name:String(d), Entradas:dt.filter(t=>t.type==='income').reduce((a,c)=>a+Number(c.amount),0), Saídas:dt.filter(t=>t.type==='expense').reduce((a,c)=>a+Number(c.amount),0) }; }); }, [filtered, currentDate]);
       const catData = useMemo(() => { const m={}; filtered.filter(t=>t.type==='expense').forEach(t=>{m[t.category]=(m[t.category]||0)+Number(t.amount)}); return Object.entries(m).map(([name,value])=>({name,value})).sort((a,b)=>b.value-a.value).slice(0,5); }, [filtered]);
+
       return (
-        <div className="space-y-6 animate-slide-up"><div className="flex flex-col md:flex-row justify-between items-center gap-4"><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div><div className="grid grid-cols-1 md:grid-cols-3 gap-6"><Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible"><div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div><div className="relative z-10"><p className="text-violet-200 font-medium text-sm">Saldo Acumulado</p><h2 className={`text-4xl font-extrabold tracking-tight my-4 ${privacyMode?'blur-md':''}`}>{formatCurrency(total, privacyMode)}</h2><div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-2"><div className="flex justify-between text-sm"><span className="text-violet-200">Anterior</span><span className={`font-bold ${privacyMode?'blur-sm':''}`}>{formatCurrency(prevBal, privacyMode)}</span></div><div className="h-px bg-white/10"></div><div className="flex justify-between text-sm"><span className="text-violet-200">Mês Atual</span><span className={`font-bold ${balance>=0?'text-emerald-300':'text-rose-300'} ${privacyMode?'blur-sm':''}`}>{balance>0?'+':''}{formatCurrency(balance, privacyMode)}</span></div></div></div></Card><Card><div className="flex justify-between mb-2"><span className="text-slate-400 text-sm font-bold uppercase">Entradas</span><ArrowUpRight className="text-emerald-500"/></div><h2 className={`text-3xl font-bold text-slate-800 dark:text-white ${privacyMode?'blur-md':''}`}>{formatCurrency(inc, privacyMode)}</h2></Card><Card><div className="flex justify-between mb-2"><span className="text-slate-400 text-sm font-bold uppercase">Saídas</span><ArrowDownRight className="text-rose-500"/></div><h2 className={`text-3xl font-bold text-slate-800 dark:text-white ${privacyMode?'blur-md':''}`}>{formatCurrency(exp, privacyMode)}</h2></Card></div><div className="grid grid-cols-1 lg:grid-cols-3 gap-6"><Card className="lg:col-span-2 min-h-[350px]"><h3 className="text-lg font-bold text-white mb-6">Fluxo Diário</h3><div className={`h-[250px] w-full ${privacyMode?'opacity-20 blur-sm':''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="cInc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="cExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333"/><XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false}/><RechartsTooltip contentStyle={{background:'#18181b', border:'none', borderRadius:'12px', color:'#fff'}}/><Area type="monotone" dataKey="Entradas" stroke="#10B981" fill="url(#cInc)" strokeWidth={3}/><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fill="url(#cExp)" strokeWidth={3}/></AreaChart></ResponsiveContainer></div></Card><Card className="min-h-[350px] flex flex-col"><h3 className="text-lg font-bold text-white mb-6">Top Despesas</h3><div className="flex-1 flex items-center justify-center relative">{catData.length>0?(<><div className="w-full h-48 absolute inset-0"><ResponsiveContainer><PieChart><Pie data={catData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{catData.map((e,i)=><Cell key={i} fill={CATEGORY_COLORS[e.name]||'#666'}/>)}</Pie></PieChart></ResponsiveContainer></div><div className="w-full mt-48 space-y-2">{catData.map((e,i)=>(<div key={i} className="flex justify-between text-sm"><div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{backgroundColor:CATEGORY_COLORS[e.name]}}></div><span className="text-slate-300">{e.name}</span></div><span className="font-bold text-white">{formatCurrency(e.value)}</span></div>))}</div></>):(<p className="text-slate-500 text-sm">Sem dados</p>)}</div></Card></div></div>
+        <div className="space-y-6 md:space-y-8 animate-slide-up">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"><div className="flex justify-between items-center w-full md:w-auto"><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible flex flex-col justify-between"><div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div><div className="relative z-10 flex flex-col h-full justify-between"><div className="flex justify-between items-start mb-2"><p className="text-violet-200 font-medium text-sm md:text-base">Saldo Acumulado</p><span className="bg-white/20 text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-md">Atualizado</span></div><h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight mb-6 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(total, privacyMode)}</h2><div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-3"><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium">Saldo Anterior</span><span className={`font-bold ${privacyMode ? 'blur-sm' : ''} ${prevBal < 0 ? 'text-rose-300' : 'text-white'}`}>{formatCurrency(prevBal, privacyMode)}</span></div><div className="h-px bg-white/10 w-full"></div><div className="flex justify-between items-center text-sm"><span className="text-violet-200 font-medium capitalize">Resultado {currentDate.toLocaleDateString('pt-BR',{month:'long'})}</span><span className={`font-bold ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${privacyMode ? 'blur-sm' : ''}`}>{balance > 0 ? '+' : ''}{formatCurrency(balance, privacyMode)}</span></div></div></div></Card>
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Entradas</p></div><div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400"><ArrowUpRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(inc, privacyMode)}</h2></Card>
+            <Card className="flex flex-col justify-between"><div className="flex justify-between items-start"><div><p className="text-slate-400 text-sm font-bold uppercase">Saídas</p></div><div className="p-2 bg-rose-500/10 rounded-xl text-rose-400"><ArrowDownRight size={20}/></div></div><h2 className={`text-2xl md:text-3xl font-bold text-white mt-2 ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(exp, privacyMode)}</h2></Card>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <Card className="lg:col-span-2 min-h-[350px] md:min-h-[400px]"><div className="flex justify-between items-center mb-6 md:mb-8"><h3 className="text-lg md:text-xl font-bold text-white">Fluxo Diário</h3><div className="flex gap-4"><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500"></span>Entradas</span><span className="flex items-center text-[10px] md:text-xs text-slate-400 gap-2"><span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-rose-500"></span>Saídas</span></div></div><div className={`h-[250px] md:h-[300px] w-full ${privacyMode ? 'opacity-20 blur-sm' : ''}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={areaData}><defs><linearGradient id="cInc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/></linearGradient><linearGradient id="cExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3}/><stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" /><XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} interval={2} /><YAxis hide /><RechartsTooltip cursor={{stroke: '#ffffff10', strokeWidth: 1}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} itemStyle={{color: '#fff'}} /><Area type="monotone" dataKey="Entradas" stroke="#10B981" fillOpacity={1} fill="url(#cInc)" strokeWidth={3} /><Area type="monotone" dataKey="Saídas" stroke="#F43F5E" fillOpacity={1} fill="url(#cExp)" strokeWidth={3} /></AreaChart></ResponsiveContainer></div></Card>
+            <Card className="min-h-[350px] md:min-h-[400px] flex flex-col"><h3 className="text-lg md:text-xl font-bold text-white mb-6">Top Despesas</h3><div className="flex-1 relative flex items-center justify-center">{categoryData.length > 0 ? (<div className="w-full h-full flex flex-col items-center justify-center"><div className="w-full h-40 md:h-48 relative"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value" stroke="none">{categoryData.map((entry, index) => (<Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || '#94a3b8'} />))}</Pie><RechartsTooltip formatter={(value) => formatCurrency(value, false)} itemStyle={{color: '#fff'}} contentStyle={{background:'#18181b', border:'1px solid #333', borderRadius:'12px', color:'#fff'}} /></PieChart></ResponsiveContainer></div><div className="w-full mt-4 space-y-2 px-2 overflow-y-auto max-h-40 custom-scrollbar">{categoryData.map((entry, index) => (<div key={index} className="flex items-center justify-between text-sm"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[entry.name] || '#94a3b8' }}></div><span className="text-slate-300">{entry.name}</span></div><span className="font-bold text-white">{formatCurrency(entry.value, false)}</span></div>))}</div></div>) : (<div className="absolute inset-0 flex items-center justify-center text-slate-500 text-sm">Sem despesas no período</div>)}</div></Card>
+          </div>
+        </div>
       );
     };
 
@@ -126,14 +196,19 @@
         const [filter, setFilter] = useState('');
         const safe = Array.isArray(transactions) ? transactions : [];
         const filtered = safe.filter(t=>t.description.toLowerCase().includes(filter.toLowerCase()));
-        return (<div className="space-y-6 animate-fade-in"><div className="flex justify-between gap-4"><div className="relative flex-1"><Search size={18} className="absolute left-4 top-3.5 text-slate-400"/><input type="text" placeholder="Buscar..." value={filter} onChange={e=>setFilter(e.target.value)} className={`${theme.input} !pl-12`}/></div></div><Card className="!p-0 overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left text-sm text-slate-400"><thead className="bg-white/5 text-xs uppercase text-slate-300"><tr><th className="p-4">Descrição</th><th className="p-4">Categoria</th><th className="p-4 text-right">Valor</th><th className="p-4 text-center">Data</th><th className="p-4 text-center">Ação</th></tr></thead><tbody className="divide-y divide-white/5">{filtered.map(t=>(<tr key={t.id} className="hover:bg-white/5"><td className="p-4 font-medium text-white">{t.description}{t.isRecurring&&<span className="text-[10px] text-violet-500 ml-2">Recurring</span>}</td><td className="p-4"><span className="px-2 py-1 rounded text-xs bg-white/10 text-white">{t.category}</span></td><td className={`p-4 text-right font-bold ${t.type==='income'?'text-emerald-400':'text-rose-400'}`}>{t.type==='income'?'+':'-'} {formatCurrency(t.amount)}</td><td className="p-4 text-center">{formatDate(t.date)}</td><td className="p-4 text-center flex justify-center gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></td></tr>))}</tbody></table></div></Card></div>);
+        return (
+            <div className="space-y-6 animate-fade-in">
+                <div className="flex justify-between gap-4"><div className="relative flex-1"><Search size={18} className="absolute left-4 top-3.5 text-slate-400"/><input type="text" placeholder="Buscar..." value={filter} onChange={e=>setFilter(e.target.value)} className={`${theme.input} !pl-12`}/></div></div>
+                <Card className="!p-0 overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left text-sm text-slate-400"><thead className="bg-white/5 text-xs uppercase text-slate-300"><tr><th className="p-4">Descrição</th><th className="p-4">Categoria</th><th className="p-4 text-right">Valor</th><th className="p-4 text-center">Data</th><th className="p-4 text-center">Ação</th></tr></thead><tbody className="divide-y divide-white/5">{filtered.map(t=>(<tr key={t.id} className="hover:bg-white/5"><td className="p-4 font-medium text-white">{t.description}{t.isRecurring&&<span className="text-[10px] text-violet-500 ml-2">Recurring</span>}</td><td className="p-4"><span className="px-2 py-1 rounded text-xs bg-white/10 text-white">{t.category}</span></td><td className={`p-4 text-right font-bold ${t.type==='income'?'text-emerald-400':'text-rose-400'}`}>{t.type==='income'?'+':'-'} {formatCurrency(t.amount)}</td><td className="p-4 text-center">{formatDate(t.date)}</td><td className="p-4 text-center flex justify-center gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></td></tr>))}</tbody></table></div></Card>
+            </div>
+        );
     };
 
-    const RecurringView = ({ transactions=[], onAdd, onEdit, onDelete, privacyMode }) => {
+    const RecurringView = ({ transactions=[], cards=[], onEdit, onDelete, onAdd, privacyMode }) => {
         const safeTrans = Array.isArray(transactions) ? transactions : [];
         const list = useMemo(()=> { const m=new Map(); safeTrans.filter(t=>t.isRecurring).forEach(t=>{const ex=m.get(t.description); if(!ex||new Date(t.date)>new Date(ex.date)) m.set(t.description,t)}); return Array.from(m.values()); }, [safeTrans]);
         const total = list.reduce((a,c)=>a+Number(c.amount),0);
-        return (<div className="space-y-8 animate-fade-in"><div className="flex justify-between items-end"><div><h2 className="text-xl font-bold text-white flex gap-2"><Repeat className="text-violet-500"/> Recorrências</h2></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div><div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(total, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{list.length} assinaturas ativas</p></div></div></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{list.map(t=>(<div key={t.id} className="bg-[#18181b] border border-white/5 rounded-[24px] p-5 flex flex-col justify-between h-full"><div className="flex justify-between mb-4"><div><h4 className="font-bold text-white">{t.description}</h4><p className="text-slate-500 text-xs">{t.category}</p></div><h3 className="text-xl font-bold text-white">{formatCurrency(t.amount)}</h3></div><div className="flex justify-between pt-4 border-t border-white/5"><span className="text-xs bg-white/5 px-2 py-1 rounded text-slate-400">Dia {new Date(t.date).getDate()}</span><div className="flex gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></div></div></div>))}</div></div>);
+        return (<div className="space-y-8 animate-fade-in"><div className="flex justify-between items-end"><div><h2 className="text-xl font-bold text-white flex gap-2"><Repeat className="text-violet-500"/> Recorrências</h2></div><button onClick={onAdd} className={theme.btnAccent}><Plus size={18}/> Nova</button></div><div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10"><div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div><div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between"><div className="flex-1 w-full"><div className="flex items-center gap-2 mb-2"><span className="p-2 bg-violet-500/20 rounded-lg text-violet-300"><Repeat size={18}/></span><p className="text-violet-200 text-sm font-bold uppercase tracking-wider">Custo Mensal Fixo</p></div><h3 className={`text-4xl font-extrabold ${privacyMode ? 'blur-md' : ''}`}>{formatCurrency(total, privacyMode)}</h3><p className="text-slate-400 text-xs mt-2">{list.length} assinaturas ativas</p></div></div></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{list.length>0?list.map(t=>(<div key={t.id} className="bg-[#18181b] border border-white/5 rounded-[24px] p-5 flex flex-col justify-between h-full"><div className="flex justify-between mb-4"><div><h4 className="font-bold text-white">{t.description}</h4><p className="text-slate-500 text-xs">{t.category}</p></div><h3 className="text-xl font-bold text-white">{formatCurrency(t.amount)}</h3></div><div className="flex justify-between pt-4 border-t border-white/5"><span className="text-xs bg-white/5 px-2 py-1 rounded text-slate-400">Dia {new Date(t.date).getDate()}</span><div className="flex gap-2"><button onClick={()=>onEdit(t)} className="text-blue-400"><Edit2 size={16}/></button><button onClick={()=>onDelete(t.id)} className="text-rose-400"><Trash2 size={16}/></button></div></div></div>)):<div className="col-span-full text-center py-10 text-slate-500">Nenhuma recorrência.</div>}</div></div>);
     };
 
     const BudgetView = ({ transactions=[], budgets=[], onRefresh, privacyMode, user }) => {
@@ -159,7 +234,7 @@
         );
     };
 
-    const InvestmentsView = ({ investments=[], cards=[], onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode, user }) => {
+    const InvestmentsView = ({ investments, cards, onAddCard, onUpdateCard, onDeleteCard, onAddInvest, onUpdateInvest, onDeleteInvest, privacyMode, user }) => {
         const [edCard, setEdCard] = useState(null); const [addCard, setAddCard] = useState(false);
         const [edInv, setEdInv] = useState(null); const [addInv, setAddInv] = useState(false);
         const safeInv = Array.isArray(investments) ? investments : [];
@@ -229,6 +304,7 @@
         };
 
         useEffect(() => {
+            document.documentElement.classList.add('dark'); // FORCE DARK MODE IN APP
             const saved = localStorage.getItem('prospera_keep_login');
             if (saved) { 
                 const u = JSON.parse(saved);
@@ -292,15 +368,15 @@
         const navItems = [ { id: 'overview', label: 'Dashboard', icon: LayoutDashboard }, { id: 'transactions', label: 'Extrato', icon: ListFilter }, { id: 'goals', label: 'Objetivos', icon: Target }, { id: 'budgets', label: 'Orçamentos', icon: PiggyBank }, { id: 'investments', label: 'Carteira', icon: TrendingUp }, { id: 'recurring', label: 'Recorrência', icon: Repeat }, { id: 'calculator', label: 'Calculadora', icon: Calculator } ];
 
         return (
-            <div className="flex flex-col md:flex-row h-screen bg-slate-50 dark:bg-[#050505] overflow-hidden text-slate-900 dark:text-white">
-                <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm">
+            <div className="flex flex-col md:flex-row h-screen bg-[#09090b] text-slate-100 overflow-hidden font-body">
+                <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-white/5 bg-[#09090b]/50 backdrop-blur-sm">
                     <div className="mb-8 scale-75"><CustomLogo /></div>
-                    <div className="flex-1 flex flex-col gap-4 w-full px-4">{navItems.map(i => (<button key={i.id} onClick={() => setActiveTab(i.id)} className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab===i.id?'bg-white/10':''}`}><i.icon size={22}/><span className="text-[9px]">{i.label}</span></button>))}</div>
-                    <div className="flex flex-col gap-4 px-4 pb-4"><button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 flex items-center justify-center">{privacyMode?<EyeOff/>:<Eye/>}</button><button onClick={handleLogout} className="w-full aspect-square rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center"><LogOut/></button></div>
+                    <div className="flex-1 flex flex-col gap-4 w-full px-4">{navItems.map(i => (<button key={i.id} onClick={() => setActiveTab(i.id)} className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab===i.id?'bg-white/10 text-white':'text-slate-400 hover:bg-white/5 hover:text-slate-300'}`}><i.icon size={22}/><span className="text-[9px] font-medium">{i.label}</span></button>))}</div>
+                    <div className="flex flex-col gap-4 px-4 pb-4"><button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">{privacyMode?<EyeOff/>:<Eye/>}</button><button onClick={handleLogout} className="w-full aspect-square rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center"><LogOut/></button></div>
                 </aside>
                 <main className="flex-1 overflow-y-auto relative z-20 pb-24 md:pb-0 pt-safe">
                     <div className="max-w-7xl mx-auto p-6 md:p-10">
-                        <header className="flex justify-between items-center mb-10"><div><h1 className="text-3xl font-extrabold mb-1">Olá, {user?.name}</h1><p className="text-slate-500">Bem-vindo de volta.</p></div><div className="flex gap-3">{activeTab==='overview'&&<button onClick={()=>{setEditingTransaction(null);toggleModal('transaction',true)}} className={theme.btnAccent}><Plus size={18}/> Transação</button>}</div></header>
+                        <header className="flex justify-between items-center mb-10"><div><h1 className="text-3xl font-extrabold mb-1 text-white">Olá, {user?.name}</h1><p className="text-slate-400 font-medium">Bem-vindo de volta.</p></div><div className="flex gap-3">{activeTab==='overview'&&<button onClick={()=>{setEditingTransaction(null);toggleModal('transaction',true)}} className={theme.btnAccent}><Plus size={18}/> Transação</button>}</div></header>
                         
                         {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
                         {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem('transactions', id)} onEdit={(t)=>{setEditingTransaction(t);toggleModal('transaction',true)}} />}
