@@ -112,22 +112,30 @@ app.use(express.static(path.join(__dirname, '/')));
 //               ROTAS DA API
 // ==========================================
 
-// --- USUÁRIOS (AUTH SIMPLES) ---
+// --- USUÁRIOS (AUTH COM RECUPERAÇÃO) ---
+
+// 1. Registro (Agora salva pergunta e resposta)
 app.post('/api/auth/register', async (req, res) => {
-  const { name, pin } = req.body;
+  const { name, pin, question, answer } = req.body;
   try {
-    // Verifica se já existe (opcional, mas bom para evitar duplicatas em app de 1 usuário)
     const check = await pool.query('SELECT * FROM users LIMIT 1');
     if (check.rows.length > 0) {
-        // Atualiza o existente se já houver um usuário (comportamento de app pessoal)
-        await pool.query('UPDATE users SET name=$1, pin=$2 WHERE id=$3', [name, pin, check.rows[0].id]);
+        // Atualiza usuário existente com dados de segurança
+        await pool.query(
+            'UPDATE users SET name=$1, pin=$2, security_question=$3, security_answer=$4 WHERE id=$5', 
+            [name, pin, question, answer, check.rows[0].id]
+        );
         return res.json({ success: true, user: { name, pin } });
     }
-    const result = await pool.query('INSERT INTO users (name, pin) VALUES ($1, $2) RETURNING *', [name, pin]);
+    const result = await pool.query(
+        'INSERT INTO users (name, pin, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING *', 
+        [name, pin, question, answer]
+    );
     res.json({ success: true, user: result.rows[0] });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no registro' }); }
 });
 
+// 2. Login (Igual ao anterior)
 app.post('/api/auth/login', async (req, res) => {
   const { pin } = req.body;
   try {
@@ -138,6 +146,26 @@ app.post('/api/auth/login', async (req, res) => {
       res.status(401).json({ error: 'PIN incorreto' });
     }
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro no login' }); }
+});
+
+// 3. Recuperação de Senha (NOVA ROTA)
+app.post('/api/auth/reset', async (req, res) => {
+  const { name, answer, newPin } = req.body;
+  try {
+    // Busca usuário pelo nome e verifica a resposta (Case insensitive para a resposta ficar mais fácil)
+    const result = await pool.query(
+        'SELECT * FROM users WHERE name = $1 AND LOWER(security_answer) = LOWER($2)', 
+        [name, answer]
+    );
+
+    if (result.rows.length > 0) {
+      // Se acertou, atualiza o PIN
+      await pool.query('UPDATE users SET pin = $1 WHERE id = $2', [newPin, result.rows[0].id]);
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ error: 'Nome ou resposta de segurança incorretos.' });
+    }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao resetar senha' }); }
 });
 
 
