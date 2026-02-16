@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // --- CONFIGURAÇÃO DO BANCO DE DADOS ---
 const pool = new Pool({
@@ -362,7 +362,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Inicia o servidor
-app.listen(port, () => {
+// O '0.0.0.0' é essencial para o Docker/Easypanel enxergar o site
+app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
