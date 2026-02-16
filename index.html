@@ -66,7 +66,7 @@
 
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    h1, h2, h3, h4, button, ...font-heading { font-family: 'Outfit', sans-serif; }
+    h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
     
     /* Scrollbar Personalizada (Desktop) */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1409,7 +1409,17 @@
       useEffect(() => {
         document.documentElement.classList.add('dark');
         const savedUser = localStorage.getItem('prospera_user');
-        if (savedUser) { setUser(JSON.parse(savedUser)); setAuthMode('login'); } else { setAuthMode('register'); }
+        if (savedUser) {
+          try {
+            const u = JSON.parse(savedUser);
+            setUser(u);
+            setAuthMode('app');
+          } catch {
+            setAuthMode('register');
+          }
+        } else {
+          setAuthMode('register');
+        }
       }, []);
       
       const loadData = async () => {
@@ -1424,6 +1434,14 @@
             addToast(`Falha ao carregar do servidor: ${e.message}`, 'error');
           }
       };
+
+      // Auto-carrega dados quando já existe usuário salvo (refresh)
+      useEffect(() => {
+        if (authMode === 'app' && user?.id) {
+          loadData();
+        }
+      }, [authMode, user?.id]);
+
 
       // Handlers com TOASTS
       const handleTypeChange = (e) => {
@@ -1616,7 +1634,12 @@
       const handleDayClick = (dateStr, dayTransactions) => { if (dayTransactions && dayTransactions.length > 0) { setSelectedDateDetails({ date: dateStr, transactions: dayTransactions }); toggleModal('dayDetails', true); } else { setPrefilledDate(dateStr); toggleModal('transaction', true); } };
       const handleAddFromDetails = () => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); };
       const handleExportBackup = () => { const blob = new Blob([JSON.stringify({ user, transactions, goals, investments, cards, budgets, timestamp: new Date().toISOString() })], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `prospera_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
-      const handleLogout = () => { setAuthMode('login'); setModals({ ...modals, settings: false }); };
+      const handleLogout = () => {
+        try { localStorage.removeItem('prospera_user'); } catch {}
+        setUser(null);
+        setAuthMode('login');
+        setModals(prev => ({ ...prev, settings: false }));
+      };
       
       const toggleModal = (key, val) => setModals(prev => ({ ...prev, [key]: val }));
       const toggleDarkMode = () => {
@@ -1808,7 +1831,7 @@
            <Modal isOpen={modals.card} onClose={() => toggleModal('card', false)} title="Novo Cartão"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setCards([...cards, {id: Date.now(), name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color')}]); addToast("Cartão adicionado!"); toggleModal('card', false);}} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" className={theme.input}/></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" className={theme.input}/></div></div><div><label className={theme.label}>Estilo</label><select name="color" className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option></select></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>
            <Modal isOpen={modals.investment} onClose={() => toggleModal('investment', false)} title="Novo Ativo"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setInvestments([...investments, {id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate')}]); addToast("Investimento adicionado!"); toggleModal('investment', false);}} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" className={theme.input}><option>Renda Fixa</option><option>Ações</option><option>Cripto</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" className={theme.input}/></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" className={theme.input}/></div><button type="submit" className={theme.btnPrimary}>Adicionar</button></form></Modal>
            
-           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?...transactions || []} onDelete={(id) => deleteItem(setTransactions, id)} onAdd={handleAddFromDetails} onEdit={handleEditTransaction} />
+           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem(setTransactions, id)} onAdd={handleAddFromDetails} onEdit={handleEditTransaction} />
            <SettingsModal isOpen={modals.settings} onClose={() => toggleModal('settings', false)} onExport={handleExportBackup} onImport={handleImportBackup} onLogout={handleLogout} />
         </div>
       );
