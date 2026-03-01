@@ -1,21 +1,24 @@
-# Use an official Python runtime as a parent image
+# Usa uma imagem oficial do Python, versão slim para otimização
 FROM python:3.11-slim
 
-# Set the working directory in the container
+# Define o diretório de trabalho dentro do container
 WORKDIR /code
 
-# Copy the requirements file into the container
-COPY ./backend/requirements.txt /code/requirements.txt
-COPY ./backend/app /code/app
+# Variáveis de ambiente para otimizar o Python no Docker
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Install any needed packages specified in requirements.txt
+# Copia o arquivo de dependências (criaremos no próximo passo)
+COPY ./requirements.txt /code/requirements.txt
+
+# Instala as dependências sem armazenar cache para manter a imagem leve
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Copy the current directory contents into the container at /code
+# Copia o código da aplicação
 COPY ./app /code/app
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Expõe a porta que o FastAPI vai rodar
+EXPOSE 8000
 
-# Run app.main:app when the container launches
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+# Comando de inicialização usando Uvicorn (Servidor ASGI de alta performance)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
