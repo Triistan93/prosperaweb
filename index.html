@@ -182,7 +182,7 @@
     // --------------------
     // API (multi-usuário, mesma origem)
     // --------------------
-    const API_BASE = "/api"; // Apontando para as rotas do FastAPI no Easypanel
+    const API_BASE = "https://prospera-backend.timft8.easypanel.host/api"; // Apontando para as rotas do FastAPI no Easypanel
 
     const getStoredUser = () => {
       try { return JSON.parse(localStorage.getItem('prospera_user') || 'null'); }
@@ -1730,3 +1730,4 @@
   </script>
 </body>
 </html>
+
