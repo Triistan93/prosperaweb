@@ -1,33 +1,49 @@
-# models.py
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey, Date
 from sqlalchemy.sql import func
-from database import Base
+from sqlalchemy.orm import relationship
+from .database import Base
 
 class User(Base):
-    """
-    Modelo ORM que mapeia a entidade de Usuário para a tabela correspondente no PostgreSQL/MySQL.
-    Segue os princípios SOLID ao isolar as responsabilidades de persistência de identidade.
-    """
     __tablename__ = "users"
 
-    # A indexação da chave primária garante tempo de busca O(1) em pesquisas diretas
     id = Column(Integer, primary_key=True, index=True)
-    
-    # Índices em colunas de alta concorrência nas queries de autenticação (username e email)
-    # garantem a performance, reduzindo a necessidade de Full Table Scans.
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    email = Column(String(100), unique=True, index=True, nullable=False)
-    
-    # O hash bcrypt requer tipicamente 60 caracteres. Alocamos 255 por precaução arquitetural
-    # para permitir futuras migrações de algoritmos (ex: Argon2).
-    hashed_password = Column(String(255), nullable=False)
-    
-    is_active = Column(Boolean, default=True)
-    
-    # Campos de auditoria para monitoramento contínuo de anomalias
+    name = Column(String(255), nullable=False)
+    # Utilizamos index=True pois o PIN será a chave de busca do login
+    pin_hash = Column(String(255), unique=True, index=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login_at = Column(DateTime(timezone=True), nullable=True)
-    
-    # Estrutura para o novo fluxo de recuperação de senha (OTP/Magic Link)
-    reset_token_hash = Column(String(255), nullable=True)
-    reset_token_expiry = Column(DateTime(timezone=True), nullable=True)
+
+    # Relacionamentos (Cascade Delete)
+    transactions = relationship("Transaction", back_populates="owner", cascade="all, delete-orphan")
+    investments = relationship("Investment", back_populates="owner", cascade="all, delete-orphan")
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    description = Column(String(255), nullable=False)
+    amount = Column(Numeric(15, 2), nullable=False)
+    type = Column(String(10), nullable=False) # 'income' ou 'expense'
+    category = Column(String(50))
+    subcategory = Column(String(50))
+    date = Column(Date, nullable=False)
+    payment_method = Column(String(50))
+    is_recurring = Column(Boolean, default=False)
+    card_id = Column(Integer, nullable=True)
+
+    owner = relationship("User", back_populates="transactions")
+
+class Investment(Base):
+    __tablename__ = "investments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String(255), nullable=False)
+    type = Column(String(50), nullable=False)
+    value_amount = Column(Numeric(15, 2), nullable=False)
+    return_rate = Column(String(50))
+
+    owner = relationship("User", back_populates="investments")
+
+# NOTA PARA O EDUARDO: Para manter o código limpo, siga esta mesma 
+# estrutura para as classes Goal, Card e Budget.
