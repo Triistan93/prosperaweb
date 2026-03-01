@@ -42,7 +42,6 @@
           },
           screens: {
             'xs': '375px',
-            // Padrões do Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px
           }
         }
       }
@@ -68,13 +67,11 @@
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, h4, button, .font-heading { font-family: 'Outfit', sans-serif; }
     
-    /* Scrollbar Personalizada (Desktop) */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-    /* Glass Effect */
     .glass {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(16px);
@@ -88,17 +85,14 @@
                   radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.1), transparent 40%);
     }
 
-    /* Fix Inputs & Mobile Utilities */
     select { color-scheme: dark; }
     option { background-color: #18181b !important; color: #ffffff !important; padding: 10px; }
     .dark option { background-color: #18181b !important; color: #ffffff !important; }
     ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
     
-    /* Safe Area Spacing for iOS */
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     .pt-safe { padding-top: env(safe-area-inset-top); }
     
-    /* Hide scrollbar for clean UI but keep functionality */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -188,7 +182,7 @@
     // --------------------
     // API (multi-usuário, mesma origem)
     // --------------------
-    const API_BASE = ""; // mesma origem. Se usar outro domínio, coloque "https://seu-dominio.com"
+    const API_BASE = "/api"; // Apontando para as rotas do FastAPI no Easypanel
 
     const getStoredUser = () => {
       try { return JSON.parse(localStorage.getItem('prospera_user') || 'null'); }
@@ -196,11 +190,18 @@
     };
 
     async function apiFetch(path, { method = "GET", body } = {}) {
-      const user = getStoredUser();
+      // ARQUITETURA DE ALTA PERFORMANCE: Uso de JWT no Header
+      const token = sessionStorage.getItem('prospera_token');
       const headers = { "Content-Type": "application/json" };
-      if (user?.id) headers['x-user-id'] = String(user.id);
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      const res = await fetch(`${API_BASE}${path}`, {
+      // Evita o prefixo /api duplicado caso path já venha com ele
+      const fullUrl = path.startsWith('/api') ? path : `${API_BASE}${path}`;
+
+      const res = await fetch(fullUrl, {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
@@ -208,7 +209,7 @@
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const msg = (data && (data.error || data.message)) || `Erro HTTP ${res.status}`;
+        const msg = (data && (data.error || data.detail || data.message)) || `Erro HTTP ${res.status}`;
         throw new Error(msg);
       }
       return data;
@@ -216,11 +217,11 @@
 
     async function loadAll() {
       const [transactions, goals, cards, investments, budgets] = await Promise.all([
-        apiFetch('/api/transactions'),
-        apiFetch('/api/goals'),
-        apiFetch('/api/cards'),
-        apiFetch('/api/investments'),
-        apiFetch('/api/budgets'),
+        apiFetch('/transactions'),
+        apiFetch('/goals'),
+        apiFetch('/cards'),
+        apiFetch('/investments'),
+        apiFetch('/budgets'),
       ]);
       return { transactions, goals, cards, investments, budgets };
     }
@@ -393,25 +394,20 @@
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"><div className="flex justify-between items-center w-full md:w-auto"><MonthSelector currentDate={currentDate} onChange={setCurrentDate} /></div></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             
-            {/* CARD ATUALIZADO - SALDO ACUMULADO */}
             <Card className="!bg-gradient-to-br from-violet-600/90 to-indigo-800/90 !border-0 text-white relative overflow-visible flex flex-col justify-between">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                 
                 <div className="relative z-10 flex flex-col h-full justify-between">
-                    {/* Header */}
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-violet-200 font-medium text-sm md:text-base">Saldo Acumulado</p>
                         <span className="bg-white/20 text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-md">Atualizado</span>
                     </div>
 
-                    {/* Main Value */}
                     <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight mb-6 ${privacyMode ? 'blur-md' : ''}`}>
                         {formatCurrency(totalAccumulatedBalance, privacyMode)}
                     </h2>
 
-                    {/* Details Box */}
                     <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/5 space-y-3">
-                        {/* Row 1: Saldo Anterior */}
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-violet-200 font-medium">Saldo Anterior</span>
                             <span className={`font-bold ${privacyMode ? 'blur-sm' : ''} ${previousBalance < 0 ? 'text-rose-300' : 'text-white'}`}>
@@ -419,10 +415,8 @@
                             </span>
                         </div>
                         
-                        {/* Divider */}
                         <div className="h-px bg-white/10 w-full"></div>
 
-                        {/* Row 2: Resultado Mês */}
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-violet-200 font-medium capitalize">Resultado {currentMonthName}</span>
                             <span className={`font-bold ${currentMonthResult >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${privacyMode ? 'blur-sm' : ''}`}>
@@ -596,7 +590,6 @@
     };
 
     const RecurringView = ({ transactions, cards, onEdit, onDelete, onAdd, privacyMode }) => {
-       // Filter recurring and group by description (taking the most recent one to show as the 'active subscription')
        const recurringMap = new Map();
        transactions
         .filter(t => t.isRecurring)
@@ -613,7 +606,7 @@
        
        const getPaymentIcon = (t) => { 
            if (t.paymentMethod === 'credit_card') return <CreditCard size={16} className="text-violet-400"/>;
-           if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; // Using Gem for Pix abstraction
+           if (t.paymentMethod === 'pix') return <Gem size={16} className="text-emerald-400"/>; 
            return <DollarSign size={16} className="text-slate-400"/>;
        };
 
@@ -627,7 +620,6 @@
 
        return (
          <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
-            {/* Header & Summary */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
                     <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -640,7 +632,6 @@
                 </button>
             </div>
 
-            {/* Dashboard Summary Card */}
             <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-violet-900 via-slate-900 to-slate-900 p-6 text-white shadow-2xl border border-violet-500/10">
                 <div className="absolute top-0 right-0 p-4 opacity-10"><CalendarClock size={120}/></div>
                 <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
@@ -657,13 +648,11 @@
                 </div>
             </div>
 
-            {/* Subscriptions Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recurringTrans.length > 0 ? recurringTrans.map(t => {
                     const status = getStatus(t.date);
                     return (
                         <div key={t.id} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                             {/* Category Stripe */}
                              <div className="absolute top-0 left-0 bottom-0 w-1.5" style={{backgroundColor: CATEGORY_COLORS[t.category] || '#64748b'}}></div>
                              
                              <div className="pl-3 flex flex-col justify-between h-full">
@@ -716,7 +705,6 @@
       
       const currentMonth = new Date(); 
       
-      // Calculate expenses per category
       const currentMonthExpenses = useMemo(() => {
         return transactions.filter(t => { 
             const d = new Date(t.date); 
@@ -728,7 +716,6 @@
         }, {});
       }, [transactions]);
 
-      // Totals for the summary header
       const totalBudget = budgets.reduce((acc, b) => acc + b.limit, 0);
       const totalSpent = budgets.reduce((acc, b) => acc + (currentMonthExpenses[b.category] || 0), 0);
       const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
@@ -737,8 +724,8 @@
         e.preventDefault();
         const val = parseFloat(new FormData(e.target).get('limit'));
         try {
-          await apiFetch(`/api/budgets/${encodeURIComponent(editingBudget.category)}`, { method: 'PUT', body: { limit: val } });
-          const fresh = await apiFetch('/api/budgets');
+          await apiFetch(`/budgets/${encodeURIComponent(editingBudget.category)}`, { method: 'PUT', body: { limit: val } });
+          const fresh = await apiFetch('/budgets');
           setBudgets(fresh);
           setEditingBudget(null);
         } catch (e2) {
@@ -751,8 +738,8 @@
         const cat = fd.get('category');
         const lim = parseFloat(fd.get('limit'));
         try {
-          await apiFetch('/api/budgets', { method: 'POST', body: { category: cat, limit: lim } });
-          const fresh = await apiFetch('/api/budgets');
+          await apiFetch('/budgets', { method: 'POST', body: { category: cat, limit: lim } });
+          const fresh = await apiFetch('/budgets');
           setBudgets(fresh);
           setIsAdding(false);
         } catch (e2) {
@@ -762,8 +749,8 @@
       const confirmDelete = async () => {
         if (!deletingBudget) return;
         try {
-          await apiFetch(`/api/budgets/${encodeURIComponent(deletingBudget.category)}`, { method: 'DELETE' });
-          const fresh = await apiFetch('/api/budgets');
+          await apiFetch(`/budgets/${encodeURIComponent(deletingBudget.category)}`, { method: 'DELETE' });
+          const fresh = await apiFetch('/budgets');
           setBudgets(fresh);
           setDeletingBudget(null);
         } catch (e2) {
@@ -774,7 +761,6 @@
       return (
         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
           
-          {/* Header & Summary */}
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
              <div>
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -787,7 +773,6 @@
              </button>
           </div>
 
-          {/* Global Summary Card */}
           <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-2xl">
              <div className="absolute top-0 right-0 p-4 opacity-10"><PiggyBank size={120}/></div>
              <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
@@ -808,24 +793,21 @@
              </div>
           </div>
 
-          {/* Budget Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {budgets.map(b => {
                 const spent = currentMonthExpenses[b.category] || 0;
                 const percentage = (spent / b.limit) * 100;
                 const remaining = b.limit - spent;
                 const isOver = spent > b.limit;
-                const catColor = CATEGORY_COLORS[b.category] || '#64748b'; // Default color
+                const catColor = CATEGORY_COLORS[b.category] || '#64748b';
 
                 return (
                     <div key={b.category} className="group relative bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/5 rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                        {/* Status Bar Indicator */}
                         <div className="absolute top-0 left-0 right-0 h-1" style={{background: isOver ? '#ef4444' : catColor}}></div>
                         
                         <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: catColor}}>
-                                    {/* Ideally map icons, but using generic first letter or generic icon is fine */}
                                     <span className="font-bold text-lg">{b.category[0]}</span>
                                 </div>
                                 <div>
@@ -846,13 +828,12 @@
                             </p>
                         </div>
 
-                        {/* Custom Progress */}
                         <div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                             <div 
                                 className={`absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-rose-500' : ''}`}
                                 style={{
                                     width: `${Math.min(percentage, 100)}%`,
-                                    background: isOver ? undefined : catColor // use category color for progress
+                                    background: isOver ? undefined : catColor 
                                 }}
                             ></div>
                         </div>
@@ -899,7 +880,6 @@
       const [isAdding, setIsAdding] = useState(false);
       const [deletingGoal, setDeletingGoal] = useState(null);
 
-      // Calculations for Summary
       const totalTarget = goals.reduce((acc, g) => acc + g.target, 0);
       const totalCurrent = goals.reduce((acc, g) => acc + g.current, 0);
       const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
@@ -916,7 +896,7 @@
           color: fd.get('color'),
         };
         try {
-          await apiFetch(`/api/goals/${editingGoal.id}`, { method: 'PUT', body: updated });
+          await apiFetch(`/goals/${editingGoal.id}`, { method: 'PUT', body: updated });
           setEditingGoal(null);
           addToast('Meta atualizada! ✅');
           await loadData();
@@ -933,7 +913,7 @@
         const newCurrent = (depositGoal.current || 0) + val;
 
         try {
-          await apiFetch(`/api/goals/${depositGoal.id}`, {
+          await apiFetch(`/goals/${depositGoal.id}`, {
             method: 'PUT',
             body: { ...depositGoal, current: newCurrent },
           });
@@ -954,7 +934,7 @@
           color: fd.get('color'),
         };
         try {
-          await apiFetch('/api/goals', { method: 'POST', body: payload });
+          await apiFetch('/goals', { method: 'POST', body: payload });
           setIsAdding(false);
           addToast('Meta adicionada! 🎯');
           await loadData();
@@ -966,7 +946,6 @@
 
       return (
         <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
-          {/* Header & Summary */}
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
              <div>
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -979,7 +958,6 @@
              </button>
           </div>
 
-          {/* Global Summary Card */}
           <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-emerald-900 to-slate-900 p-6 text-white shadow-2xl border border-emerald-500/10">
              <div className="absolute top-0 right-0 p-4 opacity-10"><Trophy size={120}/></div>
              <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
@@ -1009,7 +987,6 @@
                 return (
                   <div key={g.id} className={`group relative bg-white dark:bg-[#18181b] border ${isCompleted ? 'border-yellow-500/50 shadow-yellow-500/10' : 'border-slate-200 dark:border-white/5'} rounded-[24px] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden`}>
                     
-                    {/* Header */}
                     <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg" style={{backgroundColor: g.color || '#8b5cf6'}}>
@@ -1030,7 +1007,6 @@
                         </div>
                     </div>
 
-                    {/* Values */}
                     <div className="space-y-1 mb-4">
                         <div className="flex justify-between items-end">
                             <p className="text-sm text-slate-500 dark:text-slate-400">Acumulado</p>
@@ -1041,7 +1017,6 @@
                         </p>
                     </div>
 
-                    {/* Progress Bar */}
                     <div className="relative h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-6">
                         <div 
                             className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
@@ -1076,7 +1051,6 @@
             )}
           </div>
 
-          {/* Modals */}
           {editingGoal && <Modal isOpen={!!editingGoal} onClose={() => setEditingGoal(null)} title="Editar Meta"><form onSubmit={handleEditSave} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" defaultValue={editingGoal.name} className={theme.input} /></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" defaultValue={editingGoal.target} className={theme.input} /></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue={editingGoal.current} className={theme.input} /></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked={editingGoal.color === '#8b5cf6'} className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" defaultChecked={editingGoal.color === '#ec4899'} className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" defaultChecked={editingGoal.color === '#06b6d4'} className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" defaultChecked={editingGoal.color === '#10b981'} className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>}
           
           {isAdding && <Modal isOpen={isAdding} onClose={() => setIsAdding(false)} title="Novo Objetivo"><form onSubmit={handleAdd} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" className={theme.input} placeholder="Ex: Viagem, Carro Novo..."/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" className={theme.input}/></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue="0" className={theme.input}/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Criar Meta</button></form></Modal>}
@@ -1096,7 +1070,6 @@
 
         const totalInvested = investments.reduce((a,c) => a + c.value, 0);
         
-        // Data for PieChart distribution
         const distributionData = useMemo(() => {
             const counts = {};
             investments.forEach(i => counts[i.type] = (counts[i.type] || 0) + i.value);
@@ -1147,11 +1120,11 @@
             };
             try {
               if (editingInvest) {
-                await apiFetch(`/api/investments/${editingInvest.id}`, { method: 'PUT', body: { ...editingInvest, ...payload } });
+                await apiFetch(`/investments/${editingInvest.id}`, { method: 'PUT', body: { ...editingInvest, ...payload } });
                 addToast('Investimento atualizado! 📈');
                 setEditingInvest(null);
               } else {
-                await apiFetch('/api/investments', { method: 'POST', body: payload });
+                await apiFetch('/investments', { method: 'POST', body: payload });
                 addToast('Investimento adicionado! 📈');
               }
               toggleModal('investment', false);
@@ -1164,7 +1137,6 @@
         return (
             <div className="space-y-8 animate-fade-in pb-20 md:pb-0">
                 
-                {/* Header Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-900 border border-white/5 p-6 flex flex-col md:flex-row items-center justify-between shadow-2xl">
                         <div className="z-10">
@@ -1181,7 +1153,6 @@
                                 </button>
                             </div>
                         </div>
-                        {/* Mini Chart */}
                         <div className="w-32 h-32 md:w-40 md:h-40 relative mt-6 md:mt-0 opacity-80">
                              <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -1195,7 +1166,6 @@
                         </div>
                     </div>
                     
-                    {/* Quick Stats or Filler */}
                     <div className="hidden md:flex flex-col justify-center bg-slate-100 dark:bg-white/5 rounded-[32px] p-6 border border-slate-200 dark:border-white/5">
                         <h4 className="text-slate-500 font-bold uppercase text-xs mb-4">Diversificação</h4>
                         <div className="space-y-3">
@@ -1214,7 +1184,6 @@
                     </div>
                 </div>
 
-                {/* Credit Cards Section - Horizontal Scroll on Mobile */}
                 <div>
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Cartões</h3>
                     <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x no-scrollbar">
@@ -1248,14 +1217,12 @@
                                     </div>
                                 </div>
 
-                                {/* Actions overlay */}
                                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                     <button onClick={() => setEditingCard(c)} className="p-2 bg-black/20 hover:bg-black/40 rounded-full text-white backdrop-blur-md"><Edit2 size={14}/></button>
                                     <button onClick={() => onDeleteCard(c.id)} className="p-2 bg-black/20 hover:bg-rose-500/80 rounded-full text-white backdrop-blur-md"><Trash2 size={14}/></button>
                                 </div>
                             </div>
                         ))}
-                        {/* Add Card Button (Visible if empty or at end) */}
                         <button onClick={() => setIsAddingCard(true)} className="snap-center shrink-0 w-[85vw] md:w-auto h-52 rounded-[28px] border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-violet-500 hover:border-violet-500/50 hover:bg-violet-500/5 transition-all gap-3 group">
                             <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-white/5 group-hover:bg-violet-500/20 flex items-center justify-center transition-colors">
                                 <Plus size={24}/>
@@ -1265,7 +1232,6 @@
                     </div>
                 </div>
 
-                {/* Investments Grid */}
                 <div>
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 px-1">Meus Ativos</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1357,7 +1323,6 @@
                       {expense > 0 && <div className="text-[9px] md:text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 px-1 md:px-2 py-0.5 md:py-1 rounded-lg flex justify-between font-bold overflow-hidden"><span className="hidden md:inline">-</span><span>{Math.round(expense)}</span></div>}
                     </div>
 
-                    {/* Tooltip on Hover */}
                     {hasActivity && (
                       <div className="hidden group-hover:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl z-50 pointer-events-none">
                         <div className="flex justify-between mb-1"><span className="text-emerald-400">Ent:</span> <span>{formatCurrency(income, false)}</span></div>
@@ -1376,40 +1341,35 @@
 
     // --- MAIN APP ---
     function App() {
-      // ... states ...
       const [toasts, setToasts] = useState([]);
       const [authMode, setAuthMode] = useState('loading');
-      // ... other states (user, privacy, tabs...)
       const [user, setUser] = useState(null);
       const [privacyMode, setPrivacyMode] = useState(false);
       const [activeTab, setActiveTab] = useState('overview');
       const [isDarkMode, setIsDarkMode] = useState(true);
       const [modals, setModals] = useState({ transaction: false, goal: false, card: false, investment: false, settings: false, dayDetails: false, subscription: false });
       const [transactions, setTransactions] = useState([]);
-      // ... (data states) ...
       const [goals, setGoals] = useState([]);
       const [investments, setInvestments] = useState([]);
       const [cards, setCards] = useState(INITIAL_CARDS);
       const [budgets, setBudgets] = useState([]);
-      // Form states
       const [transType, setTransType] = useState('expense');
       const [transCat, setTransCat] = useState(Object.keys(CATEGORIES.expense)[0]);
       const [selectedDateDetails, setSelectedDateDetails] = useState(null);
       const [prefilledDate, setPrefilledDate] = useState(new Date().toISOString().split('T')[0]);
       const [editingTransaction, setEditingTransaction] = useState(null);
 
-      // Toast Helper
       const addToast = (msg, type = 'success') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, msg, type }]);
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
       };
 
-      // Effects (Load/Save Data/Auth) ... [Manter lógica anterior]
       useEffect(() => {
         document.documentElement.classList.add('dark');
         const savedUser = localStorage.getItem('prospera_user');
-        if (savedUser) {
+        const savedToken = sessionStorage.getItem('prospera_token');
+        if (savedUser && savedToken) {
           try {
             const u = JSON.parse(savedUser);
             setUser(u);
@@ -1425,25 +1385,22 @@
       const loadData = async () => {
           try {
             const all = await loadAll();
-            setTransactions(all.transactions);
-            setGoals(all.goals);
-            setInvestments(all.investments);
-            setCards(all.cards.length ? all.cards : INITIAL_CARDS);
-            setBudgets(all.budgets);
+            setTransactions(all.transactions || []);
+            setGoals(all.goals || []);
+            setInvestments(all.investments || []);
+            setCards((all.cards && all.cards.length) ? all.cards : INITIAL_CARDS);
+            setBudgets(all.budgets || []);
           } catch (e) {
             addToast(`Falha ao carregar do servidor: ${e.message}`, 'error');
           }
       };
 
-      // Auto-carrega dados quando já existe usuário salvo (refresh)
       useEffect(() => {
         if (authMode === 'app' && user?.id) {
           loadData();
         }
       }, [authMode, user?.id]);
 
-
-      // Handlers com TOASTS
       const handleTypeChange = (e) => {
         const type = e.target.value;
         setTransType(type);
@@ -1476,11 +1433,11 @@
 
         try {
           if (editingTransaction) {
-            await apiFetch(`/api/transactions/${editingTransaction.id}`, { method: 'PUT', body: payload });
+            await apiFetch(`/transactions/${editingTransaction.id}`, { method: 'PUT', body: payload });
             addToast('Transação atualizada! 📝');
             setEditingTransaction(null);
           } else {
-            await apiFetch('/api/transactions', { method: 'POST', body: payload });
+            await apiFetch('/transactions', { method: 'POST', body: payload });
             addToast('Transação adicionada! 💸');
           }
 
@@ -1491,7 +1448,6 @@
           addToast(e2.message, 'error');
         }
       };
-        
 
       const handleAddSubscription = (e) => {
          e.preventDefault();
@@ -1505,7 +1461,7 @@
             subcategory: 'Assinatura',
             amount,
             date: fd.get('date'),
-            isRecurring: true, // Força recorrência
+            isRecurring: true,
             paymentMethod: fd.get('paymentMethod'),
             cardId: fd.get('cardId')
           };
@@ -1520,15 +1476,21 @@
         toggleModal('subscription', true); 
       };
 
-      const deleteItem = (setList, id) => {
-         setList(prev => prev.filter(i => i.id !== id));
-         addToast("Item excluído 🗑️", 'error');
-         // update day details view if open
-         if (selectedDateDetails) {
-            setSelectedDateDetails(prev => ({
-              ...prev,
-              transactions: prev.transactions.filter(t => t.id !== id)
-            }));
+      const deleteItem = async (setList, id, endpoint) => {
+         try {
+           if (endpoint) {
+             await apiFetch(`/${endpoint}/${id}`, { method: 'DELETE' });
+           }
+           setList(prev => prev.filter(i => i.id !== id));
+           addToast("Item excluído 🗑️", 'error');
+           if (selectedDateDetails) {
+              setSelectedDateDetails(prev => ({
+                ...prev,
+                transactions: prev.transactions.filter(t => t.id !== id)
+              }));
+           }
+         } catch(e) {
+           addToast(e.message, 'error');
          }
       };
       
@@ -1538,9 +1500,8 @@
            try {
               const data = JSON.parse(e.target.result);
               if (data.user && data.transactions) {
-                 // ... restore logic
                  setUser(data.user); setTransactions(data.transactions); setGoals(data.goals); 
-                 addToast("Backup restaurado com sucesso! 🚀"); // Toast instead of alert
+                 addToast("Backup restaurado com sucesso! 🚀"); 
                  setModals({ ...modals, settings: false });
               }
            } catch { addToast("Erro ao ler arquivo", 'error'); }
@@ -1548,12 +1509,12 @@
         reader.readAsText(file);
       };
 
-      // ... (Restante dos handlers: Login, Register, Goals, Cards mantendo a logica, adicionando addToast onde relevante) ...
       const handleRegister = async (name, pin) => {
         try {
-          const r = await apiFetch('/api/auth/register', { method: 'POST', body: { name, pin } });
+          const r = await apiFetch('/auth/register', { method: 'POST', body: { name, pin } });
           setUser(r.user);
           localStorage.setItem('prospera_user', JSON.stringify(r.user));
+          sessionStorage.setItem('prospera_token', r.access_token);
           setAuthMode('app');
           await loadData();
           addToast(`Bem-vindo, ${r.user.name || name}!`);
@@ -1561,11 +1522,13 @@
           addToast(e.message, 'error');
         }
       };
+
       const handleLogin = async (pin) => {
         try {
-          const r = await apiFetch('/api/auth/login', { method: 'POST', body: { pin } });
+          const r = await apiFetch('/auth/login', { method: 'POST', body: { pin } });
           setUser(r.user);
           localStorage.setItem('prospera_user', JSON.stringify(r.user));
+          sessionStorage.setItem('prospera_token', r.access_token);
           setAuthMode('app');
           await loadData();
           addToast('Bem-vindo! 🔓');
@@ -1574,68 +1537,15 @@
         }
       };
       
-      const handleAddGoal = async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const payload = {
-          name: fd.get('name'),
-          target: parseFloat(fd.get('target')),
-          current: parseFloat(fd.get('current') || 0),
-          color: fd.get('color'),
-        };
-
-        try {
-          await apiFetch('/api/goals', { method: 'POST', body: payload });
-          addToast('Objetivo criado! 🎯');
-          toggleModal('goal', false);
-          await loadData();
-        } catch (e2) {
-          addToast(e2.message, 'error');
-        }
-      };
-      const handleAddCard = async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const payload = {
-          name: fd.get('name'),
-          limit: parseFloat(fd.get('limit')),
-          used: 0,
-          dueDay: parseInt(fd.get('dueDay') || '0', 10) || null,
-          color: fd.get('color'),
-        };
-        try {
-          await apiFetch('/api/cards', { method: 'POST', body: payload });
-          addToast('Cartão criado! 💳');
-          toggleModal('card', false);
-          await loadData();
-        } catch (e2) {
-          addToast(e2.message, 'error');
-        }
-      };
-      const handleUpdateCard = async (updatedCard) => {
-        try {
-          await apiFetch(`/api/cards/${updatedCard.id}`, { method: 'PUT', body: updatedCard });
-          addToast('Cartão atualizado! 💳');
-          await loadData();
-        } catch (e) {
-          addToast(e.message, 'error');
-        }
-      };
-      const handleAddInv = (e) => { e.preventDefault(); const fd = new FormData(e.target); setInvestments([...investments, { id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate') }]); addToast("Investimento adicionado! 📈"); toggleModal('investment', false); };
-      const handleUpdateInvest = async (updatedInvest) => {
-        try {
-          await apiFetch(`/api/investments/${updatedInvest.id}`, { method: 'PUT', body: updatedInvest });
-          addToast('Investimento atualizado! 📈');
-          await loadData();
-        } catch (e) {
-          addToast(e.message, 'error');
-        }
-      };
       const handleDayClick = (dateStr, dayTransactions) => { if (dayTransactions && dayTransactions.length > 0) { setSelectedDateDetails({ date: dateStr, transactions: dayTransactions }); toggleModal('dayDetails', true); } else { setPrefilledDate(dateStr); toggleModal('transaction', true); } };
       const handleAddFromDetails = () => { setPrefilledDate(selectedDateDetails.date); toggleModal('dayDetails', false); toggleModal('transaction', true); };
       const handleExportBackup = () => { const blob = new Blob([JSON.stringify({ user, transactions, goals, investments, cards, budgets, timestamp: new Date().toISOString() })], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `prospera_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
+      
       const handleLogout = () => {
-        try { localStorage.removeItem('prospera_user'); } catch {}
+        try { 
+            localStorage.removeItem('prospera_user'); 
+            sessionStorage.removeItem('prospera_token');
+        } catch {}
         setUser(null);
         setAuthMode('login');
         setModals(prev => ({ ...prev, settings: false }));
@@ -1647,15 +1557,9 @@
         else { document.documentElement.classList.add('dark'); setIsDarkMode(true); }
       };
 
-      // Persistência (agora tudo vai para o banco via API)
-      // OBS: mantemos apenas a persistência do usuário (prospera_user).
-
-
-      // ... Renderização Condicional (Auth/Loading) ...
       if (authMode === 'login') return <AuthScreen mode="login" onLogin={handleLogin} />;
       if (authMode === 'register') return <AuthScreen mode="register" onRegister={handleRegister} />;
 
-      // Nav Items
       const navItems = [
         { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'transactions', label: 'Extrato', icon: ListFilter },
@@ -1669,7 +1573,6 @@
 
       return (
         <div className="flex flex-col md:flex-row h-screen bg-slate-50 dark:bg-[#050505] overflow-hidden bg-gradient-animate relative transition-colors duration-500">
-           {/* Sidebar */}
            <aside className="w-24 hidden md:flex flex-col items-center py-8 z-30 h-full border-r border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm">
              <div className="mb-8 scale-75"><CustomLogo /></div>
              <div className="flex-1 flex flex-col gap-4 w-full px-4 overflow-y-auto no-scrollbar">
@@ -1680,40 +1583,34 @@
                  </button>
                ))}
              </div>
-             {/* ... Footer Actions ... */}
              <div className="flex flex-col gap-4 px-4 mt-4 mb-4">
                  <button onClick={() => setPrivacyMode(!privacyMode)} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">
                     {privacyMode ? <EyeOff size={20}/> : <Eye size={20}/>}
                  </button>
                  <button onClick={() => toggleModal('settings', true)} className="w-full aspect-square rounded-2xl bg-white/5 text-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center"><ShieldCheck size={20}/></button>
                  <button onClick={() => {if(isDarkMode){document.documentElement.classList.remove('dark');setIsDarkMode(false)}else{document.documentElement.classList.add('dark');setIsDarkMode(true)}}} className="w-full aspect-square rounded-2xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center">{isDarkMode?<Sun size={20}/>:<Moon size={20}/>}</button>
-                 <button className="w-full aspect-square rounded-2xl bg-white/5 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center" onClick={() => setAuthMode('login')}><LogOut size={20}/></button>
+                 <button className="w-full aspect-square rounded-2xl bg-white/5 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center" onClick={handleLogout}><LogOut size={20}/></button>
              </div>
            </aside>
 
            <main className="flex-1 overflow-y-auto relative z-20 pb-24 md:pb-0 pt-safe">
              <div className="max-w-7xl mx-auto p-4 md:p-10">
-                {/* Header (Desktop) */}
                 <header className="hidden md:flex justify-between items-center mb-10">
                    <div><h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-1">{navItems.find(i=>i.id===activeTab)?.label}</h1><p className="text-slate-500 dark:text-slate-400 font-medium">Bem-vindo, <span className="text-violet-500">{user?.name}</span></p></div>
                    <div className="flex gap-4">
-                      {/* Contextual Buttons */}
                       {activeTab === 'overview' && <button onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }} className={theme.btnAccent}><Plus size={18} /> Nova Transação</button>}
-                      {/* ... outros botões ... */}
                    </div>
                 </header>
 
-                {/* --- RENDERIZAÇÃO DAS TELAS --- */}
                 {activeTab === 'overview' && <Overview transactions={transactions} goals={goals} privacyMode={privacyMode} toggleModal={toggleModal} setPrefilledDate={setPrefilledDate} user={user} />}
-                {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={handleEditTransaction} />}
-                {/* ... Outras abas (Budget, Goals, etc) usando os componentes definidos anteriormente ... */}
-                {activeTab === 'goals' && <GoalsView goals={goals} setGoals={setGoals} onDelete={(id) => deleteItem(setGoals, id)} privacyMode={privacyMode} />}
+                {activeTab === 'transactions' && <TransactionsView transactions={transactions} onDelete={(id) => deleteItem(setTransactions, id, 'transactions')} onEdit={handleEditTransaction} />}
+                {activeTab === 'goals' && <GoalsView goals={goals} setGoals={setGoals} onDelete={(id) => deleteItem(setGoals, id, 'goals')} privacyMode={privacyMode} />}
                 {activeTab === 'budgets' && <BudgetView transactions={transactions} budgets={budgets} setBudgets={setBudgets} privacyMode={privacyMode} />}
                 {activeTab === 'calculator' && <CalculatorView />}
                 {activeTab === 'calendar' && <CalendarView transactions={transactions} onDayClick={handleDayClick} />}
                 {activeTab === 'investments' && <InvestmentsView investments={investments} cards={cards} 
-                    onDeleteCard={(id) => deleteItem(setCards, id)} 
-                    onDeleteInvest={(id) => deleteItem(setInvestments, id)} 
+                    onDeleteCard={(id) => deleteItem(setCards, id, 'cards')} 
+                    onDeleteInvest={(id) => deleteItem(setInvestments, id, 'investments')} 
                     onEditCard={(c) => {
                         if(cards.find(old => old.id === c.id)) {
                             setCards(cards.map(old=>old.id===c.id?c:old)); 
@@ -1734,11 +1631,10 @@
                     }}
                     privacyMode={privacyMode} 
                 />}
-                {activeTab === 'recurring' && <RecurringView transactions={transactions} cards={cards} onDelete={(id) => deleteItem(setTransactions, id)} onEdit={handleEditTransaction} onAdd={handleAddRecurringFromView} privacyMode={privacyMode} />}
+                {activeTab === 'recurring' && <RecurringView transactions={transactions} cards={cards} onDelete={(id) => deleteItem(setTransactions, id, 'transactions')} onEdit={handleEditTransaction} onAdd={handleAddRecurringFromView} privacyMode={privacyMode} />}
              </div>
            </main>
            
-           {/* Mobile Header & Bottom Dock */}
            <div className="md:hidden flex justify-between items-center px-4 py-3 z-30 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 border-b border-slate-200 dark:border-white/5 pt-safe"><div className="flex items-center gap-2"><CustomLogo /><span className="font-bold text-slate-800 dark:text-white text-lg">Prospera</span></div>
              <div className="flex gap-2">
                 <button onClick={() => setPrivacyMode(!privacyMode)} className="p-2 text-slate-400">
@@ -1748,7 +1644,6 @@
              </div>
            </div>
            
-           {/* Mobile Floating Action Button (FAB) for Overview */}
            {activeTab === 'overview' && (
              <button 
                onClick={() => { setPrefilledDate(new Date().toISOString().split('T')[0]); toggleModal('transaction', true); }}
@@ -1773,10 +1668,8 @@
              </div>
            </div>
 
-           {/* --- MODAIS E TOASTS --- */}
            <ToastContainer toasts={toasts} />
            
-           {/* Transaction Modal (Com edição) */}
            <Modal isOpen={modals.transaction} onClose={() => { toggleModal('transaction', false); setEditingTransaction(null); }} title={editingTransaction ? "Editar Transação" : "Nova Transação"}>
              <form key={editingTransaction ? editingTransaction.id : 'new'} onSubmit={handleAddTrans} className="space-y-6">
                <div className="grid grid-cols-2 gap-4">
@@ -1789,7 +1682,6 @@
                   <div><label className={theme.label}>Subcategoria</label><select name="subcategory" className={theme.input} defaultValue={editingTransaction?.subcategory}>{CATEGORIES[transType][transCat]?.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
                </div>
 
-               {/* Seção de Pagamento */}
                <div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4">
                   <div className="flex items-center gap-2 mb-2"><Wallet size={16} className="text-violet-500"/><span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pagamento</span></div>
                   <div className="grid grid-cols-2 gap-4">
@@ -1827,11 +1719,7 @@
              </form>
            </Modal>
 
-           <Modal isOpen={modals.goal} onClose={() => toggleModal('goal', false)} title="Novo Objetivo"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setGoals([...goals, {id: Date.now(), name: fd.get('name'), target: parseFloat(fd.get('target')), current: parseFloat(fd.get('current')), color: fd.get('color')}]); addToast("Objetivo criado!"); toggleModal('goal', false);}} className="space-y-6"><div><label className={theme.label}>Nome</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Meta (R$)</label><input required name="target" type="number" className={theme.input}/></div><div><label className={theme.label}>Atual (R$)</label><input required name="current" type="number" defaultValue="0" className={theme.input}/></div></div><div><label className={theme.label}>Cor</label><div className="flex gap-3"><input type="radio" name="color" value="#8b5cf6" defaultChecked className="w-8 h-8 accent-violet-500 cursor-pointer"/><input type="radio" name="color" value="#ec4899" className="w-8 h-8 accent-pink-500 cursor-pointer"/><input type="radio" name="color" value="#06b6d4" className="w-8 h-8 accent-cyan-500 cursor-pointer"/><input type="radio" name="color" value="#10b981" className="w-8 h-8 accent-emerald-500 cursor-pointer"/></div></div><button type="submit" className={theme.btnPrimary}>Criar Meta</button></form></Modal>
-           <Modal isOpen={modals.card} onClose={() => toggleModal('card', false)} title="Novo Cartão"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setCards([...cards, {id: Date.now(), name: fd.get('name'), limit: parseFloat(fd.get('limit')), used: 0, dueDay: parseInt(fd.get('dueDay')), color: fd.get('color')}]); addToast("Cartão adicionado!"); toggleModal('card', false);}} className="space-y-6"><div><label className={theme.label}>Apelido</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Limite</label><input required name="limit" type="number" className={theme.input}/></div><div><label className={theme.label}>Vencimento</label><input required name="dueDay" type="number" max="31" className={theme.input}/></div></div><div><label className={theme.label}>Estilo</label><select name="color" className={theme.input}><option value="bg-violet-600">Violeta</option><option value="bg-slate-900">Black</option><option value="bg-blue-600">Azul</option></select></div><button type="submit" className={theme.btnPrimary}>Salvar</button></form></Modal>
-           <Modal isOpen={modals.investment} onClose={() => toggleModal('investment', false)} title="Novo Ativo"><form onSubmit={(e) => {e.preventDefault(); const fd=new FormData(e.target); setInvestments([...investments, {id: Date.now(), name: fd.get('name'), type: fd.get('type'), value: parseFloat(fd.get('value')), returnRate: fd.get('returnRate')}]); addToast("Investimento adicionado!"); toggleModal('investment', false);}} className="space-y-6"><div><label className={theme.label}>Ativo</label><input required name="name" className={theme.input}/></div><div className="grid grid-cols-2 gap-4"><div><label className={theme.label}>Tipo</label><select name="type" className={theme.input}><option>Renda Fixa</option><option>Ações</option><option>Cripto</option></select></div><div><label className={theme.label}>Valor</label><input required name="value" type="number" className={theme.input}/></div></div><div><label className={theme.label}>Rentabilidade</label><input name="returnRate" className={theme.input}/></div><button type="submit" className={theme.btnPrimary}>Adicionar</button></form></Modal>
-           
-           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem(setTransactions, id)} onAdd={handleAddFromDetails} onEdit={handleEditTransaction} />
+           <DayDetailsModal isOpen={modals.dayDetails} onClose={() => toggleModal('dayDetails', false)} date={selectedDateDetails?.date} transactions={selectedDateDetails?.transactions || []} onDelete={(id) => deleteItem(setTransactions, id, 'transactions')} onAdd={handleAddFromDetails} onEdit={handleEditTransaction} />
            <SettingsModal isOpen={modals.settings} onClose={() => toggleModal('settings', false)} onExport={handleExportBackup} onImport={handleImportBackup} onLogout={handleLogout} />
         </div>
       );
