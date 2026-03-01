@@ -84,3 +84,95 @@ def login(req: AuthRequest, db: Session = Depends(database.get_db)):
 @app.get("/api/transactions")
 def get_transactions(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     return db.query(models.Transaction).filter(models.Transaction.user_id == current_user.id).all()
+
+from fastapi import Request # Adicione isso nos imports lá em cima se não houver
+
+# --- ROTAS DE NEGÓCIO (CRUD) ---
+
+# 1. TRANSAÇÕES
+@app.get("/api/transactions")
+def get_transactions(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    return db.query(models.Transaction).filter(models.Transaction.user_id == current_user.id).order_by(models.Transaction.date.desc()).all()
+
+@app.post("/api/transactions")
+async def create_transaction(request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    new_item = models.Transaction(**data, user_id=current_user.id)
+    db.add(new_item)
+    db.commit()
+    db.refresh(new_item)
+    return new_item
+
+@app.put("/api/transactions/{item_id}")
+async def update_transaction(item_id: int, request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    db.query(models.Transaction).filter(models.Transaction.id == item_id, models.Transaction.user_id == current_user.id).update(data)
+    db.commit()
+    return {"status": "updated"}
+
+@app.delete("/api/transactions/{item_id}")
+def delete_transaction(item_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    db.query(models.Transaction).filter(models.Transaction.id == item_id, models.Transaction.user_id == current_user.id).delete()
+    db.commit()
+    return {"status": "deleted"}
+
+# 2. METAS (GOALS)
+@app.get("/api/goals")
+def get_goals(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    return db.query(models.Goal).filter(models.Goal.user_id == current_user.id).all()
+
+@app.post("/api/goals")
+async def create_goal(request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    new_item = models.Goal(**data, user_id=current_user.id)
+    db.add(new_item)
+    db.commit()
+    return new_item
+
+@app.put("/api/goals/{item_id}")
+async def update_goal(item_id: int, request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    db.query(models.Goal).filter(models.Goal.id == item_id, models.Goal.user_id == current_user.id).update(data)
+    db.commit()
+    return {"status": "updated"}
+
+@app.delete("/api/goals/{item_id}")
+def delete_goal(item_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    db.query(models.Goal).filter(models.Goal.id == item_id, models.Goal.user_id == current_user.id).delete()
+    db.commit()
+    return {"status": "deleted"}
+
+# 3. INVESTIMENTOS
+@app.get("/api/investments")
+def get_investments(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    return db.query(models.Investment).filter(models.Investment.user_id == current_user.id).all()
+
+@app.post("/api/investments")
+async def create_investment(request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    new_item = models.Investment(**data, user_id=current_user.id)
+    db.add(new_item)
+    db.commit()
+    return new_item
+
+@app.put("/api/investments/{item_id}")
+async def update_investment(item_id: int, request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    data = await request.json()
+    db.query(models.Investment).filter(models.Investment.id == item_id, models.Investment.user_id == current_user.id).update(data)
+    db.commit()
+    return {"status": "updated"}
+
+@app.delete("/api/investments/{item_id}")
+def delete_investment(item_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    db.query(models.Investment).filter(models.Investment.id == item_id, models.Investment.user_id == current_user.id).delete()
+    db.commit()
+    return {"status": "deleted"}
+
+# 4. CARTÕES E ORÇAMENTOS (Leitura Rápida)
+@app.get("/api/cards")
+def get_cards(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    return db.query(models.Card).filter(models.Card.user_id == current_user.id).all()
+
+@app.get("/api/budgets")
+def get_budgets(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    return db.query(models.Budget).filter(models.Budget.user_id == current_user.id).all()
